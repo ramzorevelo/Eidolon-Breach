@@ -1,0 +1,15 @@
+﻿  BasicStrikeAction.cpp
+  SkillAction.cpp
+  UltimateAction.cpp
+  Battle.cpp
+  Character.cpp
+  Enemy.cpp
+  Mage.cpp
+  Player.cpp
+  Slime.cpp
+  StoneGolem.cpp
+  VampireBat.cpp
+  main.cpp
+  ConsoleRenderer.cpp
+  Generating Code...
+  EidolonBreach.vcxproj -> C:\Users\CAT COLLEGE LEGAZPI\source\repos\test\TurnBasedRPG\x64\Debug\EidolonBreach.exe
