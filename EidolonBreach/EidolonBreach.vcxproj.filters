@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Actions">
+      <UniqueIdentifier>{bd423dbf-eb1c-4b0e-bee9-6adfd70b0dc9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Battle">
+      <UniqueIdentifier>{8e965647-c628-426c-b2bb-cf36fc62361b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{9d8e35f1-601a-4e10-a119-0ff74f57d116}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{79e9f817-280c-482d-8004-428404d509fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Entities">
+      <UniqueIdentifier>{9b4d6f5e-abb1-4421-9253-b88ee1cdfc02}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Actions\BasicStrikeAction.cpp">
+      <Filter>Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Actions\SkillAction.cpp">
+      <Filter>Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Actions\UltimateAction.cpp">
+      <Filter>Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Battle\Battle.cpp">
+      <Filter>Battle</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\ConsoleRenderer.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Entities\VampireBat.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Entities\Character.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Entities\Enemy.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Entities\Mage.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Entities\Player.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Entities\Slime.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Entities\StoneGolem.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Actions\BasicStrikeAction.h">
+      <Filter>Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Actions\IAction.h">
+      <Filter>Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Actions\SkillAction.h">
+      <Filter>Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Actions\UltimateAction.h">
+      <Filter>Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Battle\Battle.h">
+      <Filter>Battle</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Actions\ActionResult.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Drop.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\CombatConstants.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\ConsoleRenderer.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Entities\VampireBat.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Entities\Character.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Entities\Enemy.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Entities\Mage.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Entities\Player.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Entities\Slime.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Entities\StoneGolem.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
