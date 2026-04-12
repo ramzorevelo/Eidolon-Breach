@@ -27,5 +27,7 @@ inline std::unique_ptr<Enemy> makeEnemy(int hp = 100, int toughness = 50)
         "enemy_1", "TestEnemy",
         Stats{ hp, hp, 10, 0, 5 },
         Affinity::Terra,
-        toughness);
+        toughness,
+        std::make_unique<BasicAIStrategy>()
+    );
 }
