@@ -3,7 +3,12 @@
 #include <vector>
 #include <memory>
 #include <cstddef>
+/**
+ * @file Party.h
+ * @brief Container for a group of Units.
+ */
 
+/** Collection of Units (player party or enemy group). */
 class Party
 {
 public:
@@ -15,7 +20,7 @@ public:
     const Unit* getUnitAt(std::size_t index)       const;
     std::size_t        size()                             const;
     bool               contains(const Unit* unit)         const;
-    std::size_t        getIndex(const Unit* unit)         const;  // returns size() if not found
+    std::size_t        getIndex(const Unit* unit)         const;  
 
 private:
     std::vector<std::unique_ptr<Unit>> m_units;

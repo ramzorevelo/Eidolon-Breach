@@ -3,6 +3,10 @@
 #include <algorithm>
 #include <utility>
 
+/**
+ * @file Unit.cpp
+ * @brief Implementation of the abstract Unit class.
+ */
 Unit::Unit(std::string id,
     std::string name,
     Stats       stats,

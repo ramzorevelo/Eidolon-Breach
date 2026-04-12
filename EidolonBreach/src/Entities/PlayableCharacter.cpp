@@ -52,10 +52,9 @@ void PlayableCharacter::resetEnergy()
     m_energy = 0;
 }
 
-// ---------------------------------------------------------------------------
+/** Displays action menu, reads player input, executes chosen action. */
 ActionResult PlayableCharacter::takeTurn(Party& allies, Party& enemies)
 {
-    // Build a list of alive enemies with their real party indices.
     std::vector<std::pair<std::size_t, Unit*>> targets;
     for (std::size_t i = 0; i < enemies.size(); ++i)
     {

@@ -11,7 +11,6 @@ Battle::Battle(Party& playerParty, Party& enemyParty)
 {
 }
 
-// ── Turn order ────────────────────────────────────────────────────────────
 std::vector<Battle::TurnSlot> Battle::buildTurnOrder() const
 {
     std::vector<TurnSlot> slots;
@@ -42,7 +41,6 @@ std::vector<Battle::TurnSlot> Battle::buildTurnOrder() const
     return slots;
 }
 
-// ── Break-state helpers ───────────────────────────────────────────────────
 std::vector<bool> Battle::snapshotBreakStates(const Party& party) const
 {
     std::vector<bool> states;
@@ -65,7 +63,6 @@ void Battle::renderNewBreaks(const std::vector<bool>& before, const Party& party
     }
 }
 
-// ── Main loop ─────────────────────────────────────────────────────────────
 void Battle::run()
 {
     std::cout << "\n=== BATTLE START ===\n";

@@ -1,6 +1,12 @@
 #pragma once
 #include "Actions/IAction.h"
 
+/**
+ * @file SkillAction.h
+ * @brief A skill that consumes SP to deal damage.
+ */
+
+/** Skill action: consumes 1 SP, grants 30 Energy, deals configurable damage. */
 class SkillAction : public IAction
 {
 public:

@@ -5,6 +5,10 @@
 #include <memory>
 #include <limits>
 
+/** 
+ * @file PlayableCharacter.h
+ * @brief Player‑controlled Unit with SP/Energy and action abilities.
+ */
 class PlayableCharacter : public Unit
 {
 public:
@@ -24,7 +28,6 @@ public:
     void addAbility(std::unique_ptr<IAction> action);
     const std::vector<std::unique_ptr<IAction>>& getAbilities() const;
 
-    // ── SP / Energy ───────────────────────────────────────────────────
     int  getSp()         const;
     int  getEnergy()     const;
     bool ultimateReady() const;
@@ -34,9 +37,7 @@ public:
     void gainEnergy(int amount);
     void resetEnergy();          // UltimateAction calls this
 
-    // ── Turn ─────────────────────────────────────────────────────────
-    // Shows the action menu, reads player input, executes chosen action,
-    // and returns its ActionResult.
+    /** Displays action menu, reads player input, executes chosen action. */
     ActionResult takeTurn(Party& allies, Party& enemies) override;
 
 private:

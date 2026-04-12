@@ -4,8 +4,13 @@
 #include <string>
 #include <optional>
 
-class Party;   // forward declaration
+/** 
+ * @file ConsoleRenderer.h 
+ * @brief Simple console output renderer (implements IRenderer in Phase 3).
+ */
+class Party; 
 
+/** Static renderer for console output. */
 class ConsoleRenderer
 {
 public:
@@ -15,7 +20,6 @@ public:
     static void renderVictory(const std::string& enemyName, std::optional<Drop> drop);
     static void renderDefeat(const std::string& playerName);
 
-    // Displays HP / SP / Energy / Toughness bars for both parties.
     static void printPartyStatus(const Party& playerParty, const Party& enemyParty);
 
 private:

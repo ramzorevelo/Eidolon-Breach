@@ -2,6 +2,10 @@
 #include "Entities/Party.h"
 #include <vector>
 
+/** 
+ * @file Battle.h
+ * @brief Orchestrates turn‑based combat between two Parties.
+ */
 class Battle
 {
 public:
@@ -12,7 +16,6 @@ private:
     Party& m_playerParty;
     Party& m_enemyParty;
 
-    // ── Turn order helpers ────────────────────────────────────────────
     struct TurnSlot
     {
         Unit* unit;
@@ -20,6 +23,7 @@ private:
         std::size_t partyIndex;
     };
 
+    /** Sort alive units by SPD (descending), using party priority and index as tie‑breakers. */
     std::vector<TurnSlot> buildTurnOrder() const;
 
     // Snapshots isBroken() for every unit in the party.

@@ -7,6 +7,10 @@
 #include <memory>
 #include <optional>
 
+/**
+ * @file Enemy.h 
+ * @brief Base class for all enemy units.
+ */
 class Enemy : public Unit
 {
 public:
@@ -18,24 +22,19 @@ public:
         std::map<Affinity, float>        affinityModifiers = {},
         std::optional<Drop>              drop = std::nullopt);
 
-    // ── Toughness (overrides from Unit) ───────────────────────────────
     bool isBroken()              const override;
-    void applyToughnessHit(int amount) override;   // applies modifier; breaks if gauge hits 0
+    void applyToughnessHit(int amount) override;   
     void recoverFromBreak()            override;
 
     int  getToughness()    const;
     int  getMaxToughness() const;
 
-    // ── Affinity modifiers (wired in Phase 4) ────────────────────────
     float getAffinityModifier(Affinity a) const;
 
-    // ── Drops ─────────────────────────────────────────────────────────
     bool                       hasDrop()  const;
     const std::optional<Drop>& getDrop()  const;
     std::optional<Drop>        dropLoot();          // clears m_drop after use
 
-    // ── Turn ─────────────────────────────────────────────────────────
-    // Uses BasicAIStrategy: attacks first alive player unit.
     ActionResult takeTurn(Party& allies, Party& enemies) override;
 
 protected:

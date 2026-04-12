@@ -1,6 +1,10 @@
 #pragma once
 #include <string>
 
+/** 
+ * @file Affinity.h
+ * @brief The five elemental affinities.
+ */
 enum class Affinity { Blaze, Frost, Tempest, Terra, Aether };
 
 inline std::string affinityToString(Affinity a)

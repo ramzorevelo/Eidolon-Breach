@@ -1,6 +1,7 @@
 #pragma once
 #include "Entities/Enemy.h"
 
+/** Vampire Bat: lifedrain attack every 3rd turn. */
 class VampireBat : public Enemy
 {
 public:

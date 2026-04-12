@@ -5,6 +5,10 @@
 #include <algorithm>
 #include <cmath>
 
+/**
+ * @file BasicStrikeAction.cpp
+ * @brief Standard single‑target physical attack.
+ */
 std::string BasicStrikeAction::label() const
 {
     return "Basic Strike (+1 SP | +20 Energy)";

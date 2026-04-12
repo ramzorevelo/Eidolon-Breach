@@ -1,6 +1,7 @@
 #pragma once
 #include "Entities/Enemy.h"
 
+/** Slime: regenerates health every 4th turn. */
 class Slime : public Enemy
 {
 public:

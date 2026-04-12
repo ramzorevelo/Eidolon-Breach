@@ -5,9 +5,15 @@
 #include <optional>
 #include <string>
 
-class PlayableCharacter;   // forward declaration
-class Party;               // forward declaration
+class PlayableCharacter;  
+class Party;              
 
+/**
+ * @file IAction.h
+ * @brief Interface for all player‑initiated combat actions.
+ */
+
+/** Player action (basic attack, skill, ultimate, item use). */
 class IAction
 {
 public:
@@ -15,12 +21,10 @@ public:
 
     virtual std::string label() const = 0;
 
-    // Execute the action.
-    // The action is responsible for:
-    //   - applying HP damage to the target via Party::getUnitAt()
-    //   - applying toughness hits via Unit::applyToughnessHit()
-    //   - managing the user's SP / Energy
-    // Returns ActionResult for Battle to render.
+    /** Perform the action. 
+     * The action is responsible for resource changes 
+     * and applying effects/damage to the target. 
+     */
     virtual ActionResult execute(PlayableCharacter& user,
         Party& allies,
         Party& enemies,
@@ -28,6 +32,8 @@ public:
 
     virtual bool isAvailable(const PlayableCharacter&) const { return true; }
 
-    // Phase 2 will use this to record affinity votes for the Resonance Field.
+    /** @return The affinity of this action (default Aether). 
+     * Used by Resonance Field in Phase 3. 
+     */
     virtual Affinity getAffinity() const { return Affinity::Aether; }
 };

@@ -5,6 +5,10 @@
 #include <algorithm>
 #include <string>
 
+/**
+ * @file SkillAction.cpp
+ * @brief Implementation of the skill action.
+ */
 SkillAction::SkillAction(int damage) : m_damage{ damage } {}
 
 std::string SkillAction::label() const
