@@ -44,4 +44,7 @@ private:
     std::vector<std::unique_ptr<IAction>> m_abilities;
     int m_sp{ 3 };
     int m_energy{ 0 };
+    void displayActionMenu() const;
+    std::size_t selectActionIndex();
+    std::optional<TargetInfo> selectTarget(const Party& enemies);
 };

@@ -19,7 +19,6 @@ Enemy::Enemy(std::string               id,
 {
 }
 
-// ── Toughness ────────────────────────────────────────────────────────────
 bool Enemy::isBroken()        const { return m_isBroken; }
 int  Enemy::getToughness()    const { return m_toughness; }
 int  Enemy::getMaxToughness() const { return m_maxToughness; }
@@ -41,14 +40,12 @@ void Enemy::recoverFromBreak()
     m_isBroken = false;
 }
 
-// ── Affinity modifiers ───────────────────────────────────────────────────
 float Enemy::getAffinityModifier(Affinity a) const
 {
     auto it = m_affinityModifiers.find(a);
     return (it != m_affinityModifiers.end()) ? it->second : 1.0f;
 }
 
-// ── Drops ────────────────────────────────────────────────────────────────
 bool                       Enemy::hasDrop()  const { return m_drop.has_value(); }
 const std::optional<Drop>& Enemy::getDrop()  const { return m_drop; }
 
@@ -59,7 +56,6 @@ std::optional<Drop> Enemy::dropLoot()
     return result;
 }
 
-// ── Turn ─────────────────────────────────────────────────────────────────
 ActionResult Enemy::takeTurn(Party& /*allies*/, Party& enemies)
 {
     if (m_isBroken)
@@ -86,7 +82,7 @@ ActionResult Enemy::takeTurn(Party& /*allies*/, Party& enemies)
             target->takeDamage(result.value);
             break;
         case ActionResult::Type::Heal:
-            heal(result.value);      // enemy heals itself
+            heal(result.value);      
             break;
         default:
             break;
@@ -95,7 +91,6 @@ ActionResult Enemy::takeTurn(Party& /*allies*/, Party& enemies)
     return result;
 }
 
-// ── Default attack ───────────────────────────────────────────────────────
 ActionResult Enemy::performAttack()
 {
     return ActionResult{ ActionResult::Type::Damage, 20 };

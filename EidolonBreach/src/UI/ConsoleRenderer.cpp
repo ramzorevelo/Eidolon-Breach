@@ -31,7 +31,6 @@ void ConsoleRenderer::renderAttack(const std::string& actorName, const ActionRes
         std::cout << actorName << " is charging up!\n";
         break;
     case ActionResult::Type::Skip:
-        // Battle calls renderStunned for Skip results; nothing to print here.
         break;
     }
 }
@@ -60,20 +59,14 @@ void ConsoleRenderer::renderDefeat(const std::string& playerName)
     std::cout << "=== DEFEAT ===\n";
 }
 
-// ── printPartyStatus ─────────────────────────────────────────────────────
-void ConsoleRenderer::printPartyStatus(const Party& playerParty, const Party& enemyParty)
+void ConsoleRenderer::renderUnit(const Unit* unit, const std::string& label, bool showToughness)
 {
-    std::cout << "\n====================================\n";
+    std::cout << "  " << label << " " << unit->getName() << '\n';
+    std::cout << "    HP:        "; printBar(unit->getHp(), unit->getMaxHp()); std::cout << '\n';
 
-    // Enemy side
-    for (std::size_t i = 0; i < enemyParty.size(); ++i)
+    if (showToughness)
     {
-        const Unit* u = enemyParty.getUnitAt(i);
-        if (!u) continue;
-        std::cout << "  [E" << (i + 1) << "] " << u->getName() << '\n';
-        std::cout << "    HP:        "; printBar(u->getHp(), u->getMaxHp()); std::cout << '\n';
-
-        const auto* e = dynamic_cast<const Enemy*>(u);
+        const auto* e{ dynamic_cast<const Enemy*>(unit) };
         if (e)
         {
             std::cout << "    Toughness: ";
@@ -82,18 +75,9 @@ void ConsoleRenderer::printPartyStatus(const Party& playerParty, const Party& en
             std::cout << '\n';
         }
     }
-
-    std::cout << "  --\n";
-
-    // Player side
-    for (std::size_t i = 0; i < playerParty.size(); ++i)
+    else
     {
-        const Unit* u = playerParty.getUnitAt(i);
-        if (!u) continue;
-        std::cout << "  [P" << (i + 1) << "] " << u->getName() << '\n';
-        std::cout << "    HP:     "; printBar(u->getHp(), u->getMaxHp()); std::cout << '\n';
-
-        const auto* pc = dynamic_cast<const PlayableCharacter*>(u);
+        const auto* pc{ dynamic_cast<const PlayableCharacter*>(unit) };
         if (pc)
         {
             std::cout << "    SP:     " << pc->getSp() << '/' << PlayableCharacter::kMaxSp << '\n';
@@ -102,5 +86,27 @@ void ConsoleRenderer::printPartyStatus(const Party& playerParty, const Party& en
             std::cout << '\n';
         }
     }
+}
+
+void ConsoleRenderer::renderParty(const Party& party, const std::string& prefix, bool showToughness)
+{
+    for (std::size_t i{ 0 }; i < party.size(); ++i)
+    {
+        const Unit* u = party.getUnitAt(i);
+        if (!u) continue;
+
+        std::string label{ "[" + prefix + std::to_string(i + 1) + "]" };
+        renderUnit(u, label, showToughness);
+    }
+}
+
+void ConsoleRenderer::printPartyStatus(const Party& playerParty, const Party& enemyParty)
+{
+    std::cout << "\n====================================\n";
+
+    renderParty(enemyParty, "E", /*showToughness=*/true);
+    std::cout << "  --\n";
+    renderParty(playerParty, "P", /*showToughness=*/false);
+
     std::cout << "====================================\n";
 }

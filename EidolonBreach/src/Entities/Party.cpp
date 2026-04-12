@@ -42,7 +42,7 @@ bool Party::contains(const Unit* unit) const
 
 std::size_t Party::getIndex(const Unit* unit) const
 {
-    for (std::size_t i = 0; i < m_units.size(); ++i)
+    for (std::size_t i{ 0 }; i < m_units.size(); ++i)
         if (m_units[i].get() == unit) return i;
     return m_units.size();   // sentinel: not found
 }
