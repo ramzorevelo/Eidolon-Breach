@@ -23,31 +23,36 @@
     <ClCompile Include="src\Actions\SkillAction.cpp" />
     <ClCompile Include="src\Actions\UltimateAction.cpp" />
     <ClCompile Include="src\Battle\Battle.cpp" />
-    <ClCompile Include="src\Entities\Character.cpp" />
     <ClCompile Include="src\Entities\Enemy.cpp" />
-    <ClCompile Include="src\Entities\Mage.cpp" />
-    <ClCompile Include="src\Entities\Player.cpp" />
+    <ClCompile Include="src\Entities\IAIStrategy.cpp" />
+    <ClCompile Include="src\Entities\Party.cpp" />
+    <ClCompile Include="src\Entities\PlayableCharacter.cpp" />
     <ClCompile Include="src\Entities\Slime.cpp" />
     <ClCompile Include="src\Entities\StoneGolem.cpp" />
+    <ClCompile Include="src\Entities\Unit.cpp" />
     <ClCompile Include="src\Entities\VampireBat.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\UI\ConsoleRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Actions\ActionResult.h" />
     <ClInclude Include="src\Actions\BasicStrikeAction.h" />
     <ClInclude Include="src\Actions\IAction.h" />
     <ClInclude Include="src\Actions\SkillAction.h" />
     <ClInclude Include="src\Actions\UltimateAction.h" />
     <ClInclude Include="src\Battle\Battle.h" />
+    <ClInclude Include="src\Core\ActionResult.h" />
+    <ClInclude Include="src\Core\Affinity.h" />
     <ClInclude Include="src\Core\CombatConstants.h" />
     <ClInclude Include="src\Core\Drop.h" />
-    <ClInclude Include="src\Entities\Character.h" />
+    <ClInclude Include="src\Core\Stats.h" />
+    <ClInclude Include="src\Core\TargetInfo.h" />
     <ClInclude Include="src\Entities\Enemy.h" />
-    <ClInclude Include="src\Entities\Mage.h" />
-    <ClInclude Include="src\Entities\Player.h" />
+    <ClInclude Include="src\Entities\IAIStrategy.h" />
+    <ClInclude Include="src\Entities\Party.h" />
+    <ClInclude Include="src\Entities\PlayableCharacter.h" />
     <ClInclude Include="src\Entities\Slime.h" />
     <ClInclude Include="src\Entities\StoneGolem.h" />
+    <ClInclude Include="src\Entities\Unit.h" />
     <ClInclude Include="src\Entities\VampireBat.h" />
     <ClInclude Include="src\UI\ConsoleRenderer.h" />
   </ItemGroup>
