@@ -1,7 +1,11 @@
-#include "StoneGolem.h"
+#include "Entities/StoneGolem.h"
 
 StoneGolem::StoneGolem(std::string name, int maxHp, int maxToughness)
-    : Enemy{ std::move(name), maxHp, maxToughness }
+    : Enemy{ name + "_golem",
+             name,
+             Stats{ maxHp, maxHp, 15, 20, 5 },
+             Affinity::Terra,
+             maxToughness }
 {
 }
 

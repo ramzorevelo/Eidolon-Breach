@@ -19,13 +19,30 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\EidolonBreach\src\Entities\Character.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Actions\BasicStrikeAction.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Actions\SkillAction.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Actions\UltimateAction.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Battle\Battle.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Entities\Enemy.cpp" />
-    <ClCompile Include="..\EidolonBreach\src\Entities\Player.cpp" />
-    <ClCompile Include="tests\Entities\test_character.cpp" />
-    <ClCompile Include="tests\Entities\test_enemy.cpp" />
-    <ClCompile Include="tests\Entities\test_player.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Entities\IAIStrategy.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Entities\Party.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Entities\PlayableCharacter.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Entities\Slime.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Entities\StoneGolem.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Entities\Unit.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Entities\VampireBat.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\UI\ConsoleRenderer.cpp" />
+    <ClCompile Include="tests\Actions\test_BasicStrikeAction.cpp" />
+    <ClCompile Include="tests\Actions\test_SkillAction.cpp" />
+    <ClCompile Include="tests\Actions\test_UltimateAction.cpp" />
+    <ClCompile Include="tests\Battle\test_TurnOrder.cpp" />
+    <ClCompile Include="tests\Core\test_Affinity.cpp" />
+    <ClCompile Include="tests\Core\test_Stats.cpp" />
     <ClCompile Include="tests\EidolonBreach_Tests.cpp" />
+    <ClCompile Include="tests\Entities\test_Enemy.cpp" />
+    <ClCompile Include="tests\Entities\test_Party.cpp" />
+    <ClCompile Include="tests\Entities\test_PlayableCharacter.cpp" />
+    <ClCompile Include="tests\Entities\test_Unit.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="external\doctest.h" />

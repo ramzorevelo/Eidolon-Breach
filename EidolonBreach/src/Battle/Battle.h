@@ -1,23 +1,30 @@
 #pragma once
-#include "Entities/Player.h"
-#include "Entities/Enemy.h"
-#include "Actions/IAction.h"
+#include "Entities/Party.h"
 #include <vector>
-#include <memory>
 
 class Battle
 {
 public:
-    Battle(Player& player, Enemy& enemy, std::vector<std::unique_ptr<IAction>> actions);
+    Battle(Party& playerParty, Party& enemyParty);
     void run();
 
 private:
-    Player& m_player;
-    Enemy& m_enemy;
-    std::vector<std::unique_ptr<IAction>> m_actions;
+    Party& m_playerParty;
+    Party& m_enemyParty;
 
-    void printStatus() const;
-    void printBar(int current, int maximum, int width) const;
-    void playerTurn();
-    void enemyTurn();
+    // ── Turn order helpers ────────────────────────────────────────────
+    struct TurnSlot
+    {
+        Unit* unit;
+        bool        isPlayer;     // true = belongs to player party
+        std::size_t partyIndex;
+    };
+
+    std::vector<TurnSlot> buildTurnOrder() const;
+
+    // Snapshots isBroken() for every unit in the party.
+    std::vector<bool> snapshotBreakStates(const Party& party) const;
+
+    // Renders renderBreak for units that transitioned false → true.
+    void renderNewBreaks(const std::vector<bool>& before, const Party& party) const;
 };

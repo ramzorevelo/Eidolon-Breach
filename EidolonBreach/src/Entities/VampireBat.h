@@ -5,6 +5,7 @@ class VampireBat : public Enemy
 {
 public:
     VampireBat(std::string name, int maxHp, int maxToughness);
+
     ActionResult performAttack() override;
 
 private:

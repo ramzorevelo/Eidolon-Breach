@@ -2,7 +2,11 @@
 #include "Core/ActionResult.h"
 
 Slime::Slime(std::string name, int maxHp, int maxToughness)
-    : Enemy{ std::move(name), maxHp, maxToughness }
+    : Enemy{ name + "_slime",
+             name,
+             Stats{ maxHp, maxHp, 10, 5, 8 },
+             Affinity::Terra,
+             maxToughness }
 {
 }
 
