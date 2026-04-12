@@ -45,22 +45,16 @@
     <ClCompile Include="src\Battle\Battle.cpp">
       <Filter>Battle</Filter>
     </ClCompile>
-    <ClCompile Include="src\UI\ConsoleRenderer.cpp">
-      <Filter>UI</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Entities\VampireBat.cpp">
-      <Filter>Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Entities\Character.cpp">
-      <Filter>Entities</Filter>
-    </ClCompile>
     <ClCompile Include="src\Entities\Enemy.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
-    <ClCompile Include="src\Entities\Mage.cpp">
+    <ClCompile Include="src\Entities\IAIStrategy.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
-    <ClCompile Include="src\Entities\Player.cpp">
+    <ClCompile Include="src\Entities\Party.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Entities\PlayableCharacter.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
     <ClCompile Include="src\Entities\Slime.cpp">
@@ -68,6 +62,15 @@
     </ClCompile>
     <ClCompile Include="src\Entities\StoneGolem.cpp">
       <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Entities\Unit.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Entities\VampireBat.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\ConsoleRenderer.cpp">
+      <Filter>UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -86,31 +89,34 @@
     <ClInclude Include="src\Battle\Battle.h">
       <Filter>Battle</Filter>
     </ClInclude>
-    <ClInclude Include="src\Actions\ActionResult.h">
+    <ClInclude Include="src\Core\ActionResult.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="src\Core\Drop.h">
+    <ClInclude Include="src\Core\Affinity.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\CombatConstants.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="src\UI\ConsoleRenderer.h">
-      <Filter>UI</Filter>
+    <ClInclude Include="src\Core\Drop.h">
+      <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="src\Entities\VampireBat.h">
-      <Filter>Entities</Filter>
+    <ClInclude Include="src\Core\Stats.h">
+      <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="src\Entities\Character.h">
-      <Filter>Entities</Filter>
+    <ClInclude Include="src\Core\TargetInfo.h">
+      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Entities\Enemy.h">
       <Filter>Entities</Filter>
     </ClInclude>
-    <ClInclude Include="src\Entities\Mage.h">
+    <ClInclude Include="src\Entities\IAIStrategy.h">
       <Filter>Entities</Filter>
     </ClInclude>
-    <ClInclude Include="src\Entities\Player.h">
+    <ClInclude Include="src\Entities\Party.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Entities\PlayableCharacter.h">
       <Filter>Entities</Filter>
     </ClInclude>
     <ClInclude Include="src\Entities\Slime.h">
@@ -118,6 +124,15 @@
     </ClInclude>
     <ClInclude Include="src\Entities\StoneGolem.h">
       <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Entities\Unit.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Entities\VampireBat.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\ConsoleRenderer.h">
+      <Filter>UI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
