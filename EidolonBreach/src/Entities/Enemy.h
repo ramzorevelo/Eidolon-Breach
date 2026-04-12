@@ -1,40 +1,52 @@
 #pragma once
-#include "Entities/Character.h"
-#include "Core/ActionResult.h"
-#include <optional>
+#include "Entities/Unit.h"
+#include "Entities/IAIStrategy.h"
 #include "Core/Drop.h"
+#include "Core/Affinity.h"
+#include <map>
+#include <memory>
+#include <optional>
 
-// Represents a single enemy unit.
-// Inherits HP from Character and adds a Toughness break gauge.
-class Enemy : public Character
+class Enemy : public Unit
 {
 public:
-    Enemy(std::string name, int maxHp, int maxToughness, std::optional<Drop> drop = std::nullopt);
+    Enemy(std::string                      id,
+        std::string                      name,
+        Stats                            stats,
+        Affinity                         affinity,
+        int                              maxToughness,
+        std::map<Affinity, float>        affinityModifiers = {},
+        std::optional<Drop>              drop = std::nullopt);
+
+    // ── Toughness (overrides from Unit) ───────────────────────────────
+    bool isBroken()              const override;
+    void applyToughnessHit(int amount) override;   // applies modifier; breaks if gauge hits 0
+    void recoverFromBreak()            override;
+
     int  getToughness()    const;
     int  getMaxToughness() const;
-    bool isBroken()        const;
-    bool hasDrop() const;
-    const std::optional<Drop>& getDrop() const;
-    std::optional<Drop> dropLoot();
 
-    // Reduces the break gauge by amount.
-    // Sets isBroken() and resets the gauge when it reaches zero.
-    void reduceToughness(int amount);
+    // ── Affinity modifiers (wired in Phase 4) ────────────────────────
+    float getAffinityModifier(Affinity a) const;
 
-    // Called at the end of the enemy's stunned turn to clear the broken flag.
-    void recoverFromBreak();
+    // ── Drops ─────────────────────────────────────────────────────────
+    bool                       hasDrop()  const;
+    const std::optional<Drop>& getDrop()  const;
+    std::optional<Drop>        dropLoot();          // clears m_drop after use
 
-    // Returns the HP damage dealt to the player this turn.     
-    // // Derived classes override this to implement specific attack patterns.
+    // ── Turn ─────────────────────────────────────────────────────────
+    // Uses BasicAIStrategy: attacks first alive player unit.
+    ActionResult takeTurn(Party& allies, Party& enemies) override;
+
+protected:
+    // Subclasses override this to define attack patterns.
+    // Returns an ActionResult describing the attack.
     virtual ActionResult performAttack();
 
-
-
-
 private:
-    int  m_toughness{};
-    int  m_maxToughness{};
-    bool m_isBroken{ false };
-    std::optional<Drop> m_drop{};
+    int                       m_toughness{};
+    int                       m_maxToughness{};
+    bool                      m_isBroken{ false };
+    std::map<Affinity, float> m_affinityModifiers;
+    std::optional<Drop>       m_drop{};
 };
-

@@ -1,10 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
     <Filter Include="Header Files">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
@@ -13,28 +9,95 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Actions">
+      <UniqueIdentifier>{72320b38-babe-4269-839d-cf2db10afef8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Battle">
+      <UniqueIdentifier>{90479a69-1826-4915-aaa2-b2c0c7819ddb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{2af2ffed-0505-4b6b-b9e5-cb98686625dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Entities">
+      <UniqueIdentifier>{3f82ded4-7f83-4cef-9c37-18e73802cf89}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{da23ee41-65a3-4091-8e64-4bbcf222a2c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{af454ba7-7fc8-48d8-ab26-e4fd993fca23}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="tests\EidolonBreach_Tests.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="tests\Actions\test_BasicStrikeAction.cpp">
+      <Filter>Actions</Filter>
     </ClCompile>
-    <ClCompile Include="tests\Entities\test_character.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="tests\Actions\test_SkillAction.cpp">
+      <Filter>Actions</Filter>
     </ClCompile>
-    <ClCompile Include="tests\Entities\test_enemy.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="tests\Actions\test_UltimateAction.cpp">
+      <Filter>Actions</Filter>
     </ClCompile>
-    <ClCompile Include="tests\Entities\test_player.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="tests\Battle\test_TurnOrder.cpp">
+      <Filter>Battle</Filter>
     </ClCompile>
-    <ClCompile Include="..\EidolonBreach\src\Entities\Character.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="tests\Core\test_Affinity.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Core\test_Stats.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Entities\test_Enemy.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Entities\test_Party.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Entities\test_Unit.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Entities\test_PlayableCharacter.cpp">
+      <Filter>Entities</Filter>
     </ClCompile>
     <ClCompile Include="..\EidolonBreach\src\Entities\Enemy.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Entities</Filter>
     </ClCompile>
-    <ClCompile Include="..\EidolonBreach\src\Entities\Player.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\EidolonBreach\src\Entities\IAIStrategy.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Entities\Party.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Entities\PlayableCharacter.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Entities\Slime.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Entities\StoneGolem.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Entities\Unit.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Entities\VampireBat.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Battle\Battle.cpp">
+      <Filter>Battle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Actions\BasicStrikeAction.cpp">
+      <Filter>Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Actions\SkillAction.cpp">
+      <Filter>Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Actions\UltimateAction.cpp">
+      <Filter>Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\EidolonBreach_Tests.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\UI\ConsoleRenderer.cpp">
+      <Filter>UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
