@@ -3,6 +3,7 @@
 #include "Entities/PlayableCharacter.h"
 #include "Entities/Enemy.h"
 #include "Entities/Party.h"
+#include "Entities/IAIStrategy.h"
 #include <memory>
 #include "test_helpers.h"
 
@@ -38,7 +39,9 @@ TEST_CASE("BasicStrikeAction: DEF reduction formula")
     pp.addUnit(std::move(heroRaw));
 
     auto enemyRaw = std::make_unique<Enemy>(
-        "e", "E", Stats{ 100,100,10,100,5 }, Affinity::Terra, 50);
+        "e", "E", Stats{ 100,100,10,100,5 }, Affinity::Terra, 50,
+        std::make_unique<BasicAIStrategy>()
+        );
     auto* enemyPtr = enemyRaw.get();
     ep.addUnit(std::move(enemyRaw));
 

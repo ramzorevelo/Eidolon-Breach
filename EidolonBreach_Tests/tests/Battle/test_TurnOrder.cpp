@@ -3,6 +3,7 @@
 #include "Entities/PlayableCharacter.h"
 #include "Entities/Enemy.h"
 #include "Actions/BasicStrikeAction.h"
+#include "Entities/IAIStrategy.h"
 #include <memory>
 
 TEST_CASE("Turn order: player before enemy on SPD tie")
@@ -13,7 +14,8 @@ TEST_CASE("Turn order: player before enemy on SPD tie")
     hero->addAbility(std::make_unique<BasicStrikeAction>());
     pp.addUnit(std::move(hero));
     ep.addUnit(std::make_unique<Enemy>(
-        "e", "Bat", Stats{ 100,100,14,0,10 }, Affinity::Blaze, 40));
+        "e", "Bat", Stats{ 100,100,14,0,10 }, Affinity::Blaze, 40,
+        std::make_unique<BasicAIStrategy>()));
 
     CHECK(pp.getUnitAt(0)->getStats().spd == ep.getUnitAt(0)->getStats().spd);
     // Battle::buildTurnOrder is private; integration tests can verify ordering.
