@@ -1,10 +1,14 @@
 #pragma once
 
+/**
+ * @file Stats.h
+ * @brief Core stat block for all Units.
+ */
 struct Stats
 {
     int hp{};
     int maxHp{};
-    int atk{};   // base attack value; flat bonuses from items add to this (Phase 3)
-    int def{};   // used in DEF-reduction damage formula
-    int spd{};   // determines turn order
+    int atk{};   
+    int def{};   
+    int spd{};   
 };

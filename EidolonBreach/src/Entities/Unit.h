@@ -4,8 +4,13 @@
 #include "Core/Stats.h"
 #include <string>
 
+/**
+ * @file Unit.h
+ * @brief Abstract base class for all combatants.
+ */
 class Party;   // forward declaration – avoids circular headers
 
+/** Abstract base for all Units (players, enemies, summons). */
 class Unit
 {
 public:
@@ -18,14 +23,12 @@ public:
 
     virtual ~Unit() = default;
 
-    // ── Identity ──────────────────────────────────────────────────────
     const std::string& getId()                   const;
     const std::string& getName()                 const;
     Affinity           getAffinity()             const;
     int                getResonanceContribution() const;
     const std::string& getPassiveTrait()          const;
 
-    // ── Stats ─────────────────────────────────────────────────────────
     const Stats& getStats() const;
     int  getHp()    const;
     int  getMaxHp() const;
@@ -34,7 +37,6 @@ public:
     void takeDamage(int amount);
     void heal(int amount);
 
-    // ── Combat virtuals ───────────────────────────────────────────────
     // Returns ActionResult so Battle can render the outcome.
     virtual ActionResult takeTurn(Party& allies, Party& enemies) = 0;
 

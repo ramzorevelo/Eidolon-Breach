@@ -1,6 +1,7 @@
 #pragma once
 #include "Actions/IAction.h"
 
+/** Standard single‑target physical attack. */
 class BasicStrikeAction : public IAction
 {
 public:

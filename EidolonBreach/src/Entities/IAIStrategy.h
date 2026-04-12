@@ -7,7 +7,7 @@ class Party;
 // Decision returned by an AI strategy.
 struct AIDecision
 {
-    std::size_t targetIndex{ 0 };   // index in the target Party
+    std::size_t targetIndex{ 0 };   
 };
 
 class IAIStrategy
@@ -17,9 +17,7 @@ public:
     virtual AIDecision decide(const Unit& self, const Party& targets) = 0;
 };
 
-// -----------------------------------------------------------------------
-// Default Phase-1 AI: always targets the first alive unit in the party.
-// -----------------------------------------------------------------------
+/** Basic AI that targets the first alive unit in the given party. */
 class BasicAIStrategy : public IAIStrategy
 {
 public:

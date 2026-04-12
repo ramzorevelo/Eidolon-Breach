@@ -4,6 +4,10 @@
 #include "Core/CombatConstants.h"
 #include <algorithm>
 
+/**
+ * @file UltimateAction.cpp
+ * @brief Implementation of the ultimate action.
+ */
 std::string UltimateAction::label() const
 {
     return "Ultimate (uses all Energy | +2 SP)";

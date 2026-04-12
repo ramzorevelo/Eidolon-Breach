@@ -1,6 +1,7 @@
 #pragma once
 #include "Entities/Enemy.h"
 
+/** Stone Golem: heavy slam every 3rd turn. */
 class StoneGolem : public Enemy
 {
 public:

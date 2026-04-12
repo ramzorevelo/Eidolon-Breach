@@ -14,7 +14,6 @@ void ConsoleRenderer::printBar(int current, int maximum, int width)
     std::cout << "] " << current << '/' << maximum;
 }
 
-// ── renderAttack ─────────────────────────────────────────────────────────
 void ConsoleRenderer::renderAttack(const std::string& actorName, const ActionResult& result)
 {
     if (!result.flavorText.empty())
