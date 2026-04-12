@@ -31,4 +31,9 @@ private:
 
     // Renders renderBreak for units that transitioned false → true.
     void renderNewBreaks(const std::vector<bool>& before, const Party& party) const;
+
+    bool isBattleOver() const;
+    void processPlayerTurn(Unit* unit);
+    void processEnemyTurn(Unit* unit);
+    bool checkAndHandleBattleEnd();
 };
