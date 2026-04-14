@@ -1,10 +1,12 @@
 #pragma once
-#include <string>
 
 /** 
  * @file ActionResult.h 
  * @brief Result of an action used for UI and game state updates.
  */
+
+#include <string>
+
 struct ActionResult
 {
     enum class Type { Damage, Heal, Charge, Skip };

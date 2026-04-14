@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="external\doctest.h" />
+    <ClInclude Include="tests\test_helpers.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>

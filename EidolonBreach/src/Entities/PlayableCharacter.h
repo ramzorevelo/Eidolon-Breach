@@ -1,50 +1,58 @@
 #pragma once
-#include "Entities/Unit.h"
-#include "Actions/IAction.h"
-#include <vector>
-#include <memory>
-#include <limits>
 
-/** 
+/**
  * @file PlayableCharacter.h
- * @brief Player‑controlled Unit with SP/Energy and action abilities.
+ * @brief Player‑controlled Unit with Energy and action abilities.
  */
+
+#include "Actions/IAction.h"
+#include "Core/ResourceStats.h"
+#include "Entities/Unit.h"
+#include <limits>
+#include <memory>
+#include <vector>
+
 class PlayableCharacter : public Unit
 {
-public:
-    static constexpr int kMaxSp{ 5 };
-    static constexpr int kMaxEnergy{ 100 };
+  public:
+    static constexpr int kMaxEnergy{100}; 
 
     PlayableCharacter(std::string id,
-        std::string name,
-        Stats       stats,
-        Affinity    affinity,
-        int         resonanceContribution,
-        std::string passiveTrait = "");
+                      std::string name,
+                      Stats stats,
+                      Affinity affinity,
+                      int resonanceContribution,
+                      std::string passiveTrait = "");
 
-    // Declare destructor so unique_ptr<IAction> can be incomplete in the header.
     ~PlayableCharacter() override;
 
     void addAbility(std::unique_ptr<IAction> action);
-    const std::vector<std::unique_ptr<IAction>>& getAbilities() const;
+    const std::vector<std::unique_ptr<IAction>> &getAbilities() const;
 
-    int  getSp()         const;
-    int  getEnergy()     const;
-    bool ultimateReady() const;
-
-    void gainSp(int amount);
-    void useSp(int amount);      // subtracts; actions call this (e.g., SkillAction)
+    // Energy (individual resource)
+    int getEnergy() const
+    {
+        return m_resources.energy;
+    }
+    bool isUltimateReady() const
+    {
+        return m_resources.energy >= kMaxEnergy;
+    }
     void gainEnergy(int amount);
-    void resetEnergy();          // UltimateAction calls this
+    void resetEnergy();
+
+    // Delegates SP operations to the Party (shared pool)
+    bool canAffordSp(int amount, const Party &party) const;
+    void consumeSp(int amount, Party &party) const;
 
     /** Displays action menu, reads player input, executes chosen action. */
-    ActionResult takeTurn(Party& allies, Party& enemies) override;
+    ActionResult takeTurn(Party &allies, Party &enemies) override;
 
-private:
+  private:
     std::vector<std::unique_ptr<IAction>> m_abilities;
-    int m_sp{ 3 };
-    int m_energy{ 0 };
-    void displayActionMenu() const;
-    std::size_t selectActionIndex();
-    std::optional<TargetInfo> selectTarget(const Party& enemies);
+    ResourceStats m_resources{0, kMaxEnergy};
+
+    void displayActionMenu(const Party &party) const;
+    std::size_t selectActionIndex(const Party &party);
+    std::optional<TargetInfo> selectTarget(const Party &enemies);
 };
