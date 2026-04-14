@@ -23,6 +23,7 @@
     <ClCompile Include="..\EidolonBreach\src\Actions\SkillAction.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Actions\UltimateAction.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Battle\Battle.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Battle\SpeedBasedTurnOrderCalculator.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Entities\Enemy.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Entities\IAIStrategy.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Entities\Party.cpp" />
@@ -35,6 +36,7 @@
     <ClCompile Include="tests\Actions\test_BasicStrikeAction.cpp" />
     <ClCompile Include="tests\Actions\test_SkillAction.cpp" />
     <ClCompile Include="tests\Actions\test_UltimateAction.cpp" />
+    <ClCompile Include="tests\Battle\test_SpeedBasedTurnOrderCalculator.cpp" />
     <ClCompile Include="tests\Battle\test_TurnOrder.cpp" />
     <ClCompile Include="tests\Core\test_Affinity.cpp" />
     <ClCompile Include="tests\Core\test_Stats.cpp" />

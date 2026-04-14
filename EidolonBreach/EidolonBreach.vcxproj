@@ -23,6 +23,7 @@
     <ClCompile Include="src\Actions\SkillAction.cpp" />
     <ClCompile Include="src\Actions\UltimateAction.cpp" />
     <ClCompile Include="src\Battle\Battle.cpp" />
+    <ClCompile Include="src\Battle\SpeedBasedTurnOrderCalculator.cpp" />
     <ClCompile Include="src\Entities\Enemy.cpp" />
     <ClCompile Include="src\Entities\IAIStrategy.cpp" />
     <ClCompile Include="src\Entities\Party.cpp" />
@@ -40,6 +41,9 @@
     <ClInclude Include="src\Actions\SkillAction.h" />
     <ClInclude Include="src\Actions\UltimateAction.h" />
     <ClInclude Include="src\Battle\Battle.h" />
+    <ClInclude Include="src\Battle\ITurnOrderCalculator.h" />
+    <ClInclude Include="src\Battle\SpeedBasedTurnOrderCalculator.h" />
+    <ClInclude Include="src\Battle\TurnSlot.h" />
     <ClInclude Include="src\Core\ActionResult.h" />
     <ClInclude Include="src\Core\ActionUtils.h" />
     <ClInclude Include="src\Core\Affinity.h" />

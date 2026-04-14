@@ -5,6 +5,7 @@
 #include "Actions/BasicStrikeAction.h"
 #include "Actions/SkillAction.h"
 #include "Actions/UltimateAction.h"
+#include "Entities/Party.h" 
 #include "Entities/PlayableCharacter.h"
 #include "doctest.h"
 #include "test_helpers.h"

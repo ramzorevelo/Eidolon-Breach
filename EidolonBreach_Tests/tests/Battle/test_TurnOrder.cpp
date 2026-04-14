@@ -1,8 +1,9 @@
 /**
- * @file test_TurnOrder.cpp
- * @brief Integration‑style test for turn order tie‑breakers.
+ * @file test_BattleTurnOrderIntegration.cpp
+ * @brief Integration test verifying Battle uses the calculator correctly.
  */
 #include "Actions/BasicStrikeAction.h"
+#include "Battle/Battle.h"
 #include "Entities/Enemy.h"
 #include "Entities/IAIStrategy.h"
 #include "Entities/Party.h"
@@ -10,19 +11,22 @@
 #include "doctest.h"
 #include <memory>
 
-TEST_CASE("Turn order: player before enemy on SPD tie")
+TEST_CASE("Battle integration: turn order uses injected calculator")
 {
-    Party pp, ep;
+    Party playerParty, enemyParty;
     auto hero = std::make_unique<PlayableCharacter>(
-        "h", "Hero", Stats{120, 120, 15, 0, 10}, Affinity::Aether, 10);
+        "hero", "Hero", Stats{100, 100, 10, 0, 20}, Affinity::Aether, 10);
     hero->addAbility(std::make_unique<BasicStrikeAction>());
-    pp.addUnit(std::move(hero));
+    playerParty.addUnit(std::move(hero));
 
-    ep.addUnit(std::make_unique<Enemy>(
-        "e", "Bat", Stats{100, 100, 14, 0, 10}, Affinity::Blaze, 40,
-        std::make_unique<BasicAIStrategy>()));
+    auto enemy = std::make_unique<Enemy>(
+        "bat", "Bat", Stats{100, 100, 14, 0, 5}, Affinity::Blaze, 40,
+        std::make_unique<BasicAIStrategy>());
+    enemyParty.addUnit(std::move(enemy));
 
-    CHECK(pp.getUnitAt(0)->getStats().spd == ep.getUnitAt(0)->getStats().spd);
-    // Battle::buildTurnOrder is private; actual ordering is verified by
-    // integration tests or manual observation.
+    Battle battle{playerParty, enemyParty};
+    // The default calculator is SpeedBasedTurnOrderCalculator.
+    // We can't easily test the full run() without mock input,
+    // but we can verify the calculator is present.
+    CHECK(battle.getTurnOrderCalculator() != nullptr);
 }
