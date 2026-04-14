@@ -72,6 +72,9 @@
     <ClCompile Include="src\UI\ConsoleRenderer.cpp">
       <Filter>UI</Filter>
     </ClCompile>
+    <ClCompile Include="src\Battle\SpeedBasedTurnOrderCalculator.cpp">
+      <Filter>Battle</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Actions\BasicStrikeAction.h">
@@ -142,6 +145,15 @@
     </ClInclude>
     <ClInclude Include="src\Core\ActionUtils.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Battle\ITurnOrderCalculator.h">
+      <Filter>Battle</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Battle\SpeedBasedTurnOrderCalculator.h">
+      <Filter>Battle</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Battle\TurnSlot.h">
+      <Filter>Battle</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
