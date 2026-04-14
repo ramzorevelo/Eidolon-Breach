@@ -134,5 +134,14 @@
     <ClInclude Include="src\UI\ConsoleRenderer.h">
       <Filter>UI</Filter>
     </ClInclude>
+    <ClInclude Include="src\Core\PartyResources.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\ResourceStats.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\ActionUtils.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

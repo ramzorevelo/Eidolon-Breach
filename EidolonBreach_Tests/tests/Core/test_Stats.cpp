@@ -1,5 +1,10 @@
-#include "doctest.h"
+/**
+ * @file test_Stats.cpp
+ * @brief Unit tests for Stats struct.
+ */
+
 #include "Core/Stats.h"
+#include "doctest.h"
 
 TEST_CASE("Stats: default-constructed values are zero")
 {

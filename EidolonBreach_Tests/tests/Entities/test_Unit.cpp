@@ -1,13 +1,15 @@
-#include "doctest.h"
-#include "Entities/Unit.h"
-#include "Entities/PlayableCharacter.h"
+/**
+ * @file test_Unit.cpp
+ * @brief Unit tests for Unit base class HP management.
+ */
 #include "Actions/BasicStrikeAction.h"
 #include "Actions/SkillAction.h"
 #include "Actions/UltimateAction.h"
+#include "Entities/PlayableCharacter.h"
+#include "Entities/Unit.h"
+#include "doctest.h"
 #include "test_helpers.h"
 #include <memory>
-
-
 
 TEST_CASE("Unit: HP management")
 {

@@ -4,6 +4,7 @@
  * @file CombatConstants.h
  * @brief Global constants for combat calculations.
  */
+
 namespace CombatConstants
 {
     constexpr int   kBasicToughDmg{ 10 };

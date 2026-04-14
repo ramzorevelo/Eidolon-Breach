@@ -1,9 +1,12 @@
-#include "doctest.h"
+/**
+ * @file test_Enemy.cpp
+ * @brief Unit tests for Enemy toughness and AI.
+ */
 #include "Entities/Enemy.h"
 #include "Entities/Party.h"
-#include <memory>
+#include "doctest.h"
 #include "test_helpers.h"
-
+#include <memory>
 
 TEST_CASE("Enemy: toughness break and recovery")
 {
@@ -18,7 +21,7 @@ TEST_CASE("Enemy: toughness break and recovery")
 
     e->applyToughnessHit(30);
     CHECK(e->isBroken());
-    CHECK(e->getToughness() == 50);
+    CHECK(e->getToughness() == 50); // resets to max
 
     e->recoverFromBreak();
     CHECK(!e->isBroken());
@@ -40,8 +43,7 @@ TEST_CASE("Enemy: takeTurn returns Skip when broken")
     REQUIRE(e->isBroken());
 
     Party playerParty, enemyParty;
-
     ActionResult result = e->takeTurn(enemyParty, playerParty);
     CHECK(result.type == ActionResult::Type::Skip);
-    CHECK(!e->isBroken());
+    CHECK(!e->isBroken()); // recovers after skip
 }
