@@ -1,29 +1,34 @@
 #include "Actions/BasicStrikeAction.h"
-#include "Entities/PlayableCharacter.h"
-#include "Entities/Party.h"
+#include "Core/ActionUtils.h"
 #include "Core/CombatConstants.h"
 #include "Core/CombatUtils.h"
-#include <algorithm>
-#include <cmath>
-#include "Core/ActionUtils.h"
+#include "Entities/Party.h"
+#include "Entities/PlayableCharacter.h"
 
-/**
- * @file BasicStrikeAction.cpp
- * @brief Standard single‑target physical attack.
- */
+namespace
+{
+constexpr int kSpGain{15};    // to party pool
+constexpr int kEnergyGain{8}; // to self
+constexpr int kBasePower{15};
+} // namespace
+
 std::string BasicStrikeAction::label() const
 {
-    return "Basic Strike (+1 SP | +20 Energy)";
+    return "Basic Strike (+15 SP | +8 Energy)";
 }
 
-ActionResult BasicStrikeAction::execute(PlayableCharacter& user,
-    Party& /*allies*/,
-    Party& enemies,
-    std::optional<TargetInfo> target)
+bool BasicStrikeAction::isAvailable(const PlayableCharacter & /*user*/, const Party & /*party*/) const
 {
-    user.gainSp(1);
-    user.gainEnergy(20);
-    constexpr int basicStrikeBasePower{ 15 };
-    return ActionUtils::executeDamageAction(user, enemies, target, basicStrikeBasePower,
-        CombatConstants::kBasicToughDmg);
+    return true; // always available
+}
+
+ActionResult BasicStrikeAction::execute(PlayableCharacter &user,
+                                        Party &allies,
+                                        Party &enemies,
+                                        std::optional<TargetInfo> target)
+{
+    allies.gainSp(kSpGain);
+    user.gainEnergy(kEnergyGain);
+    return ActionUtils::executeDamageAction(user, enemies, target,
+                                            kBasePower, CombatConstants::kBasicToughDmg);
 }

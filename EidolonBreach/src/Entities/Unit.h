@@ -1,13 +1,15 @@
 #pragma once
-#include "Core/ActionResult.h"
-#include "Core/Affinity.h"
-#include "Core/Stats.h"
-#include <string>
 
 /**
  * @file Unit.h
  * @brief Abstract base class for all combatants.
  */
+
+#include "Core/ActionResult.h"
+#include "Core/Affinity.h"
+#include "Core/Stats.h"
+#include <string>
+
 class Party;   // forward declaration – avoids circular headers
 
 /** Abstract base for all Units (players, enemies, summons). */

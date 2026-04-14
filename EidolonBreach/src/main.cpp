@@ -1,40 +1,47 @@
-#include "Battle/Battle.h"
-#include "Entities/PlayableCharacter.h"
-#include "Entities/VampireBat.h"
 #include "Actions/BasicStrikeAction.h"
 #include "Actions/SkillAction.h"
 #include "Actions/UltimateAction.h"
+#include "Battle/Battle.h"
+#include "Entities/PlayableCharacter.h"
+#include "Entities/StoneGolem.h"
+#include "Entities/VampireBat.h"
 #include <iostream>
 #include <memory>
-#include <string>
 
 int main()
 {
-    std::cout << "Enter your hero's name: ";
-    std::string name{};
-    std::getline(std::cin, name);
-    if (name.empty()) name = "Hero";
+    std::cout << "=== 2v2 TEST: STRIKER + CONDUIT vs STONE GOLEM + VAMPIRE BAT ===\n";
+    std::cout << "Goal: Basic attacks alone will lose. Use skills/ultimates to win.\n\n";
 
-    // ── Player party ──────────────────────────────────────────────────
     Party playerParty;
+    // Shared SP starts at 50 (per spec §2.3.2)
+    playerParty.gainSp(50);
 
-    // Generic hero (Aether, balanced stats, SPD 10)
-    auto hero = std::make_unique<PlayableCharacter>(
-        "hero_1", name,
-        Stats{ 120, 120, 15, 10, 10 },
-        Affinity::Aether, 10);
-    hero->addAbility(std::make_unique<BasicStrikeAction>());
-    hero->addAbility(std::make_unique<SkillAction>());
-    hero->addAbility(std::make_unique<UltimateAction>());
-    playerParty.addUnit(std::move(hero));
+    auto striker = std::make_unique<PlayableCharacter>(
+        "striker_1", "Striker",
+        Stats{80, 80, 22, 5, 14},
+        Affinity::Blaze,
+        10);
+    striker->addAbility(std::make_unique<BasicStrikeAction>());
+    striker->addAbility(std::make_unique<SkillAction>(40));
+    striker->addAbility(std::make_unique<UltimateAction>());
+    playerParty.addUnit(std::move(striker));
 
+    auto conduit = std::make_unique<PlayableCharacter>(
+        "conduit_1", "Conduit",
+        Stats{110, 110, 10, 15, 9},
+        Affinity::Terra,
+        8);
+    conduit->addAbility(std::make_unique<BasicStrikeAction>());
+    conduit->addAbility(std::make_unique<SkillAction>(20));
+    conduit->addAbility(std::make_unique<UltimateAction>());
+    playerParty.addUnit(std::move(conduit));
 
-    // ── Enemy party ───────────────────────────────────────────────────
     Party enemyParty;
+    enemyParty.addUnit(std::make_unique<StoneGolem>("Stone Golem", 130, 60));
     enemyParty.addUnit(std::make_unique<VampireBat>("Vampire Bat", 100, 40));
 
-    // ── Run ───────────────────────────────────────────────────────────
-    Battle battle{ playerParty, enemyParty };
+    Battle battle{playerParty, enemyParty};
     battle.run();
 
     return 0;
