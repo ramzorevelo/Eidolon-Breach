@@ -1,4 +1,10 @@
 #pragma once
+
+/**
+ * @file Enemy.h
+ * @brief Base class for all enemy units.
+ */
+
 #include "Entities/Unit.h"
 #include "Entities/IAIStrategy.h"
 #include "Core/Drop.h"
@@ -7,10 +13,6 @@
 #include <memory>
 #include <optional>
 
-/**
- * @file Enemy.h
- * @brief Base class for all enemy units.
- */
 class Enemy : public Unit
 {
 public:

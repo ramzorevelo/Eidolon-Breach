@@ -104,5 +104,8 @@
     <ClInclude Include="external\doctest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="tests\test_helpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

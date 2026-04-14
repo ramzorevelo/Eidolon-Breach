@@ -1,5 +1,10 @@
-#include "doctest.h"
+/**
+ * @file test_Affinity.cpp
+ * @brief Unit tests for Affinity enum and conversion.
+ */
+
 #include "Core/Affinity.h"
+#include "doctest.h"
 
 TEST_CASE("Affinity: affinityToString covers all values")
 {

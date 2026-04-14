@@ -1,13 +1,15 @@
 #pragma once
-#include "Core/ActionResult.h"
-#include "Core/Drop.h"
-#include <string>
-#include <optional>
 
 /** 
  * @file ConsoleRenderer.h 
  * @brief Simple console output renderer (implements IRenderer in Phase 3).
  */
+
+#include "Core/ActionResult.h"
+#include "Core/Drop.h"
+#include <string>
+#include <optional>
+
 class Party;
 class Unit;
 

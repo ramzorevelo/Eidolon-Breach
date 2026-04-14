@@ -58,29 +58,48 @@ void ConsoleRenderer::renderDefeat(const std::string& playerName)
     std::cout << '\n' << playerName << " has been defeated.\n";
     std::cout << "=== DEFEAT ===\n";
 }
+void ConsoleRenderer::renderParty(const Party &party, const std::string &prefix, bool showToughness)
+{
+    if (prefix == "P")
+    {
+        // Show shared SP once at top of player section
+        std::cout << "  Party SP: " << party.getSp() << '/' << party.getMaxSp() << '\n';
+    }
+    for (std::size_t i{0}; i < party.size(); ++i)
+    {
+        const Unit *u = party.getUnitAt(i);
+        if (!u)
+            continue;
+        std::string label{"[" + prefix + std::to_string(i + 1) + "]"};
+        renderUnit(u, label, showToughness);
+    }
+}
 
-void ConsoleRenderer::renderUnit(const Unit* unit, const std::string& label, bool showToughness)
+void ConsoleRenderer::renderUnit(const Unit *unit, const std::string &label, bool showToughness)
 {
     std::cout << "  " << label << " " << unit->getName() << '\n';
-    std::cout << "    HP:        "; printBar(unit->getHp(), unit->getMaxHp()); std::cout << '\n';
+    std::cout << "    HP:        ";
+    printBar(unit->getHp(), unit->getMaxHp());
+    std::cout << '\n';
 
     if (showToughness)
     {
-        const auto* e{ dynamic_cast<const Enemy*>(unit) };
+        const auto *e{dynamic_cast<const Enemy *>(unit)};
         if (e)
         {
             std::cout << "    Toughness: ";
             printBar(e->getToughness(), e->getMaxToughness());
-            if (e->isBroken()) std::cout << " [BROKEN]";
+            if (e->isBroken())
+                std::cout << " [BROKEN]";
             std::cout << '\n';
         }
     }
     else
     {
-        const auto* pc{ dynamic_cast<const PlayableCharacter*>(unit) };
+        const auto *pc{dynamic_cast<const PlayableCharacter *>(unit)};
         if (pc)
         {
-            std::cout << "    SP:     " << pc->getSp() << '/' << PlayableCharacter::kMaxSp << '\n';
+            // Energy only; SP is now shown at party level
             std::cout << "    Energy: ";
             printBar(pc->getEnergy(), PlayableCharacter::kMaxEnergy, 10);
             std::cout << '\n';
@@ -88,17 +107,6 @@ void ConsoleRenderer::renderUnit(const Unit* unit, const std::string& label, boo
     }
 }
 
-void ConsoleRenderer::renderParty(const Party& party, const std::string& prefix, bool showToughness)
-{
-    for (std::size_t i{ 0 }; i < party.size(); ++i)
-    {
-        const Unit* u = party.getUnitAt(i);
-        if (!u) continue;
-
-        std::string label{ "[" + prefix + std::to_string(i + 1) + "]" };
-        renderUnit(u, label, showToughness);
-    }
-}
 
 void ConsoleRenderer::printPartyStatus(const Party& playerParty, const Party& enemyParty)
 {
