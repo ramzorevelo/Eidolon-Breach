@@ -52,3 +52,10 @@ TEST_CASE("PlayableCharacter: consumeSp reduces party SP")
     hero->consumeSp(25, allies);
     CHECK(allies.getSp() == 25);
 }
+
+TEST_CASE("PlayableCharacter: resonanceContribution is owned by PlayableCharacter")
+{
+    auto hero = makeHero(); // test_helpers.h creates a hero with resonanceContribution = 10
+    CHECK(hero->getResonanceContribution() == 10);
+    CHECK(hero->getPassiveTrait() == "");
+}

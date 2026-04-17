@@ -13,7 +13,7 @@ Enemy::Enemy(std::string id,
     std::unique_ptr<IAIStrategy> aiStrategy,
     std::map<Affinity, float> affinityModifiers,
     std::optional<Drop> drop)
-    : Unit{ std::move(id), std::move(name), stats, affinity, 0 }
+    : Unit{std::move(id), std::move(name), stats, affinity}
     , m_toughness{ maxToughness }
     , m_maxToughness{ maxToughness }
     , m_aiStrategy{ std::move(aiStrategy) }
@@ -76,11 +76,9 @@ ActionResult Enemy::takeTurn(Party& /*allies*/, Party& targets)
         {
         case ActionResult::Type::Damage:
         {
-            // Apply DEF reduction so enemy attacks respect player DEF.
-            int mitigated = CombatUtils::calculateDamage(result.value,
-                                                         target->getStats().def);
+            int mitigated{CombatUtils::calculateDamage(result.value, target->getStats().def)};
             target->takeDamage(mitigated);
-            result.value = mitigated;
+            result.value = mitigated; // keep result accurate for UI rendering
             break;
         }
         case ActionResult::Type::Heal:

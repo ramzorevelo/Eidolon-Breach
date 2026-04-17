@@ -11,8 +11,9 @@ PlayableCharacter::PlayableCharacter(std::string id,
                                      Affinity affinity,
                                      int resonanceContribution,
                                      std::string passiveTrait)
-    : Unit{std::move(id), std::move(name), stats, affinity,
-           resonanceContribution, std::move(passiveTrait)} {}
+    : Unit{std::move(id), std::move(name), stats, affinity}, m_resonanceContribution{resonanceContribution}, m_passiveTrait{std::move(passiveTrait)}
+{
+}
 
 PlayableCharacter::~PlayableCharacter() = default;
 
