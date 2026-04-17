@@ -3,6 +3,7 @@
 #include "Entities/Unit.h"
 #include "Entities/PlayableCharacter.h"
 #include "Entities/Enemy.h"
+#include "Core/IStatusEffect.h"
 #include <iostream>
 
 void ConsoleRenderer::printBar(int current, int maximum, int width)
@@ -58,6 +59,26 @@ void ConsoleRenderer::renderDefeat(const std::string& playerName)
     std::cout << '\n' << playerName << " has been defeated.\n";
     std::cout << "=== DEFEAT ===\n";
 }
+
+void ConsoleRenderer::renderEffects(const Unit &unit)
+{
+    const auto &effects{unit.getEffects()};
+    if (effects.empty())
+        return;
+
+    std::cout << "    Effects: ";
+    for (const auto &effect : effects)
+    {
+        std::cout << effect->getName();
+        if (effect->getDuration().has_value())
+            std::cout << '(' << *effect->getDuration() << ')';
+        else
+            std::cout << "(perm)";
+        std::cout << ' ';
+    }
+    std::cout << '\n';
+}
+
 void ConsoleRenderer::renderParty(const Party &party, const std::string &prefix, bool showToughness)
 {
     if (prefix == "P")
@@ -81,6 +102,8 @@ void ConsoleRenderer::renderUnit(const Unit *unit, const std::string &label, boo
     std::cout << "    HP:        ";
     printBar(unit->getHp(), unit->getMaxHp());
     std::cout << '\n';
+
+    renderEffects(*unit);
 
     if (showToughness)
     {

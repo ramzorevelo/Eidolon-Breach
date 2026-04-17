@@ -22,7 +22,11 @@ public:
     static void renderStunned(const std::string& enemyName);
     static void renderVictory(const std::string& enemyName, std::optional<Drop> drop);
     static void renderDefeat(const std::string& playerName);
-    
+    /**
+     * @brief Print the name and remaining duration of each active effect on a unit.
+     * @param unit The unit whose effects to render.
+     */
+    static void renderEffects(const Unit &unit);
     static void printPartyStatus(const Party& playerParty, const Party& enemyParty);
 
 private:

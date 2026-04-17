@@ -8,7 +8,10 @@
 #include "Core/ActionResult.h"
 #include "Core/Affinity.h"
 #include "Core/Stats.h"
+#include "Core/IStatusEffect.h"
 #include <string>
+#include <memory>
+#include <vector>
 
 class Party;   // forward declaration – avoids circular headers
 
@@ -27,13 +30,78 @@ public:
     const std::string& getName()                 const;
     Affinity           getAffinity()             const;
 
-    const Stats& getStats() const;
+    /** @return Raw stats with no effect modifiers applied. */
+    const Stats &getBaseStats() const;
+
+    /**
+     * @brief Compute final stats after applying all active effects (two passes).
+     *
+     * Pass 1: modifyStatsFlat() on every effect in insertion order.
+     * Pass 2: modifyStatsPct() on every effect in insertion order.
+     * Flat modifiers always precede percentage multipliers regardless of
+     * the order in which effects were applied (see §2.12.3).
+     */
+    [[nodiscard]] Stats getFinalStats() const;
+
     int  getHp()    const;
     int  getMaxHp() const;
     bool isAlive()  const;
 
+    /**
+     * @brief Reduce HP by amount, first running the shield absorption pass.
+     *
+     * Shield effects absorb damage before it reaches HP. Exhausted shields
+     * remain in m_effects until the next tickEffects() cleans them up.
+     * For DoT that should bypass shields, call takeTrueDamage() instead.
+     */
     void takeDamage(int amount);
     void heal(int amount);
+
+        // --- Direct damage (bypasses shield absorption — for DoT effects) ---
+    /**
+     * @brief Reduces HP without running the shield absorption pass.
+     * Use for DoT ticks (BurnEffect::onTick). Direct attacks call takeDamage().
+     */
+    void takeTrueDamage(int amount);
+
+    // --- Effect Management ---
+    /**
+     * @brief Apply a status effect to this unit.
+     *
+     * If an effect with the same ID already exists, it is replaced (refresh
+     * semantics — prevents infinite stacking of the same effect).
+     * onApply() is called on the incoming effect after placement.
+     */
+    void applyEffect(std::unique_ptr<IStatusEffect> effect);
+
+    /** @brief Remove the effect with the given ID, calling onRemove(). No-op if absent. */
+    void removeEffect(std::string_view id);
+
+    /** @brief Remove all effects that carry the given tag, calling onRemove() on each. */
+    void removeEffectsByTag(std::string_view tag);
+
+    /** @brief Extend duration of all effects with the given tag by the specified turns. */
+    void extendEffectsByTag(std::string_view tag, int turns);
+
+    /** @return true if an effect with the given ID is currently active. */
+    bool hasEffect(std::string_view id) const;
+
+    /** @return true if any active effect carries the given tag. */
+    bool hasEffectWithTag(std::string_view tag) const;
+
+    /**
+     * @brief Tick all active effects, decrement durations, remove expired ones.
+     *
+     * Called by Battle::run() at the start of each unit's turn.
+     * Snapshots raw pointers before iterating — onTick() may exhaust shields
+     * without invalidating the loop.
+     *
+     * @return Human-readable messages from effects that produced output (e.g. DoT damage).
+     */
+    [[nodiscard]] std::vector<std::string> tickEffects();
+
+    /** @return Read-only view of active effects (for rendering). */
+    const std::vector<std::unique_ptr<IStatusEffect>> &getEffects() const;
 
     // Returns ActionResult so Battle can render the outcome.
     virtual ActionResult takeTurn(Party& allies, Party& enemies) = 0;
@@ -49,4 +117,5 @@ protected:
     std::string m_name;
     Stats       m_stats;
     Affinity    m_affinity;
+    std::vector<std::unique_ptr<IStatusEffect>> m_effects;
 }; 

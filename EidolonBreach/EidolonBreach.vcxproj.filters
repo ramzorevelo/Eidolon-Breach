@@ -28,6 +28,9 @@
     <Filter Include="Entities">
       <UniqueIdentifier>{9b4d6f5e-abb1-4421-9253-b88ee1cdfc02}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\Effects">
+      <UniqueIdentifier>{fd430ead-c42e-4753-ac67-ff41d1a3ab9e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -74,6 +77,21 @@
     </ClCompile>
     <ClCompile Include="src\Battle\SpeedBasedTurnOrderCalculator.cpp">
       <Filter>Battle</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\StatusEffectBase.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Effects\BurnEffect.cpp">
+      <Filter>Core\Effects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Effects\RegenEffect.cpp">
+      <Filter>Core\Effects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Effects\ShieldEffect.cpp">
+      <Filter>Core\Effects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Effects\SlowEffect.cpp">
+      <Filter>Core\Effects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -154,6 +172,30 @@
     </ClInclude>
     <ClInclude Include="src\Battle\TurnSlot.h">
       <Filter>Battle</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\StatusEffectBase.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\EffectIds.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\IStatusEffect.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\CombatUtils.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Effects\BurnEffect.h">
+      <Filter>Core\Effects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Effects\RegenEffect.h">
+      <Filter>Core\Effects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Effects\ShieldEffect.h">
+      <Filter>Core\Effects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Effects\SlowEffect.h">
+      <Filter>Core\Effects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
