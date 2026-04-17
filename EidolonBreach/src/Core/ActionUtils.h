@@ -35,7 +35,7 @@ inline ActionResult executeDamageAction(PlayableCharacter & /*user*/,
         Unit *t = enemies.getUnitAt(target->index);
         if (t && t->isAlive())
         {
-            result.value = CombatUtils::calculateDamage(basePower, t->getBaseStats().def);
+            result.value = CombatUtils::calculateDamage(basePower, t->getFinalStats().def);
             t->takeDamage(result.value);
             t->applyToughnessHit(toughDmg);
         }
