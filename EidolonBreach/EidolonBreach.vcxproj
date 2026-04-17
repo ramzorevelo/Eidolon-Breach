@@ -24,6 +24,10 @@
     <ClCompile Include="src\Actions\UltimateAction.cpp" />
     <ClCompile Include="src\Battle\Battle.cpp" />
     <ClCompile Include="src\Battle\SpeedBasedTurnOrderCalculator.cpp" />
+    <ClCompile Include="src\Core\Effects\BurnEffect.cpp" />
+    <ClCompile Include="src\Core\Effects\RegenEffect.cpp" />
+    <ClCompile Include="src\Core\Effects\ShieldEffect.cpp" />
+    <ClCompile Include="src\Core\Effects\SlowEffect.cpp" />
     <ClCompile Include="src\Core\StatusEffectBase.cpp" />
     <ClCompile Include="src\Entities\Enemy.cpp" />
     <ClCompile Include="src\Entities\IAIStrategy.cpp" />
@@ -52,6 +56,10 @@
     <ClInclude Include="src\Core\CombatUtils.h" />
     <ClInclude Include="src\Core\Drop.h" />
     <ClInclude Include="src\Core\EffectIds.h" />
+    <ClInclude Include="src\Core\Effects\BurnEffect.h" />
+    <ClInclude Include="src\Core\Effects\RegenEffect.h" />
+    <ClInclude Include="src\Core\Effects\ShieldEffect.h" />
+    <ClInclude Include="src\Core\Effects\SlowEffect.h" />
     <ClInclude Include="src\Core\IStatusEffect.h" />
     <ClInclude Include="src\Core\PartyResources.h" />
     <ClInclude Include="src\Core\ResourceStats.h" />
