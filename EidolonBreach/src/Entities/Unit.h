@@ -8,7 +8,10 @@
 #include "Core/ActionResult.h"
 #include "Core/Affinity.h"
 #include "Core/Stats.h"
+#include "Core/IStatusEffect.h"
 #include <string>
+#include <memory>
+#include <vector>
 
 class Party;   // forward declaration – avoids circular headers
 
@@ -27,7 +30,19 @@ public:
     const std::string& getName()                 const;
     Affinity           getAffinity()             const;
 
-    const Stats& getStats() const;
+    /** @return Raw stats with no effect modifiers applied. */
+    const Stats &getBaseStats() const;
+
+    /**
+     * @brief Compute final stats after applying all active effects (two passes).
+     *
+     * Pass 1: modifyStatsFlat() on every effect in insertion order.
+     * Pass 2: modifyStatsPct() on every effect in insertion order.
+     * Flat modifiers always precede percentage multipliers regardless of
+     * the order in which effects were applied (see §2.12.3).
+     */
+    [[nodiscard]] Stats getFinalStats() const;
+
     int  getHp()    const;
     int  getMaxHp() const;
     bool isAlive()  const;
@@ -49,4 +64,5 @@ protected:
     std::string m_name;
     Stats       m_stats;
     Affinity    m_affinity;
+    std::vector<std::unique_ptr<IStatusEffect>> m_effects;
 }; 

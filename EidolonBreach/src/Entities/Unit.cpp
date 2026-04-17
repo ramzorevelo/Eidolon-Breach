@@ -18,7 +18,20 @@ Unit::Unit(std::string id,
 const std::string& Unit::getId()                    const { return m_id; }
 const std::string& Unit::getName()                  const { return m_name; }
 Affinity           Unit::getAffinity()              const { return m_affinity; }
-const Stats& Unit::getStats()                       const { return m_stats; }
+const Stats &Unit::getBaseStats() const
+{
+    return m_stats;
+}
+
+Stats Unit::getFinalStats() const
+{
+    Stats result{getBaseStats()};
+    for (const auto &effect : m_effects) // pass 1: flat additions
+        result = effect->modifyStatsFlat(result);
+    for (const auto &effect : m_effects) // pass 2: percentage multipliers
+        result = effect->modifyStatsPct(result);
+    return result;
+}
 int                Unit::getHp()                    const { return m_stats.hp; }
 int                Unit::getMaxHp()                 const { return m_stats.maxHp; }
 bool               Unit::isAlive()                  const { return m_stats.hp > 0; }
