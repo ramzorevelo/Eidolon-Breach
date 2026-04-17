@@ -105,6 +105,12 @@
     <ClCompile Include="..\EidolonBreach\src\Battle\SpeedBasedTurnOrderCalculator.cpp">
       <Filter>Battle</Filter>
     </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Core\StatusEffectBase.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Core\test_StatusEffectBase.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="external\doctest.h">
