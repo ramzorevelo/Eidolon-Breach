@@ -36,8 +36,8 @@ std::vector<TurnSlot> SpeedBasedTurnOrderCalculator::calculate(
     std::sort(slots.begin(), slots.end(),
               [](const TurnSlot &a, const TurnSlot &b)
               {
-                  int spdA{a.unit->getBaseStats().spd};
-                  int spdB{b.unit->getBaseStats().spd};
+                  int spdA{a.unit->getFinalStats().spd};
+                  int spdB{b.unit->getFinalStats().spd};
                   if (spdA != spdB)
                   {
                       return spdA > spdB;
