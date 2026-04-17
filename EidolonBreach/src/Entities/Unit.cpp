@@ -8,26 +8,17 @@
  * @brief Implementation of the abstract Unit class.
  */
 Unit::Unit(std::string id,
-    std::string name,
-    Stats       stats,
-    Affinity    affinity,
-    int         resonanceContribution,
-    std::string passiveTrait)
-    : m_id{ std::move(id) }
-    , m_name{ std::move(name) }
-    , m_stats{ stats }
-    , m_affinity{ affinity }
-    , m_resonanceContribution{ resonanceContribution }
-    , m_passiveTrait{ std::move(passiveTrait) }
+           std::string name,
+           Stats stats,
+           Affinity affinity)
+    : m_id{std::move(id)}, m_name{std::move(name)}, m_stats{stats}, m_affinity{affinity}
 {
 }
 
 const std::string& Unit::getId()                    const { return m_id; }
 const std::string& Unit::getName()                  const { return m_name; }
 Affinity           Unit::getAffinity()              const { return m_affinity; }
-int                Unit::getResonanceContribution() const { return m_resonanceContribution; }
-const std::string& Unit::getPassiveTrait()          const { return m_passiveTrait; }
-const Stats& Unit::getStats()                 const { return m_stats; }
+const Stats& Unit::getStats()                       const { return m_stats; }
 int                Unit::getHp()                    const { return m_stats.hp; }
 int                Unit::getMaxHp()                 const { return m_stats.maxHp; }
 bool               Unit::isAlive()                  const { return m_stats.hp > 0; }

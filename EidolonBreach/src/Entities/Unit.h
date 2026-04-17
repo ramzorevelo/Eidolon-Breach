@@ -18,18 +18,14 @@ class Unit
 public:
     Unit(std::string id,
          std::string name,
-         Stats       stats,
-         Affinity    affinity,
-         int         resonanceContribution,
-         std::string passiveTrait = "");
+         Stats stats,
+         Affinity affinity);
 
     virtual ~Unit() = default;
 
     const std::string& getId()                   const;
     const std::string& getName()                 const;
     Affinity           getAffinity()             const;
-    int                getResonanceContribution() const;
-    const std::string& getPassiveTrait()          const;
 
     const Stats& getStats() const;
     int  getHp()    const;
@@ -53,6 +49,4 @@ protected:
     std::string m_name;
     Stats       m_stats;
     Affinity    m_affinity;
-    int         m_resonanceContribution;
-    std::string m_passiveTrait;
-};
+}; 
