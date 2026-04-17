@@ -75,6 +75,9 @@
     <ClCompile Include="src\Battle\SpeedBasedTurnOrderCalculator.cpp">
       <Filter>Battle</Filter>
     </ClCompile>
+    <ClCompile Include="src\Core\StatusEffectBase.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Actions\BasicStrikeAction.h">
@@ -154,6 +157,18 @@
     </ClInclude>
     <ClInclude Include="src\Battle\TurnSlot.h">
       <Filter>Battle</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\StatusEffectBase.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\EffectIds.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\IStatusEffect.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\CombatUtils.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
