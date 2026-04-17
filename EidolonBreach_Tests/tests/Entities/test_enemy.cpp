@@ -47,3 +47,48 @@ TEST_CASE("Enemy: takeTurn returns Skip when broken")
     CHECK(result.type == ActionResult::Type::Skip);
     CHECK(!e->isBroken()); // recovers after skip
 }
+
+TEST_CASE("Enemy::takeTurn applies DEF reduction to damage")
+{
+    // Player unit with nonzero DEF (Conduit archetype baseline DEF 15)
+    auto player = std::make_unique<PlayableCharacter>(
+        "test", "TestChar",
+        Stats{100, 100, 20, 15, 10}, // DEF = 15
+        Affinity::Frost, 10);
+
+    Party playerParty;
+    playerParty.addUnit(std::move(player));
+
+    // Subclass Enemy to override performAttack() with fixed 30 damage
+    class FixedDamageEnemy : public Enemy
+    {
+      public:
+        using Enemy::Enemy;
+
+      protected:
+        ActionResult performAttack() override
+        {
+            return {ActionResult::Type::Damage, 30};
+        }
+    };
+
+    auto enemy = std::make_unique<FixedDamageEnemy>(
+        "fix", "FixedDam",
+        Stats{50, 50, 10, 5, 5},
+        Affinity::Blaze,
+        20,                                 // maxToughness
+        std::make_unique<BasicAIStrategy>() // AI strategy (targeting handled separately)
+    );
+
+    Party enemyParty;
+    Unit *enemyPtr = enemy.get();
+    enemyParty.addUnit(std::move(enemy));
+
+    // Force enemy turn (targets first alive player unit via AI)
+    enemyPtr->takeTurn(enemyParty, playerParty);
+
+    Unit *target = playerParty.getUnitAt(0);
+    // DEF 15 with K=100 gives mitigation = 15/(115) ≈ 0.13 → damage ≈ 30 * 0.87 ≈ 26
+    // Expected HP: 100 - 26 = 74
+    CHECK(target->getHp() == 74);
+}

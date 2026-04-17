@@ -1,6 +1,7 @@
 #include "Entities/Enemy.h"
 #include "Entities/Party.h"
 #include "Core/ActionResult.h"
+#include "Core/CombatUtils.h"
 #include <algorithm>
 #include <utility>
 
@@ -74,8 +75,14 @@ ActionResult Enemy::takeTurn(Party& /*allies*/, Party& targets)
         switch (result.type)
         {
         case ActionResult::Type::Damage:
-            target->takeDamage(result.value);
+        {
+            // Apply DEF reduction so enemy attacks respect player DEF.
+            int mitigated = CombatUtils::calculateDamage(result.value,
+                                                         target->getStats().def);
+            target->takeDamage(mitigated);
+            result.value = mitigated;
             break;
+        }
         case ActionResult::Type::Heal:
             heal(result.value);
             break;
