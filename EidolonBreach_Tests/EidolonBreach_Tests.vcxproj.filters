@@ -27,6 +27,9 @@
     <Filter Include="UI">
       <UniqueIdentifier>{af454ba7-7fc8-48d8-ab26-e4fd993fca23}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\Effects">
+      <UniqueIdentifier>{c85d8697-1075-4dff-b2b8-4b69b6576866}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="tests\Actions\test_BasicStrikeAction.cpp">
@@ -104,6 +107,39 @@
     </ClCompile>
     <ClCompile Include="..\EidolonBreach\src\Battle\SpeedBasedTurnOrderCalculator.cpp">
       <Filter>Battle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Core\StatusEffectBase.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Core\test_StatusEffectBase.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Core\Effects\test_BurnEffect.cpp">
+      <Filter>Core\Effects</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Core\Effects\test_RegenEffect.cpp">
+      <Filter>Core\Effects</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Core\Effects\test_ShieldEffect.cpp">
+      <Filter>Core\Effects</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Core\Effects\test_SlowEffect.cpp">
+      <Filter>Core\Effects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Core\Effects\BurnEffect.cpp">
+      <Filter>Core\Effects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Core\Effects\RegenEffect.cpp">
+      <Filter>Core\Effects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Core\Effects\ShieldEffect.cpp">
+      <Filter>Core\Effects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Core\Effects\SlowEffect.cpp">
+      <Filter>Core\Effects</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Entities\test_UnitEffects.cpp">
+      <Filter>Entities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

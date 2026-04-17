@@ -114,6 +114,21 @@ void Battle::run()
             if (isBattleOver())
                 break;
 
+            // Tick status effects at the start of each unit's turn.
+            // Messages are printed here; this std::cout call is temporary;
+            // it will migrate to IRenderer in the next phase.
+            for (const std::string &msg : slot.unit->tickEffects())
+                std::cout << msg << '\n';
+
+            // A DoT tick may have killed this unit — check before acting.
+            if (!slot.unit->isAlive())
+            {
+                if (checkAndHandleBattleEnd())
+                    return;
+                continue;
+            }
+
+
             if (slot.isPlayer)
             {
                 processPlayerTurn(slot.unit);

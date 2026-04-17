@@ -39,3 +39,27 @@ TEST_CASE("Unit: isBroken returns false by default (PlayableCharacter)")
     hero->applyToughnessHit(9999);
     CHECK(!hero->isBroken());
 }
+
+TEST_CASE("Unit: getBaseStats returns construction-time stats unchanged")
+{
+    auto hero = makeHero();
+    const Stats &base = hero->getBaseStats();
+    // makeHero uses Stats{120, 120, 15, 0, 10}
+    CHECK(base.hp == 120);
+    CHECK(base.maxHp == 120);
+    CHECK(base.atk == 15);
+    CHECK(base.def == 0);
+    CHECK(base.spd == 10);
+}
+
+TEST_CASE("Unit: getFinalStats equals getBaseStats when no effects are active")
+{
+    auto hero = makeHero();
+    Stats base = hero->getBaseStats();
+    Stats final = hero->getFinalStats();
+    CHECK(final.hp == base.hp);
+    CHECK(final.maxHp == base.maxHp);
+    CHECK(final.atk == base.atk);
+    CHECK(final.def == base.def);
+    CHECK(final.spd == base.spd);
+}

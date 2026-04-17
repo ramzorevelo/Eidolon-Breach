@@ -76,7 +76,7 @@ ActionResult Enemy::takeTurn(Party& /*allies*/, Party& targets)
         {
         case ActionResult::Type::Damage:
         {
-            int mitigated{CombatUtils::calculateDamage(result.value, target->getStats().def)};
+            int mitigated{CombatUtils::calculateDamage(result.value, target->getFinalStats().def)};
             target->takeDamage(mitigated);
             result.value = mitigated; // keep result accurate for UI rendering
             break;
