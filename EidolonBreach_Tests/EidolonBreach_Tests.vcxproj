@@ -24,6 +24,10 @@
     <ClCompile Include="..\EidolonBreach\src\Actions\UltimateAction.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Battle\Battle.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Battle\SpeedBasedTurnOrderCalculator.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Core\Effects\BurnEffect.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Core\Effects\RegenEffect.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Core\Effects\ShieldEffect.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Core\Effects\SlowEffect.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Core\StatusEffectBase.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Entities\Enemy.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Entities\IAIStrategy.cpp" />
@@ -39,6 +43,10 @@
     <ClCompile Include="tests\Actions\test_UltimateAction.cpp" />
     <ClCompile Include="tests\Battle\test_SpeedBasedTurnOrderCalculator.cpp" />
     <ClCompile Include="tests\Battle\test_TurnOrder.cpp" />
+    <ClCompile Include="tests\Core\Effects\test_BurnEffect.cpp" />
+    <ClCompile Include="tests\Core\Effects\test_RegenEffect.cpp" />
+    <ClCompile Include="tests\Core\Effects\test_ShieldEffect.cpp" />
+    <ClCompile Include="tests\Core\Effects\test_SlowEffect.cpp" />
     <ClCompile Include="tests\Core\test_Affinity.cpp" />
     <ClCompile Include="tests\Core\test_Stats.cpp" />
     <ClCompile Include="tests\Core\test_StatusEffectBase.cpp" />
@@ -47,6 +55,7 @@
     <ClCompile Include="tests\Entities\test_Party.cpp" />
     <ClCompile Include="tests\Entities\test_PlayableCharacter.cpp" />
     <ClCompile Include="tests\Entities\test_Unit.cpp" />
+    <ClCompile Include="tests\Entities\test_UnitEffects.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="external\doctest.h" />
