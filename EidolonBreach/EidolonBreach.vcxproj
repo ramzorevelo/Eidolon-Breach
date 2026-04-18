@@ -54,7 +54,6 @@
     <ClInclude Include="src\Battle\TurnSlot.h" />
     <ClInclude Include="src\Core\ActionData.h" />
     <ClInclude Include="src\Core\ActionResult.h" />
-    <ClInclude Include="src\Core\ActionUtils.h" />
     <ClInclude Include="src\Core\Affinity.h" />
     <ClInclude Include="src\Core\CombatConstants.h" />
     <ClInclude Include="src\Core\CombatUtils.h" />

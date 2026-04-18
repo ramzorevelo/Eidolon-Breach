@@ -23,7 +23,7 @@ int main()
         Affinity::Blaze,
         10);
     striker->addAbility(std::make_unique<BasicStrikeAction>());
-    striker->addAbility(std::make_unique<SkillAction>(40));
+    striker->addAbility(std::make_unique<SkillAction>(2.0f));
     striker->addAbility(std::make_unique<UltimateAction>());
     playerParty.addUnit(std::move(striker));
 
@@ -33,7 +33,7 @@ int main()
         Affinity::Terra,
         8);
     conduit->addAbility(std::make_unique<BasicStrikeAction>());
-    conduit->addAbility(std::make_unique<SkillAction>(20));
+    conduit->addAbility(std::make_unique<SkillAction>(2.0f));
     conduit->addAbility(std::make_unique<UltimateAction>());
     playerParty.addUnit(std::move(conduit));
 
