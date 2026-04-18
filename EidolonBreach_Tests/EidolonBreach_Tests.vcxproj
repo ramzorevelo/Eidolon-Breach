@@ -51,6 +51,7 @@
     <ClCompile Include="tests\Core\Effects\test_SlowEffect.cpp" />
     <ClCompile Include="tests\Core\testActionData.cpp" />
     <ClCompile Include="tests\Core\test_Affinity.cpp" />
+    <ClCompile Include="tests\Core\test_BattleState.cpp" />
     <ClCompile Include="tests\Core\test_Stats.cpp" />
     <ClCompile Include="tests\Core\test_StatusEffectBase.cpp" />
     <ClCompile Include="tests\EidolonBreach_Tests.cpp" />

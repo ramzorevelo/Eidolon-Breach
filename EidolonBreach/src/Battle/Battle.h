@@ -8,6 +8,8 @@
 #include "Battle/TurnSlot.h"
 #include "Entities/Party.h"
 #include "UI/ConsoleRenderer.h"
+#include "Battle/BattleState.h"
+#include "Battle/ResonanceField.h"
 #include <memory>
 #include <vector>
 
@@ -45,4 +47,7 @@ class Battle
     void processEnemyTurn(Unit *unit);
     bool checkAndHandleBattleEnd();
     mutable ConsoleRenderer m_renderer;
+    ResonanceField m_field{};
+    void processPlayerTurn(Unit *unit, BattleState &state);
+    void processEnemyTurn(Unit *unit, BattleState &state);
 };

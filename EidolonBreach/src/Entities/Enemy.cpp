@@ -57,7 +57,7 @@ std::optional<Drop> Enemy::dropLoot()
     return result;
 }
 
-ActionResult Enemy::takeTurn(Party& /*allies*/, Party& targets)
+ActionResult Enemy::takeTurn(Party & /*allies*/, Party &targets, BattleState & /*state*/)
 {
     if (m_isBroken)
     {
