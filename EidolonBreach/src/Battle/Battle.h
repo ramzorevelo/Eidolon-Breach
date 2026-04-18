@@ -7,6 +7,7 @@
 #include "Battle/ITurnOrderCalculator.h"
 #include "Battle/TurnSlot.h"
 #include "Entities/Party.h"
+#include "UI/ConsoleRenderer.h"
 #include <memory>
 #include <vector>
 
@@ -43,4 +44,5 @@ class Battle
     void processPlayerTurn(Unit *unit);
     void processEnemyTurn(Unit *unit);
     bool checkAndHandleBattleEnd();
+    mutable ConsoleRenderer m_renderer;
 };

@@ -39,6 +39,7 @@
     <ClCompile Include="src\Entities\Unit.cpp" />
     <ClCompile Include="src\Entities\VampireBat.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\UI\ConsoleInputHandler.cpp" />
     <ClCompile Include="src\UI\ConsoleRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -79,7 +80,10 @@
     <ClInclude Include="src\Entities\StoneGolem.h" />
     <ClInclude Include="src\Entities\Unit.h" />
     <ClInclude Include="src\Entities\VampireBat.h" />
+    <ClInclude Include="src\UI\ConsoleInputHandler.h" />
     <ClInclude Include="src\UI\ConsoleRenderer.h" />
+    <ClInclude Include="src\UI\IInputHandler.h" />
+    <ClInclude Include="src\UI\IRenderer.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
