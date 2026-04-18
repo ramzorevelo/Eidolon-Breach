@@ -33,7 +33,7 @@ TEST_CASE("SkillAction: requires and consumes 25 SP from party")
     CHECK(enemyPtr->getHp() == 72);
     CHECK(enemyPtr->getToughness() == 25); // 50 - 25 (kSkillToughDmg)
     CHECK(allies.getSp() == 5);            // 30 - 25
-    CHECK(heroPtr->getEnergy() == 15);     // +15 Energy
+    CHECK(heroPtr->getMomentum() == 15);     // +15 Energy
 }
 
 TEST_CASE("SkillAction: isAvailable returns false when party SP insufficient")

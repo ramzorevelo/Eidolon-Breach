@@ -26,8 +26,8 @@ ActionResult UltimateAction::execute(PlayableCharacter &user,
                                      Party &enemies,
                                      std::optional<TargetInfo> target)
 {
-    user.resetEnergy();
-    user.gainEnergy(kEnergyRefund);
+    user.resetMomentum();
+    user.gainMomentum(kEnergyRefund);
     return ActionUtils::executeDamageAction(user, enemies, target,
                                             kBasePower, CombatConstants::kUltToughDmg);
 }
