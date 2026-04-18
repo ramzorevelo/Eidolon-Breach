@@ -4,6 +4,8 @@
  */
 #include "Entities/Enemy.h"
 #include "Entities/Party.h"
+#include "Battle/BattleState.h"
+#include "Battle/ResonanceField.h"
 #include "doctest.h"
 #include "test_helpers.h"
 #include <memory>
@@ -43,9 +45,12 @@ TEST_CASE("Enemy: takeTurn returns Skip when broken")
     REQUIRE(e->isBroken());
 
     Party playerParty, enemyParty;
-    ActionResult result = e->takeTurn(enemyParty, playerParty);
+    ResonanceField field{};
+    BattleState state{0, 0, field};
+
+    ActionResult result = e->takeTurn(enemyParty, playerParty, state);
     CHECK(result.type == ActionResult::Type::Skip);
-    CHECK(!e->isBroken()); // recovers after skip
+    CHECK(!e->isBroken());
 }
 
 TEST_CASE("Enemy::takeTurn applies DEF reduction to damage")
@@ -84,8 +89,11 @@ TEST_CASE("Enemy::takeTurn applies DEF reduction to damage")
     Unit *enemyPtr = enemy.get();
     enemyParty.addUnit(std::move(enemy));
 
+    ResonanceField field{};
+    BattleState state{0, 0, field};
+
     // Force enemy turn (targets first alive player unit via AI)
-    enemyPtr->takeTurn(enemyParty, playerParty);
+    enemyPtr->takeTurn(enemyParty, playerParty, state);
 
     Unit *target = playerParty.getUnitAt(0);
     // DEF 15 with K=100 gives mitigation = 15/(115) ≈ 0.13 → damage ≈ 30 * 0.87 ≈ 26

@@ -50,7 +50,7 @@ class PlayableCharacter : public Unit
     void consumeSp(int amount, Party &party) const;
 
     /** Displays action menu, reads player input, executes chosen action. */
-    ActionResult takeTurn(Party &allies, Party &enemies) override;
+    ActionResult takeTurn(Party &allies, Party &enemies, BattleState &state) override;
 
     int getResonanceContribution() const
     {

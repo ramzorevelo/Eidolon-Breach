@@ -150,6 +150,9 @@
     <ClCompile Include="..\EidolonBreach\src\Battle\ResonanceField.cpp">
       <Filter>Battle</Filter>
     </ClCompile>
+    <ClCompile Include="tests\Core\test_BattleState.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="external\doctest.h">

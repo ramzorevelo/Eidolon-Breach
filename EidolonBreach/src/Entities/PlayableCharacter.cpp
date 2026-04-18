@@ -1,5 +1,7 @@
 #include "Entities/PlayableCharacter.h"
 #include "Entities/Party.h"
+#include "Battle/BattleState.h"
+#include "Battle/ResonanceField.h" 
 #include <algorithm>
 #include <iostream>
 #include <limits>
@@ -139,11 +141,19 @@ std::optional<TargetInfo> PlayableCharacter::selectTarget(const Party &enemies)
     }
 }
 
-ActionResult PlayableCharacter::takeTurn(Party &allies, Party &enemies)
+ActionResult PlayableCharacter::takeTurn(Party &allies, Party &enemies, BattleState &state)
 {
     displayActionMenu(allies);
-    std::size_t actionIdx = selectActionIndex(allies);
-    std::optional<TargetInfo> target = selectTarget(enemies);
+    std::size_t actionIdx{selectActionIndex(allies)};
+    std::optional<TargetInfo> target{selectTarget(enemies)};
 
-    return m_abilities[actionIdx]->execute(*this, allies, enemies, target);
+    ActionResult result{m_abilities[actionIdx]->execute(*this, allies, enemies, target)};
+
+    // Contribute to Resonance Field after each player action.
+    state.resonanceField.addContribution(
+        m_abilities[actionIdx]->getAffinity(),
+        m_resonanceContribution);
+    ++state.turnNumber;
+
+    return result;
 }

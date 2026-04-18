@@ -43,17 +43,18 @@ bool Battle::isBattleOver() const
     return m_playerParty.isAllDead() || m_enemyParty.isAllDead();
 }
 
-void Battle::processPlayerTurn(Unit *unit)
+void Battle::processPlayerTurn(Unit *unit, BattleState &state)
 {
     auto breaksBefore{snapshotBreakStates(m_enemyParty)};
-    ActionResult result{unit->takeTurn(m_playerParty, m_enemyParty)};
+    ActionResult result{unit->takeTurn(m_playerParty, m_enemyParty, state)};
     m_renderer.renderActionResult(unit->getName(), result);
     renderNewBreaks(breaksBefore, m_enemyParty);
 }
 
-void Battle::processEnemyTurn(Unit *unit)
+
+void Battle::processEnemyTurn(Unit *unit, BattleState &state)
 {
-    ActionResult result{unit->takeTurn(m_enemyParty, m_playerParty)};
+    ActionResult result{unit->takeTurn(m_enemyParty, m_playerParty, state)};
     if (result.type == ActionResult::Type::Skip)
     {
         m_renderer.renderStunned(unit->getName());
@@ -99,12 +100,13 @@ bool Battle::checkAndHandleBattleEnd()
 
 void Battle::run()
 {
-    std::cout << "\n=== BATTLE START ===\n";
+    m_renderer.renderMessage("\n=== BATTLE START ===");
+    m_field.reset();
+    BattleState state{0, 0, m_field};
 
     while (!isBattleOver())
     {
         m_renderer.renderPartyStatus(m_playerParty, m_enemyParty);
-
         auto turnOrder{m_turnOrderCalc->calculate(m_playerParty, m_enemyParty)};
 
         for (const auto &slot : turnOrder)
@@ -114,13 +116,9 @@ void Battle::run()
             if (isBattleOver())
                 break;
 
-            // Tick status effects at the start of each unit's turn.
-            // Messages are printed here; this std::cout call is temporary;
-            // it will migrate to IRenderer in the next phase.
             for (const std::string &msg : slot.unit->tickEffects())
-                std::cout << msg << '\n';
+                m_renderer.renderMessage(msg);
 
-            // A DoT tick may have killed this unit — check before acting.
             if (!slot.unit->isAlive())
             {
                 if (checkAndHandleBattleEnd())
@@ -128,14 +126,13 @@ void Battle::run()
                 continue;
             }
 
-
             if (slot.isPlayer)
             {
-                processPlayerTurn(slot.unit);
+                processPlayerTurn(slot.unit, state);
             }
             else
             {
-                processEnemyTurn(slot.unit);
+                processEnemyTurn(slot.unit, state);
             }
 
             if (checkAndHandleBattleEnd())
