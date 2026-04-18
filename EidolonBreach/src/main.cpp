@@ -7,6 +7,7 @@
 #include "Entities/VampireBat.h"
 #include <iostream>
 #include <memory>
+#include <UI/ConsoleRenderer.h>
 
 int main()
 {
@@ -41,7 +42,8 @@ int main()
     enemyParty.addUnit(std::make_unique<StoneGolem>("Stone Golem", 130, 60));
     enemyParty.addUnit(std::make_unique<VampireBat>("Vampire Bat", 100, 40));
 
-    Battle battle{playerParty, enemyParty};
+    ConsoleRenderer renderer{};
+    Battle battle{playerParty, enemyParty, renderer};
     battle.run();
 
     return 0;
