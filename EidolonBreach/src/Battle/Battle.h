@@ -8,6 +8,7 @@
 #include "Battle/TurnSlot.h"
 #include "Entities/Party.h"
 #include "UI/IRenderer.h"
+#include "UI/IInputHandler.h"
 #include "Battle/BattleState.h"
 #include "Battle/ResonanceField.h"
 #include <memory>
@@ -26,6 +27,7 @@ class Battle
     Battle(Party &playerParty,
            Party &enemyParty,
            IRenderer &renderer,
+           IInputHandler &inputHandler,
            std::unique_ptr<ITurnOrderCalculator> turnOrderCalc = nullptr);
 
     void run();
@@ -52,4 +54,5 @@ class Battle
     void processPlayerTurn(Unit *unit, BattleState &state);
     void processEnemyTurn(Unit *unit, BattleState &state);
     IRenderer &m_renderer;
+    IInputHandler &m_inputHandler;
 };

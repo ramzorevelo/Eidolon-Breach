@@ -9,6 +9,8 @@
 #include "doctest.h"
 #include "test_helpers.h"
 #include <memory>
+#include <UI/test_NullRenderer.h>
+#include <UI/test_NullInputHandler.h>
 
 TEST_CASE("Enemy: toughness break and recovery")
 {
@@ -46,7 +48,9 @@ TEST_CASE("Enemy: takeTurn returns Skip when broken")
 
     Party playerParty, enemyParty;
     ResonanceField field{};
-    BattleState state{0, 0, field};
+    NullInputHandler inputHandler{};
+    NullRenderer renderer{};
+    BattleState state{0, 0, field, inputHandler, renderer};
 
     ActionResult result = e->takeTurn(enemyParty, playerParty, state);
     CHECK(result.type == ActionResult::Type::Skip);
@@ -90,7 +94,9 @@ TEST_CASE("Enemy::takeTurn applies DEF reduction to damage")
     enemyParty.addUnit(std::move(enemy));
 
     ResonanceField field{};
-    BattleState state{0, 0, field};
+    NullInputHandler inputHandler{};
+    NullRenderer renderer{};
+    BattleState state{0, 0, field, inputHandler, renderer};
 
     // Force enemy turn (targets first alive player unit via AI)
     enemyPtr->takeTurn(enemyParty, playerParty, state);

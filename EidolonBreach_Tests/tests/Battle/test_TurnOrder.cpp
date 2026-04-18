@@ -11,6 +11,7 @@
 #include "doctest.h"
 #include <memory>
 #include <UI/test_NullRenderer.h>
+#include <UI/test_NullInputHandler.h>
 
 TEST_CASE("Battle integration: turn order uses injected calculator")
 {
@@ -26,7 +27,8 @@ TEST_CASE("Battle integration: turn order uses injected calculator")
     enemyParty.addUnit(std::move(enemy));
 
     NullRenderer renderer{};
-    Battle battle{playerParty, enemyParty, renderer};
+    NullInputHandler inputHandler{};
+    Battle battle{playerParty, enemyParty, renderer, inputHandler};
     // The default calculator is SpeedBasedTurnOrderCalculator.
     // We can't easily test the full run() without mock input,
     // but we can verify the calculator is present.

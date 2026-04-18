@@ -156,3 +156,21 @@ void ConsoleRenderer::renderResonanceField(const ResonanceField &field)
         std::cout << " (" << summary << ')';
     std::cout << '\n';
 }
+
+void ConsoleRenderer::renderActionMenu(const PlayableCharacter &character,
+                                       const Party &party)
+{
+    std::cout << "\n[" << character.getName() << "]"
+              << "  SP: " << party.getSp() << '/' << party.getMaxSp()
+              << "  Momentum: " << character.getMomentum() << '/'
+              << PlayableCharacter::kMaxMomentum << '\n';
+    std::cout << "Actions:\n";
+    const auto &abilities = character.getAbilities();
+    for (std::size_t i{0}; i < abilities.size(); ++i)
+    {
+        std::cout << "  [" << (i + 1) << "] " << abilities[i]->label();
+        if (!abilities[i]->isAvailable(character, party))
+            std::cout << " [UNAVAILABLE]";
+        std::cout << '\n';
+    }
+}

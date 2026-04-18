@@ -17,4 +17,5 @@ class NullRenderer : public IRenderer
     void renderPartyStatus(const Party &, const Party &) override {}
     void renderMessage(const std::string &) override {}
     void renderResonanceField(const ResonanceField &) override {}
+    void renderActionMenu(const PlayableCharacter &, const Party &) override {}
 };

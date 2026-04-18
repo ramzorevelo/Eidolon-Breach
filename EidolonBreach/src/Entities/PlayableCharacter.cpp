@@ -2,6 +2,8 @@
 #include "Entities/Party.h"
 #include "Battle/BattleState.h"
 #include "Battle/ResonanceField.h" 
+#include "UI/IInputHandler.h"
+#include "UI/IRenderer.h"
 #include <algorithm>
 #include <iostream>
 #include <limits>
@@ -50,61 +52,25 @@ void PlayableCharacter::consumeSp(int amount, Party &party) const
     party.useSp(amount);
 }
 
-void PlayableCharacter::displayActionMenu(const Party &party) const
-{
-    std::cout << "\n[" << m_name << "]"
-              << "  SP: " << party.getSp() << '/' << party.getMaxSp()
-              << "  Energy: " << m_resources.momentum << '/' << kMaxMomentum << '\n';
-    std::cout << "Actions:\n";
-    for (std::size_t i{0}; i < m_abilities.size(); ++i)
-    {
-        std::cout << "  [" << (i + 1) << "] " << m_abilities[i]->label();
-        // Now pass the party to isAvailable
-        if (!m_abilities[i]->isAvailable(*this, party))
-        {
-            std::cout << " [UNAVAILABLE]";
-        }
-        std::cout << '\n';
-    }
-}
-
-std::size_t PlayableCharacter::selectActionIndex(const Party &party)
+std::size_t PlayableCharacter::selectActionIndex(const Party &allies,
+                                                 IInputHandler &input)
 {
     while (true)
     {
-        std::cout << "Choose action: ";
-        int choice{};
-        if (!(std::cin >> choice))
-        {
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            std::cout << "Invalid input.\n";
-            continue;
-        }
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-
-        std::size_t idx{static_cast<std::size_t>(choice - 1)};
-        if (idx >= m_abilities.size())
-        {
-            std::cout << "Invalid choice.\n";
-            continue;
-        }
-        // Pass party to isAvailable
-        if (!m_abilities[idx]->isAvailable(*this, party))
-        {
-            std::cout << "Action unavailable.\n";
-            continue;
-        }
-        return idx;
+        std::size_t idx{input.getActionChoice(m_abilities.size())};
+        if (m_abilities[idx]->isAvailable(*this, allies))
+            return idx;
+        // Unavailable feedback — renderer not available here; ConsoleInputHandler
+        // prints its own prompt. Full message rendering deferred to SDL phase.
     }
 }
-
-std::optional<TargetInfo> PlayableCharacter::selectTarget(const Party &enemies)
+std::optional<TargetInfo> PlayableCharacter::selectTarget(const Party &enemies,
+                                                          IInputHandler &input)
 {
     std::vector<std::pair<std::size_t, const Unit *>> targets{};
     for (std::size_t i{0}; i < enemies.size(); ++i)
     {
-        const Unit *u = enemies.getUnitAt(i);
+        const Unit *u{enemies.getUnitAt(i)};
         if (u && u->isAlive())
             targets.emplace_back(i, u);
     }
@@ -114,42 +80,25 @@ std::optional<TargetInfo> PlayableCharacter::selectTarget(const Party &enemies)
     if (targets.size() == 1)
         return TargetInfo{TargetInfo::Type::Enemy, targets[0].first};
 
-    std::cout << "Choose target:\n";
-    for (std::size_t i{0}; i < targets.size(); ++i)
-        std::cout << "  [" << (i + 1) << "] " << targets[i].second->getName() << '\n';
-
-    while (true)
-    {
-        std::cout << "Target: ";
-        int choice{};
-        if (!(std::cin >> choice))
-        {
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            std::cout << "Invalid input.\n";
-            continue;
-        }
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-
-        std::size_t idx{static_cast<std::size_t>(choice - 1)};
-        if (idx >= targets.size())
-        {
-            std::cout << "Invalid target.\n";
-            continue;
-        }
-        return TargetInfo{TargetInfo::Type::Enemy, targets[idx].first};
-    }
+    std::size_t choice{input.getTargetChoice(targets.size())};
+    return TargetInfo{TargetInfo::Type::Enemy, targets[choice].first};
+}
+void PlayableCharacter::displayActionMenu(const Party &party, IRenderer &renderer) const
+{
+    renderer.renderActionMenu(*this, party);
 }
 
-ActionResult PlayableCharacter::takeTurn(Party &allies, Party &enemies, BattleState &state)
+
+ActionResult PlayableCharacter::takeTurn(Party &allies,
+                                         Party &enemies,
+                                         BattleState &state)
 {
-    displayActionMenu(allies);
-    std::size_t actionIdx{selectActionIndex(allies)};
-    std::optional<TargetInfo> target{selectTarget(enemies)};
+    displayActionMenu(allies, state.renderer);
+    std::size_t actionIdx{selectActionIndex(allies, state.inputHandler)};
+    std::optional<TargetInfo> target{selectTarget(enemies, state.inputHandler)};
 
     ActionResult result{m_abilities[actionIdx]->execute(*this, allies, enemies, target)};
 
-    // Contribute to Resonance Field after each player action.
     state.resonanceField.addContribution(
         m_abilities[actionIdx]->getAffinity(),
         m_resonanceContribution);
@@ -157,7 +106,6 @@ ActionResult PlayableCharacter::takeTurn(Party &allies, Party &enemies, BattleSt
 
     return result;
 }
-
 void PlayableCharacter::consumeMomentum(int amount)
 {
     m_resources.momentum = std::max(0, m_resources.momentum - amount);

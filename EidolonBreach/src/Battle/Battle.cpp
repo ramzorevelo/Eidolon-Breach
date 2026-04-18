@@ -14,9 +14,10 @@
 Battle::Battle(Party &playerParty,
                Party &enemyParty,
                IRenderer &renderer,
+               IInputHandler &inputHandler,
                std::unique_ptr<ITurnOrderCalculator> turnOrderCalc)
-    : m_playerParty{playerParty}, m_enemyParty{enemyParty}, m_renderer{renderer}, m_turnOrderCalc{turnOrderCalc ? std::move(turnOrderCalc)
-                                                                                                                : std::make_unique<SpeedBasedTurnOrderCalculator>()}
+    : m_playerParty{playerParty}, m_enemyParty{enemyParty}, m_renderer{renderer}, m_inputHandler{inputHandler}, m_turnOrderCalc{turnOrderCalc ? std::move(turnOrderCalc)
+                                                                                                                                              : std::make_unique<SpeedBasedTurnOrderCalculator>()}
 {
 }
 
@@ -149,7 +150,7 @@ void Battle::run()
 {
     m_renderer.renderMessage("\n=== BATTLE START ===");
     m_field.reset();
-    BattleState state{0, 0, m_field};
+    BattleState state{0, 0, m_field, m_inputHandler, m_renderer};
 
     while (!isBattleOver())
     {
