@@ -10,6 +10,7 @@
 #include "Entities/PlayableCharacter.h"
 #include "doctest.h"
 #include <memory>
+#include <UI/test_NullRenderer.h>
 
 TEST_CASE("Battle integration: turn order uses injected calculator")
 {
@@ -24,7 +25,8 @@ TEST_CASE("Battle integration: turn order uses injected calculator")
         std::make_unique<BasicAIStrategy>());
     enemyParty.addUnit(std::move(enemy));
 
-    Battle battle{playerParty, enemyParty};
+    NullRenderer renderer{};
+    Battle battle{playerParty, enemyParty, renderer};
     // The default calculator is SpeedBasedTurnOrderCalculator.
     // We can't easily test the full run() without mock input,
     // but we can verify the calculator is present.

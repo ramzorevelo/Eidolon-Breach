@@ -1,5 +1,10 @@
 #include "Battle/Battle.h"
 #include "Battle/SpeedBasedTurnOrderCalculator.h"
+#include "Core/Effects/BurnEffect.h"
+#include "Core/Effects/ShieldEffect.h"
+#include "Core/Effects/SlowEffect.h"
+#include "Core/EffectIds.h"
+#include "Entities/PlayableCharacter.h"
 #include "Core/ActionResult.h"
 #include "Entities/Enemy.h"
 #include "UI/ConsoleRenderer.h"
@@ -8,9 +13,10 @@
 
 Battle::Battle(Party &playerParty,
                Party &enemyParty,
+               IRenderer &renderer,
                std::unique_ptr<ITurnOrderCalculator> turnOrderCalc)
-    : m_playerParty{playerParty}, m_enemyParty{enemyParty}, m_turnOrderCalc{turnOrderCalc ? std::move(turnOrderCalc)
-                                                                                          : std::make_unique<SpeedBasedTurnOrderCalculator>()}
+    : m_playerParty{playerParty}, m_enemyParty{enemyParty}, m_renderer{renderer}, m_turnOrderCalc{turnOrderCalc ? std::move(turnOrderCalc)
+                                                                                                                : std::make_unique<SpeedBasedTurnOrderCalculator>()}
 {
 }
 
@@ -49,6 +55,47 @@ void Battle::processPlayerTurn(Unit *unit, BattleState &state)
     ActionResult result{unit->takeTurn(m_playerParty, m_enemyParty, state)};
     m_renderer.renderActionResult(unit->getName(), result);
     renderNewBreaks(breaksBefore, m_enemyParty);
+
+    if (state.resonanceField.isReady())
+    {
+        Affinity triggered{state.resonanceField.trigger()};
+        applyResonanceTrigger(triggered);
+        m_renderer.renderMessage(">> Resonance Field: " +
+                                 affinityToString(triggered) + " triggered! <<");
+    }
+    m_renderer.renderResonanceField(state.resonanceField);
+}
+
+void Battle::applyResonanceTrigger(Affinity affinity)
+{
+    switch (affinity)
+    {
+    case Affinity::Blaze:
+        for (Unit *u : m_enemyParty.getAliveUnits())
+            u->applyEffect(std::make_unique<BurnEffect>(10, 2));
+        break;
+    case Affinity::Frost:
+        for (Unit *u : m_enemyParty.getAliveUnits())
+            u->applyEffect(std::make_unique<SlowEffect>(0.30f, 2));
+        break;
+    case Affinity::Tempest:
+        // Dynamic cast permitted here: no generic momentum interface on Unit
+        // until Phase 9 (IPassiveTrait). Flagged for Phase 9 revisit.
+        for (Unit *u : m_playerParty.getAliveUnits())
+            if (auto *pc = dynamic_cast<PlayableCharacter *>(u))
+                pc->gainMomentum(20);
+        break;
+    case Affinity::Terra:
+        for (Unit *u : m_playerParty.getAliveUnits())
+            u->applyEffect(std::make_unique<ShieldEffect>(30, 2));
+        break;
+    case Affinity::Aether:
+        for (Unit *u : m_playerParty.getAliveUnits())
+            u->removeEffectsByTag(EffectTags::kDebuff);
+        for (Unit *u : m_enemyParty.getAliveUnits())
+            u->removeEffectsByTag(EffectTags::kBuff);
+        break;
+    }
 }
 
 
