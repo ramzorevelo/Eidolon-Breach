@@ -144,6 +144,12 @@
     <ClCompile Include="tests\Core\testActionData.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="tests\Battle\test_ResonanceField.cpp">
+      <Filter>Battle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Battle\ResonanceField.cpp">
+      <Filter>Battle</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="external\doctest.h">
