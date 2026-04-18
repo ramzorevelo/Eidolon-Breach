@@ -162,3 +162,13 @@ void PlayableCharacter::consumeMomentum(int amount)
 {
     m_resources.momentum = std::max(0, m_resources.momentum - amount);
 }
+
+void PlayableCharacter::modifyExposure(int delta)
+{
+    m_exposure = std::clamp(m_exposure + delta, 0, kMaxExposure);
+}
+
+bool PlayableCharacter::canVent() const
+{
+    return m_exposure > 0 && m_exposure < kMaxExposure;
+}

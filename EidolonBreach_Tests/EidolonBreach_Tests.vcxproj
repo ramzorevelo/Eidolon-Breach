@@ -58,6 +58,7 @@
     <ClCompile Include="tests\Core\test_StatusEffectBase.cpp" />
     <ClCompile Include="tests\EidolonBreach_Tests.cpp" />
     <ClCompile Include="tests\Entities\test_Enemy.cpp" />
+    <ClCompile Include="tests\Entities\test_Exposure.cpp" />
     <ClCompile Include="tests\Entities\test_Party.cpp" />
     <ClCompile Include="tests\Entities\test_PlayableCharacter.cpp" />
     <ClCompile Include="tests\Entities\test_Unit.cpp" />

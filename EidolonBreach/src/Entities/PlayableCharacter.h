@@ -63,6 +63,16 @@ class PlayableCharacter : public Unit
     /** @brief Deduct amount from Momentum, clamped to 0. */
     void consumeMomentum(int amount);
 
+    // Exposure gauge 
+    static constexpr int kMaxExposure{100};
+    static constexpr int kVentThreshold50{50}; // consolation proc threshold
+
+    int getExposure() const
+    {
+        return m_exposure;
+    }
+    void modifyExposure(int delta);
+    bool canVent() const; // 0 < exposure < 100
   private:
     std::vector<std::unique_ptr<IAction>> m_abilities;
     ResourceStats m_resources{0, kMaxMomentum};
@@ -73,4 +83,5 @@ class PlayableCharacter : public Unit
     void displayActionMenu(const Party &party) const;
     std::size_t selectActionIndex(const Party &party);
     std::optional<TargetInfo> selectTarget(const Party &enemies);
+    int m_exposure{0};
 };

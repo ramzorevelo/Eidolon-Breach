@@ -22,19 +22,24 @@ std::string VentAction::label() const
     return "Vent (Exposure -> 0, ends turn)";
 }
 
-bool VentAction::isAvailable(const PlayableCharacter & /*user*/, const Party & /*party*/) const
+bool VentAction::isAvailable(const PlayableCharacter &user, const Party & /*party*/) const
 {
-    // Full check (Exposure > 0 && Exposure < 100) wired in Commit 10.
-    return false;
+    return user.canVent();
 }
 
-ActionResult VentAction::execute(PlayableCharacter & /*user*/,
+ActionResult VentAction::execute(PlayableCharacter &user,
                                  Party & /*allies*/,
                                  Party & /*enemies*/,
                                  std::optional<TargetInfo> /*target*/)
 {
-    // Full Exposure reduction wired in Commit 10.
-    return ActionResult{ActionResult::Type::Skip, 0};
+    // Consolation proc: if Exposure was >= 50 when venting, fire the 50-threshold proc.
+    bool consolation{user.getExposure() >= PlayableCharacter::kVentThreshold50};
+    user.modifyExposure(-user.getExposure()); // reduce to 0
+
+    ActionResult result{ActionResult::Type::Skip, 0};
+    if (consolation)
+        result.flavorText = "Resonating discharge — Exposure cleared with a bonus proc!";
+    return result;
 }
 
 Affinity VentAction::getAffinity() const
