@@ -93,6 +93,9 @@
     <ClCompile Include="src\Core\Effects\SlowEffect.cpp">
       <Filter>Core\Effects</Filter>
     </ClCompile>
+    <ClCompile Include="src\Battle\ResonanceField.cpp">
+      <Filter>Battle</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Actions\BasicStrikeAction.h">
@@ -205,6 +208,9 @@
     </ClInclude>
     <ClInclude Include="src\Core\TargetMode.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Battle\ResonanceField.h">
+      <Filter>Battle</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
