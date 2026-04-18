@@ -22,6 +22,7 @@
     <ClCompile Include="..\EidolonBreach\src\Actions\BasicStrikeAction.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Actions\SkillAction.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Actions\UltimateAction.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Actions\VentAction.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Battle\Battle.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Battle\ResonanceField.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Battle\SpeedBasedTurnOrderCalculator.cpp" />
@@ -42,6 +43,7 @@
     <ClCompile Include="tests\Actions\test_BasicStrikeAction.cpp" />
     <ClCompile Include="tests\Actions\test_SkillAction.cpp" />
     <ClCompile Include="tests\Actions\test_UltimateAction.cpp" />
+    <ClCompile Include="tests\Actions\test_VentActions.cpp" />
     <ClCompile Include="tests\Battle\test_ResonanceField.cpp" />
     <ClCompile Include="tests\Battle\test_SpeedBasedTurnOrderCalculator.cpp" />
     <ClCompile Include="tests\Battle\test_TurnOrder.cpp" />

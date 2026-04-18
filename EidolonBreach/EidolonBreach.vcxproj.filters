@@ -99,6 +99,9 @@
     <ClCompile Include="src\UI\ConsoleInputHandler.cpp">
       <Filter>UI</Filter>
     </ClCompile>
+    <ClCompile Include="src\Actions\VentAction.cpp">
+      <Filter>Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Actions\BasicStrikeAction.h">
@@ -220,6 +223,9 @@
     </ClInclude>
     <ClInclude Include="src\UI\IRenderer.h">
       <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Actions\VentAction.h">
+      <Filter>Actions</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
