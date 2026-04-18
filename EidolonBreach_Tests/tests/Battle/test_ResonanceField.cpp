@@ -75,7 +75,7 @@ TEST_CASE("ResonanceField: trigger resets gauge to 0")
 {
     ResonanceField field{};
     field.addContribution(Affinity::Blaze, 100);
-    field.trigger();
+    [[maybe_unused]] Affinity triggered = field.trigger();
     CHECK(field.getGauge() == 0);
 }
 
@@ -89,7 +89,7 @@ TEST_CASE("ResonanceField: Resonance Memory retains 25% of winning votes")
     field.addContribution(Affinity::Blaze, 25);
     field.addContribution(Affinity::Frost, 10);
 
-    field.trigger(); // Blaze wins
+    [[maybe_unused]] Affinity triggered = field.trigger(); // Blaze wins
 
     // 25% of 4.0 = 1.0 Blaze votes retained; Frost resets to 0.
     CHECK(field.getVotes(Affinity::Blaze) == doctest::Approx(1.0f));

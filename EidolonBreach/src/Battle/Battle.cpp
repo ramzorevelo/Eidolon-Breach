@@ -33,7 +33,7 @@ void Battle::renderNewBreaks(const std::vector<bool> &before, const Party &party
         const Unit *u{party.getUnitAt(i)};
         if (u && !before[i] && u->isBroken())
         {
-            ConsoleRenderer::renderBreak(u->getName());
+            m_renderer.renderBreak(u->getName());
         }
     }
 }
@@ -47,7 +47,7 @@ void Battle::processPlayerTurn(Unit *unit)
 {
     auto breaksBefore{snapshotBreakStates(m_enemyParty)};
     ActionResult result{unit->takeTurn(m_playerParty, m_enemyParty)};
-    ConsoleRenderer::renderAttack(unit->getName(), result);
+    m_renderer.renderActionResult(unit->getName(), result);
     renderNewBreaks(breaksBefore, m_enemyParty);
 }
 
@@ -56,11 +56,11 @@ void Battle::processEnemyTurn(Unit *unit)
     ActionResult result{unit->takeTurn(m_enemyParty, m_playerParty)};
     if (result.type == ActionResult::Type::Skip)
     {
-        ConsoleRenderer::renderStunned(unit->getName());
+        m_renderer.renderStunned(unit->getName());
     }
     else
     {
-        ConsoleRenderer::renderAttack(unit->getName(), result);
+        m_renderer.renderActionResult(unit->getName(), result);
     }
 }
 
@@ -75,7 +75,7 @@ bool Battle::checkAndHandleBattleEnd()
             {
                 if (auto *e = dynamic_cast<Enemy *>(u))
                 {
-                    ConsoleRenderer::renderVictory(e->getName(), e->dropLoot());
+                    m_renderer.renderVictory(e->getName(), e->dropLoot());
                 }
             }
         }
@@ -89,7 +89,7 @@ bool Battle::checkAndHandleBattleEnd()
             Unit *u{m_playerParty.getUnitAt(i)};
             if (!u->isAlive())
             {
-                ConsoleRenderer::renderDefeat(u->getName());
+                m_renderer.renderDefeat(u->getName());
             }
         }
         return true;
@@ -103,7 +103,7 @@ void Battle::run()
 
     while (!isBattleOver())
     {
-        ConsoleRenderer::printPartyStatus(m_playerParty, m_enemyParty);
+        m_renderer.renderPartyStatus(m_playerParty, m_enemyParty);
 
         auto turnOrder{m_turnOrderCalc->calculate(m_playerParty, m_enemyParty)};
 

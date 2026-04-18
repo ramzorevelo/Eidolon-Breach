@@ -4,6 +4,7 @@
 #include "Entities/PlayableCharacter.h"
 #include "Entities/Enemy.h"
 #include "Core/IStatusEffect.h"
+#include "Battle/ResonanceField.h"
 #include <iostream>
 
 void ConsoleRenderer::printBar(int current, int maximum, int width)
@@ -15,7 +16,7 @@ void ConsoleRenderer::printBar(int current, int maximum, int width)
     std::cout << "] " << current << '/' << maximum;
 }
 
-void ConsoleRenderer::renderAttack(const std::string& actorName, const ActionResult& result)
+void ConsoleRenderer::renderActionResult(const std::string& actorName, const ActionResult& result)
 {
     if (!result.flavorText.empty())
         std::cout << result.flavorText << '\n';
@@ -131,7 +132,7 @@ void ConsoleRenderer::renderUnit(const Unit *unit, const std::string &label, boo
 }
 
 
-void ConsoleRenderer::printPartyStatus(const Party& playerParty, const Party& enemyParty)
+void ConsoleRenderer::renderPartyStatus(const Party& playerParty, const Party& enemyParty)
 {
     std::cout << "\n====================================\n";
 
@@ -140,4 +141,18 @@ void ConsoleRenderer::printPartyStatus(const Party& playerParty, const Party& en
     renderParty(playerParty, "P", /*showToughness=*/false);
 
     std::cout << "====================================\n";
+}
+
+void ConsoleRenderer::renderMessage(const std::string &message)
+{
+    std::cout << message << '\n';
+}
+
+void ConsoleRenderer::renderResonanceField(const ResonanceField &field)
+{
+    std::cout << "  [Resonance Field] " << field.getGauge() << "/100";
+    std::string summary{field.getVoteSummary()};
+    if (!summary.empty())
+        std::cout << " (" << summary << ')';
+    std::cout << '\n';
 }
