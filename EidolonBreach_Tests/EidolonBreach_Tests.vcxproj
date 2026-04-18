@@ -47,6 +47,7 @@
     <ClCompile Include="tests\Core\Effects\test_RegenEffect.cpp" />
     <ClCompile Include="tests\Core\Effects\test_ShieldEffect.cpp" />
     <ClCompile Include="tests\Core\Effects\test_SlowEffect.cpp" />
+    <ClCompile Include="tests\Core\testActionData.cpp" />
     <ClCompile Include="tests\Core\test_Affinity.cpp" />
     <ClCompile Include="tests\Core\test_Stats.cpp" />
     <ClCompile Include="tests\Core\test_StatusEffectBase.cpp" />

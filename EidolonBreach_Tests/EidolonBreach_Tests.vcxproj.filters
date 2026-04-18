@@ -141,6 +141,9 @@
     <ClCompile Include="tests\Entities\test_UnitEffects.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
+    <ClCompile Include="tests\Core\testActionData.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="external\doctest.h">

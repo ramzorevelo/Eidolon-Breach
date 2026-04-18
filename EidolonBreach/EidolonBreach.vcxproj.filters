@@ -197,5 +197,14 @@
     <ClInclude Include="src\Core\Effects\SlowEffect.h">
       <Filter>Core\Effects</Filter>
     </ClInclude>
+    <ClInclude Include="src\Core\ActionData.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\ScalingStat.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\TargetMode.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
