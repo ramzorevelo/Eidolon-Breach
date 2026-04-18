@@ -15,8 +15,8 @@
 class PlayableCharacter : public Unit
 {
   public:
-    static constexpr int kMaxEnergy{100}; 
-
+    static constexpr int kMaxMomentum{100}; 
+    static constexpr int kArchSkillThreshold{40}; // Arch Skill available when momentum >= 40
     PlayableCharacter(std::string id,
                       std::string name,
                       Stats stats,
@@ -30,16 +30,20 @@ class PlayableCharacter : public Unit
     const std::vector<std::unique_ptr<IAction>> &getAbilities() const;
 
     // Energy (individual resource)
-    int getEnergy() const
+    int getMomentum() const
     {
-        return m_resources.energy;
+        return m_resources.momentum;
     }
     bool isUltimateReady() const
     {
-        return m_resources.energy >= kMaxEnergy;
+        return m_resources.momentum >= kMaxMomentum;
     }
-    void gainEnergy(int amount);
-    void resetEnergy();
+    bool isArchSkillReady() const
+    {
+        return m_resources.momentum >= kArchSkillThreshold;
+    }
+    void gainMomentum(int amount);
+    void resetMomentum();
 
     // Delegates SP operations to the Party (shared pool)
     bool canAffordSp(int amount, const Party &party) const;
@@ -59,7 +63,7 @@ class PlayableCharacter : public Unit
 
   private:
     std::vector<std::unique_ptr<IAction>> m_abilities;
-    ResourceStats m_resources{0, kMaxEnergy};
+    ResourceStats m_resources{0, kMaxMomentum};
 
     int m_resonanceContribution{};
     std::string m_passiveTrait{};

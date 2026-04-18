@@ -124,7 +124,7 @@ void ConsoleRenderer::renderUnit(const Unit *unit, const std::string &label, boo
         {
             // Energy only; SP is now shown at party level
             std::cout << "    Energy: ";
-            printBar(pc->getEnergy(), PlayableCharacter::kMaxEnergy, 10);
+            printBar(pc->getMomentum(), PlayableCharacter::kMaxMomentum, 10);
             std::cout << '\n';
         }
     }

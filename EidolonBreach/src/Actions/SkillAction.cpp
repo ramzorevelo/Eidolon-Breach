@@ -29,7 +29,7 @@ ActionResult SkillAction::execute(PlayableCharacter &user,
                                   std::optional<TargetInfo> target)
 {
     allies.useSp(kSpCost);
-    user.gainEnergy(kEnergyGain);
+    user.gainMomentum(kEnergyGain);
     return ActionUtils::executeDamageAction(user, enemies, target,
                                             m_damage, CombatConstants::kSkillToughDmg);
 }

@@ -14,22 +14,22 @@
 TEST_CASE("PlayableCharacter: Energy management")
 {
     auto hero = makeHero();
-    CHECK(hero->getEnergy() == 0);
+    CHECK(hero->getMomentum() == 0);
     CHECK(!hero->isUltimateReady());
 
-    hero->gainEnergy(60);
-    CHECK(hero->getEnergy() == 60);
+    hero->gainMomentum(60);
+    CHECK(hero->getMomentum() == 60);
 
-    hero->gainEnergy(60);
-    CHECK(hero->getEnergy() == 100);
+    hero->gainMomentum(60);
+    CHECK(hero->getMomentum() == 100);
     CHECK(hero->isUltimateReady());
 
-    hero->resetEnergy();
-    CHECK(hero->getEnergy() == 0);
+    hero->resetMomentum();
+    CHECK(hero->getMomentum() == 0);
 
     // Energy caps at kMaxEnergy (100)
-    hero->gainEnergy(150);
-    CHECK(hero->getEnergy() == 100);
+    hero->gainMomentum(150);
+    CHECK(hero->getMomentum() == 100);
 }
 
 TEST_CASE("PlayableCharacter: SP affordability delegates to Party")
@@ -58,4 +58,20 @@ TEST_CASE("PlayableCharacter: resonanceContribution is owned by PlayableCharacte
     auto hero = makeHero(); // test_helpers.h creates a hero with resonanceContribution = 10
     CHECK(hero->getResonanceContribution() == 10);
     CHECK(hero->getPassiveTrait() == "");
+}
+
+TEST_CASE("PlayableCharacter: Arch Skill threshold")
+{
+    auto hero = makeHero();
+    CHECK(!hero->isArchSkillReady());
+
+    hero->gainMomentum(39);
+    CHECK(!hero->isArchSkillReady());
+
+    hero->gainMomentum(1); // reaches 40
+    CHECK(hero->isArchSkillReady());
+    CHECK(!hero->isUltimateReady());
+
+    hero->gainMomentum(60); // reaches 100
+    CHECK(hero->isUltimateReady());
 }

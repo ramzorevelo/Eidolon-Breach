@@ -28,7 +28,7 @@ ActionResult BasicStrikeAction::execute(PlayableCharacter &user,
                                         std::optional<TargetInfo> target)
 {
     allies.gainSp(kSpGain);
-    user.gainEnergy(kEnergyGain);
+    user.gainMomentum(kEnergyGain);
     return ActionUtils::executeDamageAction(user, enemies, target,
                                             kBasePower, CombatConstants::kBasicToughDmg);
 }

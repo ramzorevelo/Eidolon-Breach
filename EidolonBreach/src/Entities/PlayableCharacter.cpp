@@ -27,14 +27,14 @@ const std::vector<std::unique_ptr<IAction>> &PlayableCharacter::getAbilities() c
     return m_abilities;
 }
 
-void PlayableCharacter::gainEnergy(int amount)
+void PlayableCharacter::gainMomentum(int amount)
 {
-    m_resources.energy = std::min(kMaxEnergy, m_resources.energy + amount);
+    m_resources.momentum = std::min(kMaxMomentum, m_resources.momentum + amount);
 }
 
-void PlayableCharacter::resetEnergy()
+void PlayableCharacter::resetMomentum()
 {
-    m_resources.energy = 0;
+    m_resources.momentum = 0;
 }
 
 bool PlayableCharacter::canAffordSp(int amount, const Party &party) const
@@ -52,7 +52,7 @@ void PlayableCharacter::displayActionMenu(const Party &party) const
 {
     std::cout << "\n[" << m_name << "]"
               << "  SP: " << party.getSp() << '/' << party.getMaxSp()
-              << "  Energy: " << m_resources.energy << '/' << kMaxEnergy << '\n';
+              << "  Energy: " << m_resources.momentum << '/' << kMaxMomentum << '\n';
     std::cout << "Actions:\n";
     for (std::size_t i{0}; i < m_abilities.size(); ++i)
     {

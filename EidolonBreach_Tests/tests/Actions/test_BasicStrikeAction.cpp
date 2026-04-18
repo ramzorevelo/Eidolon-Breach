@@ -33,7 +33,7 @@ TEST_CASE("BasicStrikeAction: deals damage and toughness, grants SP to party and
     CHECK(enemyPtr->getHp() == 85);
     CHECK(enemyPtr->getToughness() == 40); // 50 - 10 (kBasicToughDmg)
     CHECK(allies.getSp() == 15);           // +15 to shared pool
-    CHECK(heroPtr->getEnergy() == 8);      // +8 Energy
+    CHECK(heroPtr->getMomentum() == 8);      // +8 Energy
 }
 
 TEST_CASE("BasicStrikeAction: DEF reduction formula applies")
