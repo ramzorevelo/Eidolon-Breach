@@ -11,7 +11,8 @@
 #include <limits>
 #include <memory>
 #include <vector>
-
+#include <UI/IInputHandler.h>
+class IRenderer; // forward declaration — full definition in PlayableCharacter.cpp
 class PlayableCharacter : public Unit
 {
   public:
@@ -80,8 +81,8 @@ class PlayableCharacter : public Unit
     int m_resonanceContribution{};
     std::string m_passiveTrait{};
 
-    void displayActionMenu(const Party &party) const;
-    std::size_t selectActionIndex(const Party &party);
-    std::optional<TargetInfo> selectTarget(const Party &enemies);
+    void displayActionMenu(const Party &party, IRenderer &renderer) const;
+    std::size_t selectActionIndex(const Party &allies, IInputHandler &input);
+    std::optional<TargetInfo> selectTarget(const Party &enemies, IInputHandler &input);
     int m_exposure{0};
 };

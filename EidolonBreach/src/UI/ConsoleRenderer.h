@@ -27,6 +27,9 @@ class ConsoleRenderer : public IRenderer
                            const Party &enemyParty) override;
     void renderMessage(const std::string &message) override;
     void renderResonanceField(const ResonanceField &field) override;
+    void renderActionMenu(const PlayableCharacter &character,
+                          const Party &party) override;
+
 
   private:
     static void printBar(int current, int maximum, int width = 20);

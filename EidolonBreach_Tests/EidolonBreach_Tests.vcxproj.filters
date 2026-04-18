@@ -173,5 +173,8 @@
     <ClInclude Include="tests\UI\test_NullRenderer.h">
       <Filter>UI</Filter>
     </ClInclude>
+    <ClInclude Include="tests\UI\test_NullInputHandler.h">
+      <Filter>UI</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

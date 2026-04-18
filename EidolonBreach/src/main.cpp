@@ -8,6 +8,7 @@
 #include <iostream>
 #include <memory>
 #include <UI/ConsoleRenderer.h>
+#include <UI/ConsoleInputHandler.h>
 
 int main()
 {
@@ -43,7 +44,8 @@ int main()
     enemyParty.addUnit(std::make_unique<VampireBat>("Vampire Bat", 100, 40));
 
     ConsoleRenderer renderer{};
-    Battle battle{playerParty, enemyParty, renderer};
+    ConsoleInputHandler inputHandler{};
+    Battle battle{playerParty, enemyParty, renderer, inputHandler};
     battle.run();
 
     return 0;

@@ -6,7 +6,7 @@
  * Battle and other game systems receive IRenderer& at construction.
  * They never instantiate a concrete renderer.
  */
-
+#include "Entities/PlayableCharacter.h" 
 #include "Core/ActionResult.h"
 #include "Core/Drop.h"
 #include <optional>
@@ -52,4 +52,11 @@ class IRenderer
      * @param field The current ResonanceField state.
      */
     virtual void renderResonanceField(const ResonanceField &field) = 0;
+    /**
+     * @brief Render the action menu for the active player character.
+     * @param character The acting character (for name, momentum, SP).
+     * @param party     The player party (for shared SP display).
+     */
+    virtual void renderActionMenu(const PlayableCharacter &character,
+                                  const Party &party) = 0;
 };

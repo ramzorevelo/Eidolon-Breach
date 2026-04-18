@@ -67,6 +67,7 @@
   <ItemGroup>
     <ClInclude Include="external\doctest.h" />
     <ClInclude Include="tests\test_helpers.h" />
+    <ClInclude Include="tests\UI\test_NullInputHandler.h" />
     <ClInclude Include="tests\UI\test_NullRenderer.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
