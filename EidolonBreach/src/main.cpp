@@ -7,6 +7,8 @@
 #include "Entities/VampireBat.h"
 #include <iostream>
 #include <memory>
+#include <UI/ConsoleRenderer.h>
+#include <UI/ConsoleInputHandler.h>
 
 int main()
 {
@@ -23,7 +25,7 @@ int main()
         Affinity::Blaze,
         10);
     striker->addAbility(std::make_unique<BasicStrikeAction>());
-    striker->addAbility(std::make_unique<SkillAction>(40));
+    striker->addAbility(std::make_unique<SkillAction>(2.0f));
     striker->addAbility(std::make_unique<UltimateAction>());
     playerParty.addUnit(std::move(striker));
 
@@ -33,7 +35,7 @@ int main()
         Affinity::Terra,
         8);
     conduit->addAbility(std::make_unique<BasicStrikeAction>());
-    conduit->addAbility(std::make_unique<SkillAction>(20));
+    conduit->addAbility(std::make_unique<SkillAction>(2.0f));
     conduit->addAbility(std::make_unique<UltimateAction>());
     playerParty.addUnit(std::move(conduit));
 
@@ -41,7 +43,9 @@ int main()
     enemyParty.addUnit(std::make_unique<StoneGolem>("Stone Golem", 130, 60));
     enemyParty.addUnit(std::make_unique<VampireBat>("Vampire Bat", 100, 40));
 
-    Battle battle{playerParty, enemyParty};
+    ConsoleRenderer renderer{};
+    ConsoleInputHandler inputHandler{};
+    Battle battle{playerParty, enemyParty, renderer, inputHandler};
     battle.run();
 
     return 0;

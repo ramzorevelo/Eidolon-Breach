@@ -141,6 +141,27 @@
     <ClCompile Include="tests\Entities\test_UnitEffects.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
+    <ClCompile Include="tests\Core\testActionData.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Battle\test_ResonanceField.cpp">
+      <Filter>Battle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Battle\ResonanceField.cpp">
+      <Filter>Battle</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Core\test_BattleState.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Actions\test_VentActions.cpp">
+      <Filter>Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Actions\VentAction.cpp">
+      <Filter>Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Entities\test_Exposure.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="external\doctest.h">
@@ -148,6 +169,12 @@
     </ClInclude>
     <ClInclude Include="tests\test_helpers.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tests\UI\test_NullRenderer.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="tests\UI\test_NullInputHandler.h">
+      <Filter>UI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

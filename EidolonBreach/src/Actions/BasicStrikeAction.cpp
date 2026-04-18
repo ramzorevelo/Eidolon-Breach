@@ -1,25 +1,36 @@
+/**
+ * @file BasicStrikeAction.cpp
+ * @brief BasicStrikeAction implementation.
+ */
+
 #include "Actions/BasicStrikeAction.h"
-#include "Core/ActionUtils.h"
 #include "Core/CombatConstants.h"
 #include "Core/CombatUtils.h"
 #include "Entities/Party.h"
 #include "Entities/PlayableCharacter.h"
 
-namespace
+BasicStrikeAction::BasicStrikeAction()
+    : m_data{ActionData{
+          .skillPower = 1.0f,
+          .scaling = ScalingStat::ATK,
+          .spCost = 0,
+          .momentumCost = 0,
+          .momentumGain = 25,
+          .toughnessDamage = CombatConstants::kBasicToughDmg,
+          .targetMode = TargetMode::SingleEnemy,
+          .affinity = Affinity::Blaze}}
 {
-constexpr int kSpGain{15};    // to party pool
-constexpr int kEnergyGain{8}; // to self
-constexpr int kBasePower{15};
-} // namespace
+}
 
 std::string BasicStrikeAction::label() const
 {
-    return "Basic Strike (+15 SP | +8 Energy)";
+    return "Basic Strike (+15 SP | +25 Momentum)";
 }
 
-bool BasicStrikeAction::isAvailable(const PlayableCharacter & /*user*/, const Party & /*party*/) const
+bool BasicStrikeAction::isAvailable(const PlayableCharacter & /*user*/,
+                                    const Party & /*party*/) const
 {
-    return true; // always available
+    return true;
 }
 
 ActionResult BasicStrikeAction::execute(PlayableCharacter &user,
@@ -27,8 +38,31 @@ ActionResult BasicStrikeAction::execute(PlayableCharacter &user,
                                         Party &enemies,
                                         std::optional<TargetInfo> target)
 {
-    allies.gainSp(kSpGain);
-    user.gainEnergy(kEnergyGain);
-    return ActionUtils::executeDamageAction(user, enemies, target,
-                                            kBasePower, CombatConstants::kBasicToughDmg);
+    allies.gainSp(kSpGainToParty);
+    user.gainMomentum(m_data.momentumGain);
+
+    ActionResult result{ActionResult::Type::Damage, 0};
+    if (target && target->type == TargetInfo::Type::Enemy)
+    {
+        Unit *t{enemies.getUnitAt(target->index)};
+        if (t && t->isAlive())
+        {
+            result.value = CombatUtils::calculateDamage(m_data.skillPower,
+                                                        user.getFinalStats(),
+                                                        t->getFinalStats(),
+                                                        m_data.scaling);
+            t->takeDamage(result.value);
+            t->applyToughnessHit(m_data.toughnessDamage);
+        }
+    }
+    return result;
+}
+
+Affinity BasicStrikeAction::getAffinity() const
+{
+    return m_data.affinity;
+}
+const ActionData &BasicStrikeAction::getActionData() const
+{
+    return m_data;
 }
