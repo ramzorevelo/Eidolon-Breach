@@ -38,7 +38,7 @@ public:
     const std::optional<Drop>& getDrop() const;
     std::optional<Drop> dropLoot();
 
-    ActionResult takeTurn(Party& allies, Party& enemies) override;
+    ActionResult takeTurn(Party &allies, Party &enemies, BattleState &state) override;
 
 protected:
     virtual ActionResult performAttack();

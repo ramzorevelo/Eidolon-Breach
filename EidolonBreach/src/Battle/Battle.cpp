@@ -1,5 +1,10 @@
 #include "Battle/Battle.h"
 #include "Battle/SpeedBasedTurnOrderCalculator.h"
+#include "Core/Effects/BurnEffect.h"
+#include "Core/Effects/ShieldEffect.h"
+#include "Core/Effects/SlowEffect.h"
+#include "Core/EffectIds.h"
+#include "Entities/PlayableCharacter.h"
 #include "Core/ActionResult.h"
 #include "Entities/Enemy.h"
 #include "UI/ConsoleRenderer.h"
@@ -8,9 +13,11 @@
 
 Battle::Battle(Party &playerParty,
                Party &enemyParty,
+               IRenderer &renderer,
+               IInputHandler &inputHandler,
                std::unique_ptr<ITurnOrderCalculator> turnOrderCalc)
-    : m_playerParty{playerParty}, m_enemyParty{enemyParty}, m_turnOrderCalc{turnOrderCalc ? std::move(turnOrderCalc)
-                                                                                          : std::make_unique<SpeedBasedTurnOrderCalculator>()}
+    : m_playerParty{playerParty}, m_enemyParty{enemyParty}, m_renderer{renderer}, m_inputHandler{inputHandler}, m_turnOrderCalc{turnOrderCalc ? std::move(turnOrderCalc)
+                                                                                                                                              : std::make_unique<SpeedBasedTurnOrderCalculator>()}
 {
 }
 
@@ -33,7 +40,7 @@ void Battle::renderNewBreaks(const std::vector<bool> &before, const Party &party
         const Unit *u{party.getUnitAt(i)};
         if (u && !before[i] && u->isBroken())
         {
-            ConsoleRenderer::renderBreak(u->getName());
+            m_renderer.renderBreak(u->getName());
         }
     }
 }
@@ -43,24 +50,66 @@ bool Battle::isBattleOver() const
     return m_playerParty.isAllDead() || m_enemyParty.isAllDead();
 }
 
-void Battle::processPlayerTurn(Unit *unit)
+void Battle::processPlayerTurn(Unit *unit, BattleState &state)
 {
     auto breaksBefore{snapshotBreakStates(m_enemyParty)};
-    ActionResult result{unit->takeTurn(m_playerParty, m_enemyParty)};
-    ConsoleRenderer::renderAttack(unit->getName(), result);
+    ActionResult result{unit->takeTurn(m_playerParty, m_enemyParty, state)};
+    m_renderer.renderActionResult(unit->getName(), result);
     renderNewBreaks(breaksBefore, m_enemyParty);
+
+    if (state.resonanceField.isReady())
+    {
+        Affinity triggered{state.resonanceField.trigger()};
+        applyResonanceTrigger(triggered);
+        m_renderer.renderMessage(">> Resonance Field: " +
+                                 affinityToString(triggered) + " triggered! <<");
+    }
+    m_renderer.renderResonanceField(state.resonanceField);
 }
 
-void Battle::processEnemyTurn(Unit *unit)
+void Battle::applyResonanceTrigger(Affinity affinity)
 {
-    ActionResult result{unit->takeTurn(m_enemyParty, m_playerParty)};
+    switch (affinity)
+    {
+    case Affinity::Blaze:
+        for (Unit *u : m_enemyParty.getAliveUnits())
+            u->applyEffect(std::make_unique<BurnEffect>(10, 2));
+        break;
+    case Affinity::Frost:
+        for (Unit *u : m_enemyParty.getAliveUnits())
+            u->applyEffect(std::make_unique<SlowEffect>(0.30f, 2));
+        break;
+    case Affinity::Tempest:
+        // Dynamic cast permitted here: no generic momentum interface on Unit
+        // until Phase 9 (IPassiveTrait). Flagged for Phase 9 revisit.
+        for (Unit *u : m_playerParty.getAliveUnits())
+            if (auto *pc = dynamic_cast<PlayableCharacter *>(u))
+                pc->gainMomentum(20);
+        break;
+    case Affinity::Terra:
+        for (Unit *u : m_playerParty.getAliveUnits())
+            u->applyEffect(std::make_unique<ShieldEffect>(30, 2));
+        break;
+    case Affinity::Aether:
+        for (Unit *u : m_playerParty.getAliveUnits())
+            u->removeEffectsByTag(EffectTags::kDebuff);
+        for (Unit *u : m_enemyParty.getAliveUnits())
+            u->removeEffectsByTag(EffectTags::kBuff);
+        break;
+    }
+}
+
+
+void Battle::processEnemyTurn(Unit *unit, BattleState &state)
+{
+    ActionResult result{unit->takeTurn(m_enemyParty, m_playerParty, state)};
     if (result.type == ActionResult::Type::Skip)
     {
-        ConsoleRenderer::renderStunned(unit->getName());
+        m_renderer.renderStunned(unit->getName());
     }
     else
     {
-        ConsoleRenderer::renderAttack(unit->getName(), result);
+        m_renderer.renderActionResult(unit->getName(), result);
     }
 }
 
@@ -75,7 +124,7 @@ bool Battle::checkAndHandleBattleEnd()
             {
                 if (auto *e = dynamic_cast<Enemy *>(u))
                 {
-                    ConsoleRenderer::renderVictory(e->getName(), e->dropLoot());
+                    m_renderer.renderVictory(e->getName(), e->dropLoot());
                 }
             }
         }
@@ -89,7 +138,7 @@ bool Battle::checkAndHandleBattleEnd()
             Unit *u{m_playerParty.getUnitAt(i)};
             if (!u->isAlive())
             {
-                ConsoleRenderer::renderDefeat(u->getName());
+                m_renderer.renderDefeat(u->getName());
             }
         }
         return true;
@@ -99,12 +148,13 @@ bool Battle::checkAndHandleBattleEnd()
 
 void Battle::run()
 {
-    std::cout << "\n=== BATTLE START ===\n";
+    m_renderer.renderMessage("\n=== BATTLE START ===");
+    m_field.reset();
+    BattleState state{0, 0, m_field, m_inputHandler, m_renderer};
 
     while (!isBattleOver())
     {
-        ConsoleRenderer::printPartyStatus(m_playerParty, m_enemyParty);
-
+        m_renderer.renderPartyStatus(m_playerParty, m_enemyParty);
         auto turnOrder{m_turnOrderCalc->calculate(m_playerParty, m_enemyParty)};
 
         for (const auto &slot : turnOrder)
@@ -114,13 +164,9 @@ void Battle::run()
             if (isBattleOver())
                 break;
 
-            // Tick status effects at the start of each unit's turn.
-            // Messages are printed here; this std::cout call is temporary;
-            // it will migrate to IRenderer in the next phase.
             for (const std::string &msg : slot.unit->tickEffects())
-                std::cout << msg << '\n';
+                m_renderer.renderMessage(msg);
 
-            // A DoT tick may have killed this unit — check before acting.
             if (!slot.unit->isAlive())
             {
                 if (checkAndHandleBattleEnd())
@@ -128,14 +174,13 @@ void Battle::run()
                 continue;
             }
 
-
             if (slot.isPlayer)
             {
-                processPlayerTurn(slot.unit);
+                processPlayerTurn(slot.unit, state);
             }
             else
             {
-                processEnemyTurn(slot.unit);
+                processEnemyTurn(slot.unit, state);
             }
 
             if (checkAndHandleBattleEnd())

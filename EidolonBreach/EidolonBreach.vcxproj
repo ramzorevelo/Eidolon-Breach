@@ -22,7 +22,9 @@
     <ClCompile Include="src\Actions\BasicStrikeAction.cpp" />
     <ClCompile Include="src\Actions\SkillAction.cpp" />
     <ClCompile Include="src\Actions\UltimateAction.cpp" />
+    <ClCompile Include="src\Actions\VentAction.cpp" />
     <ClCompile Include="src\Battle\Battle.cpp" />
+    <ClCompile Include="src\Battle\ResonanceField.cpp" />
     <ClCompile Include="src\Battle\SpeedBasedTurnOrderCalculator.cpp" />
     <ClCompile Include="src\Core\Effects\BurnEffect.cpp" />
     <ClCompile Include="src\Core\Effects\RegenEffect.cpp" />
@@ -38,6 +40,7 @@
     <ClCompile Include="src\Entities\Unit.cpp" />
     <ClCompile Include="src\Entities\VampireBat.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\UI\ConsoleInputHandler.cpp" />
     <ClCompile Include="src\UI\ConsoleRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -45,12 +48,15 @@
     <ClInclude Include="src\Actions\IAction.h" />
     <ClInclude Include="src\Actions\SkillAction.h" />
     <ClInclude Include="src\Actions\UltimateAction.h" />
+    <ClInclude Include="src\Actions\VentAction.h" />
     <ClInclude Include="src\Battle\Battle.h" />
+    <ClInclude Include="src\Battle\BattleState.h" />
     <ClInclude Include="src\Battle\ITurnOrderCalculator.h" />
+    <ClInclude Include="src\Battle\ResonanceField.h" />
     <ClInclude Include="src\Battle\SpeedBasedTurnOrderCalculator.h" />
     <ClInclude Include="src\Battle\TurnSlot.h" />
+    <ClInclude Include="src\Core\ActionData.h" />
     <ClInclude Include="src\Core\ActionResult.h" />
-    <ClInclude Include="src\Core\ActionUtils.h" />
     <ClInclude Include="src\Core\Affinity.h" />
     <ClInclude Include="src\Core\CombatConstants.h" />
     <ClInclude Include="src\Core\CombatUtils.h" />
@@ -63,9 +69,11 @@
     <ClInclude Include="src\Core\IStatusEffect.h" />
     <ClInclude Include="src\Core\PartyResources.h" />
     <ClInclude Include="src\Core\ResourceStats.h" />
+    <ClInclude Include="src\Core\ScalingStat.h" />
     <ClInclude Include="src\Core\Stats.h" />
     <ClInclude Include="src\Core\StatusEffectBase.h" />
     <ClInclude Include="src\Core\TargetInfo.h" />
+    <ClInclude Include="src\Core\TargetMode.h" />
     <ClInclude Include="src\Entities\Enemy.h" />
     <ClInclude Include="src\Entities\IAIStrategy.h" />
     <ClInclude Include="src\Entities\Party.h" />
@@ -74,7 +82,10 @@
     <ClInclude Include="src\Entities\StoneGolem.h" />
     <ClInclude Include="src\Entities\Unit.h" />
     <ClInclude Include="src\Entities\VampireBat.h" />
+    <ClInclude Include="src\UI\ConsoleInputHandler.h" />
     <ClInclude Include="src\UI\ConsoleRenderer.h" />
+    <ClInclude Include="src\UI\IInputHandler.h" />
+    <ClInclude Include="src\UI\IRenderer.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

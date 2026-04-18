@@ -14,7 +14,7 @@
 #include <vector>
 
 class Party;   // forward declaration – avoids circular headers
-
+struct BattleState;
 /** Abstract base for all Units (players, enemies, summons). */
 class Unit
 {
@@ -103,8 +103,8 @@ public:
     /** @return Read-only view of active effects (for rendering). */
     const std::vector<std::unique_ptr<IStatusEffect>> &getEffects() const;
 
-    // Returns ActionResult so Battle can render the outcome.
-    virtual ActionResult takeTurn(Party& allies, Party& enemies) = 0;
+    // Forward declaration so the signature compiles without including BattleState.h.
+    virtual ActionResult takeTurn(Party &allies, Party &enemies, BattleState &state) = 0;
 
     // Toughness helpers – default implementations are no-ops so that
     // PlayableCharacter does not need to override them.

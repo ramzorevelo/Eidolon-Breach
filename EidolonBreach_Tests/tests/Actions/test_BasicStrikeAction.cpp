@@ -33,7 +33,7 @@ TEST_CASE("BasicStrikeAction: deals damage and toughness, grants SP to party and
     CHECK(enemyPtr->getHp() == 85);
     CHECK(enemyPtr->getToughness() == 40); // 50 - 10 (kBasicToughDmg)
     CHECK(allies.getSp() == 15);           // +15 to shared pool
-    CHECK(heroPtr->getEnergy() == 8);      // +8 Energy
+    CHECK(heroPtr->getMomentum() == 25);   // +25 Momentum
 }
 
 TEST_CASE("BasicStrikeAction: DEF reduction formula applies")
@@ -74,5 +74,5 @@ TEST_CASE("BasicStrikeAction: isAvailable always returns true")
 TEST_CASE("BasicStrikeAction: label contains correct resource info")
 {
     BasicStrikeAction action;
-    CHECK(action.label() == "Basic Strike (+15 SP | +8 Energy)");
+    CHECK(action.label() == "Basic Strike (+15 SP | +25 Momentum)");
 }

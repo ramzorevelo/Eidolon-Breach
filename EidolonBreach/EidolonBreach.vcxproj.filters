@@ -93,6 +93,15 @@
     <ClCompile Include="src\Core\Effects\SlowEffect.cpp">
       <Filter>Core\Effects</Filter>
     </ClCompile>
+    <ClCompile Include="src\Battle\ResonanceField.cpp">
+      <Filter>Battle</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\ConsoleInputHandler.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Actions\VentAction.cpp">
+      <Filter>Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Actions\BasicStrikeAction.h">
@@ -161,9 +170,6 @@
     <ClInclude Include="src\Core\ResourceStats.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="src\Core\ActionUtils.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="src\Battle\ITurnOrderCalculator.h">
       <Filter>Battle</Filter>
     </ClInclude>
@@ -196,6 +202,33 @@
     </ClInclude>
     <ClInclude Include="src\Core\Effects\SlowEffect.h">
       <Filter>Core\Effects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\ActionData.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\ScalingStat.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\TargetMode.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Battle\ResonanceField.h">
+      <Filter>Battle</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\ConsoleInputHandler.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\IInputHandler.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\IRenderer.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Actions\VentAction.h">
+      <Filter>Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Battle\BattleState.h">
+      <Filter>Battle</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

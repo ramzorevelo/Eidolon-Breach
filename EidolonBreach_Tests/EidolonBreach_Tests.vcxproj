@@ -22,7 +22,9 @@
     <ClCompile Include="..\EidolonBreach\src\Actions\BasicStrikeAction.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Actions\SkillAction.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Actions\UltimateAction.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Actions\VentAction.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Battle\Battle.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Battle\ResonanceField.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Battle\SpeedBasedTurnOrderCalculator.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Core\Effects\BurnEffect.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Core\Effects\RegenEffect.cpp" />
@@ -41,17 +43,22 @@
     <ClCompile Include="tests\Actions\test_BasicStrikeAction.cpp" />
     <ClCompile Include="tests\Actions\test_SkillAction.cpp" />
     <ClCompile Include="tests\Actions\test_UltimateAction.cpp" />
+    <ClCompile Include="tests\Actions\test_VentActions.cpp" />
+    <ClCompile Include="tests\Battle\test_ResonanceField.cpp" />
     <ClCompile Include="tests\Battle\test_SpeedBasedTurnOrderCalculator.cpp" />
     <ClCompile Include="tests\Battle\test_TurnOrder.cpp" />
     <ClCompile Include="tests\Core\Effects\test_BurnEffect.cpp" />
     <ClCompile Include="tests\Core\Effects\test_RegenEffect.cpp" />
     <ClCompile Include="tests\Core\Effects\test_ShieldEffect.cpp" />
     <ClCompile Include="tests\Core\Effects\test_SlowEffect.cpp" />
+    <ClCompile Include="tests\Core\testActionData.cpp" />
     <ClCompile Include="tests\Core\test_Affinity.cpp" />
+    <ClCompile Include="tests\Core\test_BattleState.cpp" />
     <ClCompile Include="tests\Core\test_Stats.cpp" />
     <ClCompile Include="tests\Core\test_StatusEffectBase.cpp" />
     <ClCompile Include="tests\EidolonBreach_Tests.cpp" />
     <ClCompile Include="tests\Entities\test_Enemy.cpp" />
+    <ClCompile Include="tests\Entities\test_Exposure.cpp" />
     <ClCompile Include="tests\Entities\test_Party.cpp" />
     <ClCompile Include="tests\Entities\test_PlayableCharacter.cpp" />
     <ClCompile Include="tests\Entities\test_Unit.cpp" />
@@ -60,6 +67,8 @@
   <ItemGroup>
     <ClInclude Include="external\doctest.h" />
     <ClInclude Include="tests\test_helpers.h" />
+    <ClInclude Include="tests\UI\test_NullInputHandler.h" />
+    <ClInclude Include="tests\UI\test_NullRenderer.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>

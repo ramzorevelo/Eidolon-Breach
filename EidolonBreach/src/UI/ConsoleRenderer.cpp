@@ -4,6 +4,7 @@
 #include "Entities/PlayableCharacter.h"
 #include "Entities/Enemy.h"
 #include "Core/IStatusEffect.h"
+#include "Battle/ResonanceField.h"
 #include <iostream>
 
 void ConsoleRenderer::printBar(int current, int maximum, int width)
@@ -15,7 +16,7 @@ void ConsoleRenderer::printBar(int current, int maximum, int width)
     std::cout << "] " << current << '/' << maximum;
 }
 
-void ConsoleRenderer::renderAttack(const std::string& actorName, const ActionResult& result)
+void ConsoleRenderer::renderActionResult(const std::string& actorName, const ActionResult& result)
 {
     if (!result.flavorText.empty())
         std::cout << result.flavorText << '\n';
@@ -124,14 +125,14 @@ void ConsoleRenderer::renderUnit(const Unit *unit, const std::string &label, boo
         {
             // Energy only; SP is now shown at party level
             std::cout << "    Energy: ";
-            printBar(pc->getEnergy(), PlayableCharacter::kMaxEnergy, 10);
+            printBar(pc->getMomentum(), PlayableCharacter::kMaxMomentum, 10);
             std::cout << '\n';
         }
     }
 }
 
 
-void ConsoleRenderer::printPartyStatus(const Party& playerParty, const Party& enemyParty)
+void ConsoleRenderer::renderPartyStatus(const Party& playerParty, const Party& enemyParty)
 {
     std::cout << "\n====================================\n";
 
@@ -140,4 +141,36 @@ void ConsoleRenderer::printPartyStatus(const Party& playerParty, const Party& en
     renderParty(playerParty, "P", /*showToughness=*/false);
 
     std::cout << "====================================\n";
+}
+
+void ConsoleRenderer::renderMessage(const std::string &message)
+{
+    std::cout << message << '\n';
+}
+
+void ConsoleRenderer::renderResonanceField(const ResonanceField &field)
+{
+    std::cout << "  [Resonance Field] " << field.getGauge() << "/100";
+    std::string summary{field.getVoteSummary()};
+    if (!summary.empty())
+        std::cout << " (" << summary << ')';
+    std::cout << '\n';
+}
+
+void ConsoleRenderer::renderActionMenu(const PlayableCharacter &character,
+                                       const Party &party)
+{
+    std::cout << "\n[" << character.getName() << "]"
+              << "  SP: " << party.getSp() << '/' << party.getMaxSp()
+              << "  Momentum: " << character.getMomentum() << '/'
+              << PlayableCharacter::kMaxMomentum << '\n';
+    std::cout << "Actions:\n";
+    const auto &abilities = character.getAbilities();
+    for (std::size_t i{0}; i < abilities.size(); ++i)
+    {
+        std::cout << "  [" << (i + 1) << "] " << abilities[i]->label();
+        if (!abilities[i]->isAvailable(character, party))
+            std::cout << " [UNAVAILABLE]";
+        std::cout << '\n';
+    }
 }
