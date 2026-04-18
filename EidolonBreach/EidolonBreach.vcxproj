@@ -49,6 +49,7 @@
     <ClInclude Include="src\Battle\ITurnOrderCalculator.h" />
     <ClInclude Include="src\Battle\SpeedBasedTurnOrderCalculator.h" />
     <ClInclude Include="src\Battle\TurnSlot.h" />
+    <ClInclude Include="src\Core\ActionData.h" />
     <ClInclude Include="src\Core\ActionResult.h" />
     <ClInclude Include="src\Core\ActionUtils.h" />
     <ClInclude Include="src\Core\Affinity.h" />
@@ -63,9 +64,11 @@
     <ClInclude Include="src\Core\IStatusEffect.h" />
     <ClInclude Include="src\Core\PartyResources.h" />
     <ClInclude Include="src\Core\ResourceStats.h" />
+    <ClInclude Include="src\Core\ScalingStat.h" />
     <ClInclude Include="src\Core\Stats.h" />
     <ClInclude Include="src\Core\StatusEffectBase.h" />
     <ClInclude Include="src\Core\TargetInfo.h" />
+    <ClInclude Include="src\Core\TargetMode.h" />
     <ClInclude Include="src\Entities\Enemy.h" />
     <ClInclude Include="src\Entities\IAIStrategy.h" />
     <ClInclude Include="src\Entities\Party.h" />
