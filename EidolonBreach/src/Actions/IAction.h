@@ -5,6 +5,7 @@
  * @brief Interface for all player‑initiated combat actions.
  */
 
+#include "Core/ActionData.h"
 #include "Core/ActionResult.h"
 #include "Core/Affinity.h"
 #include "Core/TargetInfo.h"
@@ -44,4 +45,7 @@ class IAction
     {
         return Affinity::Aether;
     }
+
+    /** @return This action's data (costs, gains, targeting, affinity). */
+    virtual const ActionData &getActionData() const = 0;
 };

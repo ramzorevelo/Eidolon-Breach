@@ -60,6 +60,8 @@ class PlayableCharacter : public Unit
     {
         return m_passiveTrait;
     }
+    /** @brief Deduct amount from Momentum, clamped to 0. */
+    void consumeMomentum(int amount);
 
   private:
     std::vector<std::unique_ptr<IAction>> m_abilities;

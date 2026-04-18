@@ -1,31 +1,31 @@
 #pragma once
-
 /**
  * @file SkillAction.h
- * @brief A skill that consumes SP to deal damage.
+ * @brief Arch Skill [E]: costs 25 SP and 40 Momentum, deals configurable damage.
  */
 
 #include "Actions/IAction.h"
 
-/** Skill action: consumes 25 SP, grants +15 Energy, deals configurable damage. */
+/**
+ * @brief Arch Skill: costs 25 SP and 40 Momentum. Available when party SP >= 25
+ * and user Momentum >= 40 (isArchSkillReady()).
+ */
 class SkillAction : public IAction
 {
   public:
-    explicit SkillAction(int damage = 28);
+    /** @param skillPower Damage coefficient applied to user ATK (default 2.0). */
+    explicit SkillAction(float skillPower = 2.0f);
 
     std::string label() const override;
-    bool isAvailable(const PlayableCharacter &user, const Party &party) const override;
+    bool isAvailable(const PlayableCharacter &user,
+                     const Party &party) const override;
     ActionResult execute(PlayableCharacter &user,
                          Party &allies,
                          Party &enemies,
                          std::optional<TargetInfo> target) override;
-    Affinity getAffinity() const override
-    {
-        return Affinity::Blaze;
-    } // placeholder
+    Affinity getAffinity() const override;
+    const ActionData &getActionData() const override;
 
   private:
-    int m_damage;
-    static constexpr int kSpCost{25};
-    static constexpr int kEnergyGain{15};
+    ActionData m_data;
 };

@@ -157,3 +157,8 @@ ActionResult PlayableCharacter::takeTurn(Party &allies, Party &enemies, BattleSt
 
     return result;
 }
+
+void PlayableCharacter::consumeMomentum(int amount)
+{
+    m_resources.momentum = std::max(0, m_resources.momentum - amount);
+}
