@@ -1,13 +1,16 @@
 #pragma once
 /**
  * @file BasicStrikeAction.h
- * @brief Basic Attack [Q]: free action, grants +15 SP to party, +25 Momentum to self.
+ * @brief Basic Attack [Q]: free action, grants +15 SP (via result.spGained),
+ *        +25 Energy to self.
  */
 
 #include "Actions/IAction.h"
 
 /**
- * @brief Basic Attack: costs 0 SP, grants +15 SP to party and +25 Momentum to user.
+ * @brief Basic Attack: no SP cost, no cooldown.
+ * Sets result.spGained = kSpGainToParty; Battle applies it to the party pool.
+ * Grants kEnergyGainToUser Energy directly to the acting character.
  * Always available.
  */
 class BasicStrikeAction : public IAction
@@ -28,4 +31,5 @@ class BasicStrikeAction : public IAction
   private:
     ActionData m_data;
     static constexpr int kSpGainToParty{15};
+    static constexpr int kEnergyGainToUser{25};
 };

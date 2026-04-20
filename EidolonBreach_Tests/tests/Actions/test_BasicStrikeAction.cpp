@@ -12,10 +12,10 @@
 #include <memory>
 #include <ostream>
 
-TEST_CASE("BasicStrikeAction: deals damage and toughness, grants SP to party and Energy to user")
+TEST_CASE("BasicStrikeAction: sets spGained = 15 in result; does not touch party SP directly")
 {
     Party allies, enemies;
-    allies.gainSp(0); // start empty
+    allies.gainSp(0);
 
     auto heroRaw = makeHero();
     auto *heroPtr = heroRaw.get();
@@ -30,13 +30,13 @@ TEST_CASE("BasicStrikeAction: deals damage and toughness, grants SP to party and
     ActionResult result = action.execute(*heroPtr, allies, enemies, t);
 
     CHECK(result.type == ActionResult::Type::Damage);
-    CHECK(result.value == 15); // base power 15, 0 DEF
+    CHECK(result.value == 15);
+    CHECK(result.spGained == 15); // Battle applies this to the party pool
+    CHECK(allies.getSp() == 0);   // action no longer calls gainSp() directly
     CHECK(enemyPtr->getHp() == 85);
     CHECK(enemyPtr->getToughness() == 40); // 50 - 10 (kBasicToughDmg)
-    CHECK(allies.getSp() == 15);           // +15 to shared pool
-    CHECK(heroPtr->getEnergy() == 25);   // +25 Momentum
+    CHECK(heroPtr->getEnergy() == 25);     // +25 Energy to user
 }
-
 TEST_CASE("BasicStrikeAction: DEF reduction formula applies")
 {
     Party allies, enemies;
@@ -64,6 +64,20 @@ TEST_CASE("BasicStrikeAction: DEF reduction formula applies")
     CHECK(enemyPtr->getHp() == 93);
 }
 
+TEST_CASE("BasicStrikeAction: exposureDelta is 0 (no exposure change)")
+{
+    Party allies, enemies;
+    auto heroRaw = makeHero();
+    auto *heroPtr = heroRaw.get();
+    allies.addUnit(std::move(heroRaw));
+    enemies.addUnit(makeEnemy());
+
+    BasicStrikeAction action;
+    TargetInfo t{TargetInfo::Type::Enemy, 0};
+    ActionResult result = action.execute(*heroPtr, allies, enemies, t);
+    CHECK(result.exposureDelta == 0);
+}
+
 TEST_CASE("BasicStrikeAction: isAvailable always returns true")
 {
     Party allies;
@@ -75,5 +89,5 @@ TEST_CASE("BasicStrikeAction: isAvailable always returns true")
 TEST_CASE("BasicStrikeAction: label contains correct resource info")
 {
     BasicStrikeAction action;
-    CHECK(action.label() == "Basic Strike (+15 SP | +25 Momentum)");
+    CHECK(action.label() == "Basic Strike (+15 SP | +25 Energy)");
 }
