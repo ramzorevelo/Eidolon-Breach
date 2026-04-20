@@ -55,4 +55,5 @@ class Battle
     void processEnemyTurn(Unit *unit, BattleState &state);
     IRenderer &m_renderer;
     IInputHandler &m_inputHandler;
+    void resetAllPcConsumableState();
 };
