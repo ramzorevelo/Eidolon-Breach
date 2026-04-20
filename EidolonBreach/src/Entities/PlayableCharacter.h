@@ -101,6 +101,27 @@ class PlayableCharacter : public Unit
     void modifyExposure(int delta);
     bool canVent() const; // 0 < exposure < 100
 
+    // Consumable cooldown
+    /** @return true when a consumable may be used this turn. */
+    [[nodiscard]] bool canUseConsumable() const;
+
+    /**
+     * @brief Called when a consumable is used.
+     * @param multiTurnEffect If true, the consumable is locked for the entire battle.
+     */
+    void consumeConsumableAction(bool multiTurnEffect = false);
+
+    /** @brief Decrements m_consumableCooldown by 1, clamped to 0. Called at turn start. */
+    void tickConsumableCooldown();
+
+    /** @brief Resets m_consumableCooldown and m_consumableUsedThisBattle. Called at battle end. */
+    void resetBattleConsumableState();
+
+    [[nodiscard]] int getConsumableCooldown() const
+    {
+        return m_consumableCooldown;
+    }
+
   private:
     std::vector<std::unique_ptr<IAction>> m_abilities;
     ResourceStats m_resources{0, kMaxEnergy};
@@ -115,4 +136,6 @@ class PlayableCharacter : public Unit
     std::size_t selectActionIndex(const Party &allies, IInputHandler &input);
     std::optional<TargetInfo> selectTarget(const Party &enemies, IInputHandler &input);
     int m_archSkillCooldown{0};
+    int m_consumableCooldown{0};
+    bool m_consumableUsedThisBattle{false};
 };
