@@ -24,5 +24,5 @@ class UltimateAction : public IAction
 
   private:
     ActionData m_data;
-    static constexpr int kMomentumRefund{5};
+    static constexpr int kEnergyRefund{5};
 };

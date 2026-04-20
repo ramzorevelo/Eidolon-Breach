@@ -29,7 +29,7 @@ std::string SkillAction::label() const
 
 bool SkillAction::isAvailable(const PlayableCharacter &user, const Party &party) const
 {
-    return party.getSp() >= m_data.spCost && user.isArchSkillReady();
+    return party.getSp() >= m_data.spCost && user.getEnergy() >= m_data.momentumCost;
 }
 
 ActionResult SkillAction::execute(PlayableCharacter &user,
@@ -38,7 +38,7 @@ ActionResult SkillAction::execute(PlayableCharacter &user,
                                   std::optional<TargetInfo> target)
 {
     allies.useSp(m_data.spCost);
-    user.consumeMomentum(m_data.momentumCost);
+    user.consumeEnergy(m_data.momentumCost);
 
     ActionResult result{ActionResult::Type::Damage, 0};
     if (target && target->type == TargetInfo::Type::Enemy)

@@ -38,8 +38,8 @@ ActionResult UltimateAction::execute(PlayableCharacter &user,
                                      Party &enemies,
                                      std::optional<TargetInfo> target)
 {
-    user.resetMomentum();
-    user.gainMomentum(kMomentumRefund);
+    user.resetEnergy();
+    user.gainEnergy(kEnergyRefund);
 
     ActionResult result{ActionResult::Type::Damage, 0};
     if (target && target->type == TargetInfo::Type::Enemy)

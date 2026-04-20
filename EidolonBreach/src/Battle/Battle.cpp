@@ -84,7 +84,7 @@ void Battle::applyResonanceTrigger(Affinity affinity)
         // until Phase 9 (IPassiveTrait). Flagged for Phase 9 revisit.
         for (Unit *u : m_playerParty.getAliveUnits())
             if (auto *pc = dynamic_cast<PlayableCharacter *>(u))
-                pc->gainMomentum(20);
+                pc->gainEnergy(20);
         break;
     case Affinity::Terra:
         for (Unit *u : m_playerParty.getAliveUnits())

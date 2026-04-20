@@ -10,6 +10,7 @@
 #include "doctest.h"
 #include "test_helpers.h"
 #include <memory>
+#include <ostream>
 
 TEST_CASE("BasicStrikeAction: deals damage and toughness, grants SP to party and Energy to user")
 {
@@ -33,7 +34,7 @@ TEST_CASE("BasicStrikeAction: deals damage and toughness, grants SP to party and
     CHECK(enemyPtr->getHp() == 85);
     CHECK(enemyPtr->getToughness() == 40); // 50 - 10 (kBasicToughDmg)
     CHECK(allies.getSp() == 15);           // +15 to shared pool
-    CHECK(heroPtr->getMomentum() == 25);   // +25 Momentum
+    CHECK(heroPtr->getEnergy() == 25);   // +25 Momentum
 }
 
 TEST_CASE("BasicStrikeAction: DEF reduction formula applies")
