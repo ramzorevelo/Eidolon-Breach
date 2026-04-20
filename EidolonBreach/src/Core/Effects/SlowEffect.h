@@ -1,12 +1,12 @@
 #pragma once
 /**
  * @file SlowEffect.h
- * @brief Slow debuff: reduces SPD by percentage in the flat modifier pass.
+ * @brief Slow debuff: reduces SPD by percentage in the percentage modifier pass.
  */
 
 #include "Core/StatusEffectBase.h"
 
-/** Debuff | StatMod | Frost. Reduces SPD by m_slowRatio in the flat modifier pass. */
+/** Debuff | StatMod | Frost. Reduces SPD by m_slowRatio in the percentage modifier pass. */
 class SlowEffect : public StatusEffectBase
 {
   public:
@@ -26,11 +26,12 @@ class SlowEffect : public StatusEffectBase
     }
 
     /**
-     * @brief Reduces base.spd by slowRatio in pass 1 (flat).
+     * @brief Reduces base.spd by m_slowRatio in pass 2 (percentage).
      *
-     * Applied before percentage multipliers from other effects (see §2.12.3).
+     * Applied after all flat additions so that the slowRatio operates on
+     * the already-flat-modified SPD value (see §2.12.3 two-pass order).
      */
-    Stats modifyStatsFlat(Stats base) const override;
+    Stats modifyStatsPct(Stats base) const override;
 
   private:
     float m_slowRatio;
