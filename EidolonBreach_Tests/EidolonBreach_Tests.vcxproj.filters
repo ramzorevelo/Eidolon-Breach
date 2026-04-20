@@ -162,6 +162,9 @@
     <ClCompile Include="tests\Entities\test_Exposure.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
+    <ClCompile Include="tests\Core\test_ActionResult.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="external\doctest.h">
@@ -175,6 +178,9 @@
     </ClInclude>
     <ClInclude Include="tests\UI\test_NullInputHandler.h">
       <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\EidolonBreach\src\Core\ActionResult.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -56,4 +56,13 @@ class Battle
     IRenderer &m_renderer;
     IInputHandler &m_inputHandler;
     void resetAllPcConsumableState();
+    /**
+     * @brief Applies spGained and exposureDelta from an ActionResult.
+     * Called after every player action, after vestige onAction hooks (Phase 7).
+     * @param actor  The PlayableCharacter who performed the action.
+     * @param result The result returned by IAction::execute().
+     */
+    void processActionResult(PlayableCharacter &actor,
+                             Party &allies,
+                             const ActionResult &result);
 };

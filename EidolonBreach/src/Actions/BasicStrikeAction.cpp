@@ -15,7 +15,7 @@ BasicStrikeAction::BasicStrikeAction()
           .scaling = ScalingStat::ATK,
           .spCost = 0,
           .momentumCost = 0,
-          .momentumGain = 25,
+          .momentumGain = 0,
           .toughnessDamage = CombatConstants::kBasicToughDmg,
           .targetMode = TargetMode::SingleEnemy,
           .affinity = Affinity::Blaze}}
@@ -24,7 +24,7 @@ BasicStrikeAction::BasicStrikeAction()
 
 std::string BasicStrikeAction::label() const
 {
-    return "Basic Strike (+15 SP | +25 Momentum)";
+    return "Basic Strike (+15 SP | +25 Energy)";
 }
 
 bool BasicStrikeAction::isAvailable(const PlayableCharacter & /*user*/,
@@ -34,14 +34,15 @@ bool BasicStrikeAction::isAvailable(const PlayableCharacter & /*user*/,
 }
 
 ActionResult BasicStrikeAction::execute(PlayableCharacter &user,
-                                        Party &allies,
+                                        Party & /*allies*/,
                                         Party &enemies,
                                         std::optional<TargetInfo> target)
 {
-    allies.gainSp(kSpGainToParty);
-    user.gainEnergy(m_data.momentumGain);
+    user.gainEnergy(kEnergyGainToUser);
 
     ActionResult result{ActionResult::Type::Damage, 0};
+    result.spGained = kSpGainToParty; // Battle::processActionResult() applies this.
+
     if (target && target->type == TargetInfo::Type::Enemy)
     {
         Unit *t{enemies.getUnitAt(target->index)};
@@ -62,6 +63,7 @@ Affinity BasicStrikeAction::getAffinity() const
 {
     return m_data.affinity;
 }
+
 const ActionData &BasicStrikeAction::getActionData() const
 {
     return m_data;

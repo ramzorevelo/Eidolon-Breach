@@ -52,6 +52,7 @@
     <ClCompile Include="tests\Core\Effects\test_ShieldEffect.cpp" />
     <ClCompile Include="tests\Core\Effects\test_SlowEffect.cpp" />
     <ClCompile Include="tests\Core\testActionData.cpp" />
+    <ClCompile Include="tests\Core\test_ActionResult.cpp" />
     <ClCompile Include="tests\Core\test_Affinity.cpp" />
     <ClCompile Include="tests\Core\test_BattleState.cpp" />
     <ClCompile Include="tests\Core\test_Stats.cpp" />
@@ -65,6 +66,7 @@
     <ClCompile Include="tests\Entities\test_UnitEffects.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\EidolonBreach\src\Core\ActionResult.h" />
     <ClInclude Include="external\doctest.h" />
     <ClInclude Include="tests\test_helpers.h" />
     <ClInclude Include="tests\UI\test_NullInputHandler.h" />
