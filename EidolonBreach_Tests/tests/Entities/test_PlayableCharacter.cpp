@@ -61,20 +61,35 @@ TEST_CASE("PlayableCharacter: resonanceContribution is owned by PlayableCharacte
     CHECK(hero->getPassiveTrait() == "");
 }
 
-TEST_CASE("PlayableCharacter: Arch Skill threshold (placeholder — always ready)")
+TEST_CASE("PlayableCharacter: arch skill cooldown starts at 0 (ready)")
 {
     auto hero = makeHero();
-    // Placeholder: isArchSkillReady() returns true unconditionally.
-    // This will be replaced with cooldown logic in future hotfix
-    CHECK(hero->isArchSkillReady()); // Always ready regardless of energy
-
-    hero->gainEnergy(39);
     CHECK(hero->isArchSkillReady());
-
-    hero->gainEnergy(1);
-    CHECK(hero->isArchSkillReady());
+    CHECK(hero->getArchSkillCooldown() == 0);
 }
 
+TEST_CASE("PlayableCharacter: consumeArchSkill sets cooldown to kArchSkillCooldownTurns")
+{
+    auto hero = makeHero();
+    hero->consumeArchSkill();
+    CHECK(!hero->isArchSkillReady());
+    CHECK(hero->getArchSkillCooldown() == 2);
+}
+
+TEST_CASE("PlayableCharacter: tickArchSkillCooldown decrements and clamps at 0")
+{
+    auto hero = makeHero();
+    hero->consumeArchSkill(); // cooldown = 2
+    hero->tickArchSkillCooldown();
+    CHECK(hero->getArchSkillCooldown() == 1);
+    hero->tickArchSkillCooldown();
+    CHECK(hero->getArchSkillCooldown() == 0);
+    CHECK(hero->isArchSkillReady());
+
+    // Extra tick must not go negative.
+    hero->tickArchSkillCooldown();
+    CHECK(hero->getArchSkillCooldown() == 0);
+}
 TEST_CASE("PlayableCharacter: slots start locked")
 {
     auto hero = makeHero();

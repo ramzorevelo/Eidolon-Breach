@@ -13,8 +13,8 @@ SkillAction::SkillAction(float skillPower)
     : m_data{ActionData{
           .skillPower = skillPower,
           .scaling = ScalingStat::ATK,
-          .spCost = 25,
-          .momentumCost = 40,
+          .spCost = 0,
+          .momentumCost = 0,
           .momentumGain = 0,
           .toughnessDamage = CombatConstants::kSkillToughDmg,
           .targetMode = TargetMode::SingleEnemy,
@@ -24,12 +24,12 @@ SkillAction::SkillAction(float skillPower)
 
 std::string SkillAction::label() const
 {
-    return "Arch Skill (-25 SP | -40 Momentum)";
+    return "Arch Skill (2-turn cooldown)";
 }
 
-bool SkillAction::isAvailable(const PlayableCharacter &user, const Party &party) const
+bool SkillAction::isAvailable(const PlayableCharacter &user, const Party & /*party*/) const
 {
-    return party.getSp() >= m_data.spCost && user.getEnergy() >= m_data.momentumCost;
+    return user.isArchSkillReady();
 }
 
 ActionResult SkillAction::execute(PlayableCharacter &user,
@@ -38,7 +38,7 @@ ActionResult SkillAction::execute(PlayableCharacter &user,
                                   std::optional<TargetInfo> target)
 {
     allies.useSp(m_data.spCost);
-    user.consumeEnergy(m_data.momentumCost);
+    user.consumeArchSkill();
 
     ActionResult result{ActionResult::Type::Damage, 0};
     if (target && target->type == TargetInfo::Type::Enemy)

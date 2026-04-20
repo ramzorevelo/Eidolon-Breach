@@ -52,6 +52,12 @@ bool Battle::isBattleOver() const
 
 void Battle::processPlayerTurn(Unit *unit, BattleState &state)
 {
+    // FIXME Phase 6: replace dynamic_cast with Unit::onTurnStart() virtual hook
+    // once BattleState is extended per TS §6.1
+    // Tick arch skill cooldown at the start of each PC's turn.
+    if (auto *pc = dynamic_cast<PlayableCharacter *>(unit))
+        pc->tickArchSkillCooldown();
+
     auto breaksBefore{snapshotBreakStates(m_enemyParty)};
     ActionResult result{unit->takeTurn(m_playerParty, m_enemyParty, state)};
     m_renderer.renderActionResult(unit->getName(), result);

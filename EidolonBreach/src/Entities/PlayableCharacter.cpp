@@ -8,6 +8,7 @@
 #include "Battle/ResonanceField.h"
 #include "Entities/Party.h"
 #include "UI/IInputHandler.h"
+#include "Core/CombatConstants.h"
 #include "UI/IRenderer.h"
 #include <algorithm>
 #include <utility>
@@ -49,12 +50,6 @@ void PlayableCharacter::resetEnergy()
 void PlayableCharacter::consumeEnergy(int amount)
 {
     m_resources.energy = std::max(0, m_resources.energy - amount);
-}
-
-bool PlayableCharacter::isArchSkillReady() const
-{
-    // Placeholder; will be cooldown-gated in future hotfix
-    return true;
 }
 
 bool PlayableCharacter::canAffordSp(int amount, const Party &party) const
@@ -136,4 +131,14 @@ void PlayableCharacter::tryUnlockSlot(int slotIndex)
     if (slotIndex < 0 || slotIndex >= EquippedSkillSet::kEquipSlots)
         return;
     m_equipped.slots[static_cast<std::size_t>(slotIndex)].unlocked = true;
+}
+
+void PlayableCharacter::consumeArchSkill()
+{
+    m_archSkillCooldown = CombatConstants::kArchSkillCooldownTurns;
+}
+
+void PlayableCharacter::tickArchSkillCooldown()
+{
+    m_archSkillCooldown = std::max(0, m_archSkillCooldown - 1);
 }
