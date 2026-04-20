@@ -39,6 +39,7 @@
     <ClCompile Include="src\Entities\StoneGolem.cpp" />
     <ClCompile Include="src\Entities\Unit.cpp" />
     <ClCompile Include="src\Entities\VampireBat.cpp" />
+    <ClCompile Include="src\Items\Inventory.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\UI\ConsoleInputHandler.cpp" />
     <ClCompile Include="src\UI\ConsoleRenderer.cpp" />
@@ -83,6 +84,8 @@
     <ClInclude Include="src\Entities\StoneGolem.h" />
     <ClInclude Include="src\Entities\Unit.h" />
     <ClInclude Include="src\Entities\VampireBat.h" />
+    <ClInclude Include="src\Items\Inventory.h" />
+    <ClInclude Include="src\Items\Item.h" />
     <ClInclude Include="src\UI\ConsoleInputHandler.h" />
     <ClInclude Include="src\UI\ConsoleRenderer.h" />
     <ClInclude Include="src\UI\IInputHandler.h" />
