@@ -125,7 +125,7 @@ void ConsoleRenderer::renderUnit(const Unit *unit, const std::string &label, boo
         {
             // Energy only; SP is now shown at party level
             std::cout << "    Energy: ";
-            printBar(pc->getMomentum(), PlayableCharacter::kMaxMomentum, 10);
+            printBar(pc->getEnergy(), PlayableCharacter::kMaxEnergy, 10);
             std::cout << '\n';
         }
     }
@@ -162,8 +162,8 @@ void ConsoleRenderer::renderActionMenu(const PlayableCharacter &character,
 {
     std::cout << "\n[" << character.getName() << "]"
               << "  SP: " << party.getSp() << '/' << party.getMaxSp()
-              << "  Momentum: " << character.getMomentum() << '/'
-              << PlayableCharacter::kMaxMomentum << '\n';
+              << "  Energy: " << character.getEnergy() << '/'
+              << PlayableCharacter::kMaxEnergy << '\n';
     std::cout << "Actions:\n";
     const auto &abilities = character.getAbilities();
     for (std::size_t i{0}; i < abilities.size(); ++i)
