@@ -53,10 +53,12 @@ bool Battle::isBattleOver() const
 void Battle::processPlayerTurn(Unit *unit, BattleState &state)
 {
     // FIXME Phase 6: replace dynamic_cast with Unit::onTurnStart() virtual hook
-    // once BattleState is extended per TS §6.1
     // Tick arch skill cooldown at the start of each PC's turn.
     if (auto *pc = dynamic_cast<PlayableCharacter *>(unit))
+    {
         pc->tickArchSkillCooldown();
+        pc->tickConsumableCooldown();
+    }
 
     auto breaksBefore{snapshotBreakStates(m_enemyParty)};
     ActionResult result{unit->takeTurn(m_playerParty, m_enemyParty, state)};
@@ -152,6 +154,17 @@ bool Battle::checkAndHandleBattleEnd()
     return false;
 }
 
+
+void Battle::resetAllPcConsumableState()
+{
+    for (std::size_t i{0}; i < m_playerParty.size(); ++i)
+    {
+        Unit *u{m_playerParty.getUnitAt(i)};
+        if (auto *pc = dynamic_cast<PlayableCharacter *>(u))
+            pc->resetBattleConsumableState();
+    }
+}
+
 void Battle::run()
 {
     m_renderer.renderMessage("\n=== BATTLE START ===");
@@ -176,6 +189,7 @@ void Battle::run()
             if (!slot.unit->isAlive())
             {
                 if (checkAndHandleBattleEnd())
+                    resetAllPcConsumableState();
                     return;
                 continue;
             }
@@ -191,6 +205,7 @@ void Battle::run()
 
             if (checkAndHandleBattleEnd())
             {
+                resetAllPcConsumableState();
                 return;
             }
         }

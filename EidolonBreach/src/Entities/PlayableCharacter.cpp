@@ -142,3 +142,26 @@ void PlayableCharacter::tickArchSkillCooldown()
 {
     m_archSkillCooldown = std::max(0, m_archSkillCooldown - 1);
 }
+
+bool PlayableCharacter::canUseConsumable() const
+{
+    return m_consumableCooldown == 0 && !m_consumableUsedThisBattle;
+}
+
+void PlayableCharacter::consumeConsumableAction(bool multiTurnEffect)
+{
+    m_consumableCooldown = CombatConstants::kConsumableCooldownTurns;
+    if (multiTurnEffect)
+        m_consumableUsedThisBattle = true;
+}
+
+void PlayableCharacter::tickConsumableCooldown()
+{
+    m_consumableCooldown = std::max(0, m_consumableCooldown - 1);
+}
+
+void PlayableCharacter::resetBattleConsumableState()
+{
+    m_consumableCooldown = 0;
+    m_consumableUsedThisBattle = false;
+}
