@@ -1,14 +1,14 @@
 #pragma once
 /**
  * @file ResourceStats.h
- * @brief Per-character Momentum resource (not subject to getFinalStats() modifiers).
+ * @brief Per-character Energy resource (not subject to getFinalStats() modifiers).
  *
- * Momentum gates Arch Skill (threshold >= 40, costs 40) and Ultimate
- * (threshold = 100, resets to 0). Starts at 0 each battle.
+ * Energy gates the Ultimate (threshold = 100, resets to 0 on use).
+ * Starts at 0 each battle. Does not carry over between battles.
  */
 
 struct ResourceStats
 {
-    int momentum{};
-    int maxMomentum{};
+    int energy{};
+    int maxEnergy{100};
 };
