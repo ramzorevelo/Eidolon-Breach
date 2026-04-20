@@ -31,7 +31,7 @@ TEST_CASE("SkillAction: requires 25 SP and 40 Momentum; consumes both on execute
     // isAvailable requires both SP >= 25 AND Momentum >= 40.
     CHECK(!skill.isAvailable(*heroPtr, allies)); // momentum 0 — not ready
 
-    heroPtr->gainMomentum(40);
+    heroPtr->gainEnergy(40);
     CHECK(skill.isAvailable(*heroPtr, allies)); // momentum 40, SP 30 — ready
 
     TargetInfo t{TargetInfo::Type::Enemy, 0};
@@ -42,7 +42,7 @@ TEST_CASE("SkillAction: requires 25 SP and 40 Momentum; consumes both on execute
     CHECK(enemyPtr->getHp() == 70);
     CHECK(enemyPtr->getToughness() == 25); // 50 - 25 (kSkillToughDmg)
     CHECK(allies.getSp() == 5);            // 30 - 25
-    CHECK(heroPtr->getMomentum() == 0);    // 40 - 40 (momentum cost)
+    CHECK(heroPtr->getEnergy() == 0);    // 40 - 40 (momentum cost)
 }
 
 TEST_CASE("SkillAction: isAvailable returns false when SP insufficient even with enough Momentum")
@@ -52,7 +52,7 @@ TEST_CASE("SkillAction: isAvailable returns false when SP insufficient even with
 
     auto heroRaw = makeHero();
     auto *heroPtr = heroRaw.get();
-    heroPtr->gainMomentum(40);
+    heroPtr->gainEnergy(40);
     allies.addUnit(std::move(heroRaw));
 
     SkillAction skill{};
@@ -80,7 +80,7 @@ TEST_CASE("SkillAction: DEF reduction formula applies")
 
     auto heroRaw = makeHero();
     auto *heroPtr = heroRaw.get();
-    heroPtr->gainMomentum(40);
+    heroPtr->gainEnergy(40);
     allies.addUnit(std::move(heroRaw));
 
     auto enemyRaw = std::make_unique<Enemy>(

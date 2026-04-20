@@ -1,12 +1,15 @@
+/**
+ * @file PlayableCharacter.cpp
+ * @brief PlayableCharacter implementation.
+ */
+
 #include "Entities/PlayableCharacter.h"
-#include "Entities/Party.h"
 #include "Battle/BattleState.h"
-#include "Battle/ResonanceField.h" 
+#include "Battle/ResonanceField.h"
+#include "Entities/Party.h"
 #include "UI/IInputHandler.h"
 #include "UI/IRenderer.h"
 #include <algorithm>
-#include <iostream>
-#include <limits>
 #include <utility>
 
 PlayableCharacter::PlayableCharacter(std::string id,
@@ -15,7 +18,9 @@ PlayableCharacter::PlayableCharacter(std::string id,
                                      Affinity affinity,
                                      int resonanceContribution,
                                      std::string passiveTrait)
-    : Unit{std::move(id), std::move(name), stats, affinity}, m_resonanceContribution{resonanceContribution}, m_passiveTrait{std::move(passiveTrait)}
+    : Unit{std::move(id), std::move(name), stats, affinity},
+      m_resonanceContribution{resonanceContribution},
+      m_passiveTrait{std::move(passiveTrait)}
 {
 }
 
@@ -31,14 +36,25 @@ const std::vector<std::unique_ptr<IAction>> &PlayableCharacter::getAbilities() c
     return m_abilities;
 }
 
-void PlayableCharacter::gainMomentum(int amount)
+void PlayableCharacter::gainEnergy(int amount)
 {
-    m_resources.momentum = std::min(kMaxMomentum, m_resources.momentum + amount);
+    m_resources.energy = std::min(kMaxEnergy, m_resources.energy + amount);
 }
 
-void PlayableCharacter::resetMomentum()
+void PlayableCharacter::resetEnergy()
 {
-    m_resources.momentum = 0;
+    m_resources.energy = 0;
+}
+
+void PlayableCharacter::consumeEnergy(int amount)
+{
+    m_resources.energy = std::max(0, m_resources.energy - amount);
+}
+
+bool PlayableCharacter::isArchSkillReady() const
+{
+    // Placeholder; will be cooldown-gated in future hotfix
+    return true;
 }
 
 bool PlayableCharacter::canAffordSp(int amount, const Party &party) const
@@ -48,8 +64,17 @@ bool PlayableCharacter::canAffordSp(int amount, const Party &party) const
 
 void PlayableCharacter::consumeSp(int amount, Party &party) const
 {
-    // Assumes caller already checked affordability.
     party.useSp(amount);
+}
+
+void PlayableCharacter::modifyExposure(int delta)
+{
+    m_exposure = std::clamp(m_exposure + delta, 0, kMaxExposure);
+}
+
+bool PlayableCharacter::canVent() const
+{
+    return m_exposure > 0 && m_exposure < kMaxExposure;
 }
 
 std::size_t PlayableCharacter::selectActionIndex(const Party &allies,
@@ -60,10 +85,9 @@ std::size_t PlayableCharacter::selectActionIndex(const Party &allies,
         std::size_t idx{input.getActionChoice(m_abilities.size())};
         if (m_abilities[idx]->isAvailable(*this, allies))
             return idx;
-        // Unavailable feedback — renderer not available here; ConsoleInputHandler
-        // prints its own prompt. Full message rendering deferred to SDL phase.
     }
 }
+
 std::optional<TargetInfo> PlayableCharacter::selectTarget(const Party &enemies,
                                                           IInputHandler &input)
 {
@@ -83,11 +107,11 @@ std::optional<TargetInfo> PlayableCharacter::selectTarget(const Party &enemies,
     std::size_t choice{input.getTargetChoice(targets.size())};
     return TargetInfo{TargetInfo::Type::Enemy, targets[choice].first};
 }
+
 void PlayableCharacter::displayActionMenu(const Party &party, IRenderer &renderer) const
 {
     renderer.renderActionMenu(*this, party);
 }
-
 
 ActionResult PlayableCharacter::takeTurn(Party &allies,
                                          Party &enemies,
@@ -105,18 +129,4 @@ ActionResult PlayableCharacter::takeTurn(Party &allies,
     ++state.turnNumber;
 
     return result;
-}
-void PlayableCharacter::consumeMomentum(int amount)
-{
-    m_resources.momentum = std::max(0, m_resources.momentum - amount);
-}
-
-void PlayableCharacter::modifyExposure(int delta)
-{
-    m_exposure = std::clamp(m_exposure + delta, 0, kMaxExposure);
-}
-
-bool PlayableCharacter::canVent() const
-{
-    return m_exposure > 0 && m_exposure < kMaxExposure;
 }

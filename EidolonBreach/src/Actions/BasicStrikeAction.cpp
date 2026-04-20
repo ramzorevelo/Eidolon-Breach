@@ -39,7 +39,7 @@ ActionResult BasicStrikeAction::execute(PlayableCharacter &user,
                                         std::optional<TargetInfo> target)
 {
     allies.gainSp(kSpGainToParty);
-    user.gainMomentum(m_data.momentumGain);
+    user.gainEnergy(m_data.momentumGain);
 
     ActionResult result{ActionResult::Type::Damage, 0};
     if (target && target->type == TargetInfo::Type::Enemy)

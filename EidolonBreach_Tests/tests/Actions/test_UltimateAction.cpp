@@ -28,7 +28,7 @@ TEST_CASE("UltimateAction: requires full Momentum, resets it and refunds 5")
     UltimateAction ult;
     CHECK(!ult.isAvailable(*heroPtr, allies)); // momentum 0
 
-    heroPtr->gainMomentum(100);
+    heroPtr->gainEnergy(100);
     CHECK(ult.isAvailable(*heroPtr, allies)); // momentum 100
 
     TargetInfo t{TargetInfo::Type::Enemy, 0};
@@ -38,7 +38,7 @@ TEST_CASE("UltimateAction: requires full Momentum, resets it and refunds 5")
     CHECK(result.value == 60);
     CHECK(enemyPtr->getHp() == 40);
     CHECK(enemyPtr->getToughness() == 20); // 50 - 30 (kUltToughDmg)
-    CHECK(heroPtr->getMomentum() == 5);    // reset to 0 then +5 refund
+    CHECK(heroPtr->getEnergy() == 5);    // reset to 0 then +5 refund
     CHECK(allies.getSp() == 50);           // ultimate does not affect SP
 }
 
@@ -52,7 +52,7 @@ TEST_CASE("UltimateAction: does not consume SP")
     allies.addUnit(std::move(heroRaw));
     enemies.addUnit(makeEnemy());
 
-    heroPtr->gainMomentum(100);
+    heroPtr->gainEnergy(100);
     UltimateAction ult;
     ult.execute(*heroPtr, allies, enemies, TargetInfo{TargetInfo::Type::Enemy, 0});
     CHECK(allies.getSp() == 50);
