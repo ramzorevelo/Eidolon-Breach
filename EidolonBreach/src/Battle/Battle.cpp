@@ -65,6 +65,10 @@ void Battle::processPlayerTurn(Unit *unit, BattleState &state)
     m_renderer.renderActionResult(unit->getName(), result);
     renderNewBreaks(breaksBefore, m_enemyParty);
 
+    // Apply spGained and exposureDelta from the result.
+    if (auto *pc = dynamic_cast<PlayableCharacter *>(unit))
+        processActionResult(*pc, m_playerParty, result);
+
     if (state.resonanceField.isReady())
     {
         Affinity triggered{state.resonanceField.trigger()};
@@ -210,4 +214,16 @@ void Battle::run()
             }
         }
     }
+}
+
+
+void Battle::processActionResult(PlayableCharacter &actor,
+                                 Party &allies,
+                                 const ActionResult &result)
+{
+    if (result.spGained != 0)
+        allies.gainSp(result.spGained);
+
+    if (result.exposureDelta != 0)
+        actor.modifyExposure(result.exposureDelta);
 }

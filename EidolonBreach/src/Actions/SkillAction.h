@@ -1,15 +1,9 @@
 #pragma once
-/**
- * @file SkillAction.h
- * @brief Arch Skill [E]: costs 25 SP and 40 Momentum, deals configurable damage.
- */
+
 
 #include "Actions/IAction.h"
 
-/**
- * @brief Arch Skill: costs 25 SP and 40 Momentum. Available when party SP >= 25
- * and user Momentum >= 40 (isArchSkillReady()).
- */
+
 class SkillAction : public IAction
 {
   public:
