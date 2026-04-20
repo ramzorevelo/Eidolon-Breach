@@ -58,8 +58,21 @@ class PlayableCharacter : public Unit
     void resetEnergy();
     void consumeEnergy(int amount);
 
-    // Arch Skill availability: cooldown-based 
-    bool isArchSkillReady() const;
+    // Arch Skill cooldown
+    /** @return true when m_archSkillCooldown == 0. */
+    [[nodiscard]] bool isArchSkillReady() const
+    {
+        return m_archSkillCooldown == 0;
+    }
+    /** @return Remaining cooldown turns for UI display. */
+    [[nodiscard]] int getArchSkillCooldown() const
+    {
+        return m_archSkillCooldown;
+    }
+    /** Sets cooldown to kArchSkillCooldownTurns. Call after Arch Skill is used. */
+    void consumeArchSkill();
+    /** Decrements cooldown by 1, clamped to 0. Call at the start of each PC turn. */
+    void tickArchSkillCooldown();
 
     // SP: delegates to Party (shared pool)
     bool canAffordSp(int amount, const Party &party) const;
@@ -101,4 +114,5 @@ class PlayableCharacter : public Unit
     void displayActionMenu(const Party &party, IRenderer &renderer) const;
     std::size_t selectActionIndex(const Party &allies, IInputHandler &input);
     std::optional<TargetInfo> selectTarget(const Party &enemies, IInputHandler &input);
+    int m_archSkillCooldown{0};
 };
