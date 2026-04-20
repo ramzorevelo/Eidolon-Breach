@@ -31,6 +31,9 @@
     <Filter Include="Core\Effects">
       <UniqueIdentifier>{fd430ead-c42e-4753-ac67-ff41d1a3ab9e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Items">
+      <UniqueIdentifier>{667afe70-f072-4d62-bb71-554d3d69aac0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -101,6 +104,9 @@
     </ClCompile>
     <ClCompile Include="src\Actions\VentAction.cpp">
       <Filter>Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Items\Inventory.cpp">
+      <Filter>Items</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -232,6 +238,12 @@
     </ClInclude>
     <ClInclude Include="src\Actions\SlotState.h">
       <Filter>Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Items\Inventory.h">
+      <Filter>Items</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Items\Item.h">
+      <Filter>Items</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
