@@ -230,5 +230,8 @@
     <ClInclude Include="src\Battle\BattleState.h">
       <Filter>Battle</Filter>
     </ClInclude>
+    <ClInclude Include="src\Actions\SlotState.h">
+      <Filter>Actions</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

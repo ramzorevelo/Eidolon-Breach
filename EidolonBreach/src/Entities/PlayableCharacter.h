@@ -5,6 +5,7 @@
  */
 
 #include "Actions/IAction.h"
+#include "Actions/SlotState.h"
 #include "Core/ResourceStats.h"
 #include "Entities/Unit.h"
 #include "UI/IInputHandler.h"
@@ -30,6 +31,19 @@ class PlayableCharacter : public Unit
 
     void addAbility(std::unique_ptr<IAction> action);
     const std::vector<std::unique_ptr<IAction>> &getAbilities() const;
+
+    /**
+     * @brief Unlocks slot `slotIndex` (0 or 1) if not already unlocked.
+     * Called by MetaProgress::gainXP() when a level threshold is crossed.
+     * No-op if slotIndex is out of range or already unlocked.
+     */
+    void tryUnlockSlot(int slotIndex);
+
+    /** @return Read-only view of the equipped skill set. */
+    const EquippedSkillSet &getEquippedSkills() const
+    {
+        return m_equipped;
+    }
 
     // Energy (individual resource)
     int getEnergy() const
@@ -81,6 +95,8 @@ class PlayableCharacter : public Unit
     int m_resonanceContribution{};
     std::string m_passiveTrait{};
     int m_exposure{0};
+
+    EquippedSkillSet m_equipped{};
 
     void displayActionMenu(const Party &party, IRenderer &renderer) const;
     std::size_t selectActionIndex(const Party &allies, IInputHandler &input);
