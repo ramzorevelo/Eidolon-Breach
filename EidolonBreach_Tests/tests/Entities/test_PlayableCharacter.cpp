@@ -127,3 +127,33 @@ TEST_CASE("PlayableCharacter: tryUnlockSlot twice is a no-op (idempotent)")
     hero->tryUnlockSlot(0); // second call must not crash
     CHECK(hero->getEquippedSkills().slots[0].unlocked);
 }
+
+TEST_CASE("PlayableCharacter: consumable available by default")
+{
+    auto hero = makeHero();
+    CHECK(hero->canUseConsumable());
+}
+
+TEST_CASE("PlayableCharacter: consumable unavailable immediately after use")
+{
+    auto hero = makeHero();
+    hero->consumeConsumableAction(false);
+    CHECK(!hero->canUseConsumable());
+    CHECK(hero->getConsumableCooldown() == 1); // if getter added; else verify indirectly
+}
+
+TEST_CASE("PlayableCharacter: consumable available again after 1 tick")
+{
+    auto hero = makeHero();
+    hero->consumeConsumableAction(false);
+    hero->tickConsumableCooldown();
+    CHECK(hero->canUseConsumable());
+}
+
+TEST_CASE("PlayableCharacter: multi-turn consumable locks for entire battle")
+{
+    auto hero = makeHero();
+    hero->consumeConsumableAction(true); // multi-turn
+    hero->tickConsumableCooldown();      // cooldown reaches 0
+    CHECK(!hero->canUseConsumable());    // still locked by m_consumableUsedThisBattle
+}
