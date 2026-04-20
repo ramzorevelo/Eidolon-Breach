@@ -74,3 +74,41 @@ TEST_CASE("PlayableCharacter: Arch Skill threshold (placeholder — always ready)"
     hero->gainEnergy(1);
     CHECK(hero->isArchSkillReady());
 }
+
+TEST_CASE("PlayableCharacter: slots start locked")
+{
+    auto hero = makeHero();
+    const auto &equipped = hero->getEquippedSkills();
+    CHECK(!equipped.slots[0].unlocked);
+    CHECK(!equipped.slots[1].unlocked);
+    CHECK(!equipped.slots[0].isReady());
+    CHECK(!equipped.slots[1].isReady());
+}
+
+TEST_CASE("PlayableCharacter: tryUnlockSlot unlocks the correct slot")
+{
+    auto hero = makeHero();
+    hero->tryUnlockSlot(0);
+    CHECK(hero->getEquippedSkills().slots[0].unlocked);
+    CHECK(!hero->getEquippedSkills().slots[1].unlocked);
+
+    hero->tryUnlockSlot(1);
+    CHECK(hero->getEquippedSkills().slots[1].unlocked);
+}
+
+TEST_CASE("PlayableCharacter: tryUnlockSlot out-of-range is a no-op")
+{
+    auto hero = makeHero();
+    hero->tryUnlockSlot(-1); // must not crash
+    hero->tryUnlockSlot(2);  // must not crash
+    CHECK(!hero->getEquippedSkills().slots[0].unlocked);
+    CHECK(!hero->getEquippedSkills().slots[1].unlocked);
+}
+
+TEST_CASE("PlayableCharacter: tryUnlockSlot twice is a no-op (idempotent)")
+{
+    auto hero = makeHero();
+    hero->tryUnlockSlot(0);
+    hero->tryUnlockSlot(0); // second call must not crash
+    CHECK(hero->getEquippedSkills().slots[0].unlocked);
+}

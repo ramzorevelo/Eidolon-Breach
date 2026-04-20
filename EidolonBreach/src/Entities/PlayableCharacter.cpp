@@ -130,3 +130,10 @@ ActionResult PlayableCharacter::takeTurn(Party &allies,
 
     return result;
 }
+
+void PlayableCharacter::tryUnlockSlot(int slotIndex)
+{
+    if (slotIndex < 0 || slotIndex >= EquippedSkillSet::kEquipSlots)
+        return;
+    m_equipped.slots[static_cast<std::size_t>(slotIndex)].unlocked = true;
+}
