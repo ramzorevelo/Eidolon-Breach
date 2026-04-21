@@ -48,7 +48,7 @@ class Battle
     bool isBattleOver() const;
     void processPlayerTurn(Unit *unit);
     void processEnemyTurn(Unit *unit);
-    bool checkAndHandleBattleEnd(BattleState &state);
+    bool checkAndHandleBattleEnd();
     ResonanceField m_field{};
     void applyResonanceTrigger(Affinity affinity);
     void processPlayerTurn(Unit *unit, BattleState &state);
@@ -65,9 +65,4 @@ class Battle
     void processActionResult(PlayableCharacter &actor,
                              Party &allies,
                              const ActionResult &result);
-    /**
-     * @brief Collect drops from all defeated enemies and add them to the player
-     *        party's inventory. Called once at the end of a victorious battle.
-     */
-    void collectDrops(BattleState &state);
 };
