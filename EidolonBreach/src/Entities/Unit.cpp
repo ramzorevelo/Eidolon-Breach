@@ -38,8 +38,9 @@ bool               Unit::isAlive()                  const { return m_stats.hp > 
 
 void Unit::takeDamage(int amount)
 {
-    // Run the absorption pass over all shield effects in insertion order.
-    int remaining{amount};
+    int remaining{std::max(0, amount)};
+
+    // Run the shield absorption pass.
     for (auto &effect : m_effects)
     {
         if (remaining <= 0)

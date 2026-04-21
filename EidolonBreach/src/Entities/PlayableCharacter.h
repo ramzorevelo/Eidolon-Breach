@@ -8,6 +8,7 @@
 #include "Actions/SlotState.h"
 #include "Core/ResourceStats.h"
 #include "Entities/Unit.h"
+#include "Items/Item.h"
 #include "UI/IInputHandler.h"
 #include <memory>
 #include <optional>
@@ -122,6 +123,45 @@ class PlayableCharacter : public Unit
         return m_consumableCooldown;
     }
 
+    /**
+     * @brief Per-character equipment loadout (weapon, armor, accessory).
+     *        Each slot holds at most one Item. std::nullopt = unequipped.
+     */
+    struct CharacterEquipment
+    {
+        std::optional<Item> weapon{};
+        std::optional<Item> armor{};
+        std::optional<Item> accessory{};
+    };
+    // Equipment
+    /**
+     * @brief Equip an item into the appropriate slot.
+     *        If the slot was occupied, the previous item is returned via the
+     *        return value so the caller can return it to inventory.
+     *        Sets ResonanceModifier on m_resonanceContribution immediately.
+     * @return The displaced item, if any.
+     */
+    std::optional<Item> equip(const Item &item);
+
+    /**
+     * @brief Remove the item from the given slot and return it.
+     *        Reverses any ResonanceModifier. Returns nullopt if slot was empty.
+     */
+    std::optional<Item> unequip(EquipSlot slot);
+
+    /** @return Read-only view of all equipped items. */
+    [[nodiscard]] const CharacterEquipment &getEquipment() const
+    {
+        return m_equipment;
+    }
+
+    /**
+     * @brief Compute final stats: equipment pre-pass (flat StatModifiers from gear),
+     *        then the two-pass IStatusEffect fold (flat then pct).
+     *        Override of Unit::getFinalStats().
+     */
+    [[nodiscard]] Stats getFinalStats() const;
+    [[nodiscard]] int getAffinityResistance(Affinity affinity) const override;
   private:
     std::vector<std::unique_ptr<IAction>> m_abilities;
     ResourceStats m_resources{0, kMaxEnergy};
@@ -138,4 +178,5 @@ class PlayableCharacter : public Unit
     int m_archSkillCooldown{0};
     int m_consumableCooldown{0};
     bool m_consumableUsedThisBattle{false};
+    CharacterEquipment m_equipment{};
 };

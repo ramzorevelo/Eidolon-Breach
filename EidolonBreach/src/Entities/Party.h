@@ -7,6 +7,7 @@
 
 #include "Entities/Unit.h"
 #include "Core/PartyResources.h"
+#include "Items/Inventory.h"
 #include <vector>
 #include <memory>
 #include <cstddef>
@@ -28,11 +29,21 @@ public:
 	int  getSp() const { return m_resources.sp; }
 	int  getMaxSp() const { return m_resources.maxSp; }
 	void gainSp(int amount);
-	bool useSp(int amount);   // returns true if enough SP was available
+	bool useSp(int amount);   // returns true if enough SP was available/** @return The shared party inventory (consumables, equipment, gold). */
+    [[nodiscard]] Inventory &getInventory()
+    {
+        return m_inventory;
+    }
+    [[nodiscard]] const Inventory &getInventory() const
+    {
+        return m_inventory;
+    }
+
 
 private:
 	std::vector<std::unique_ptr<Unit>> m_units;
 	PartyResources m_resources{ 0, kDefaultMaxSp };
 
 	static constexpr int kDefaultMaxSp{ 100 };
+    Inventory m_inventory{};
 };
