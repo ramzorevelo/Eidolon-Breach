@@ -15,7 +15,9 @@ const ActionData VentAction::kVentData{
     .momentumGain = 0,
     .toughnessDamage = 0,
     .targetMode = TargetMode::Self,
-    .affinity = Affinity::Aether};
+    .affinity = Affinity::Aether,
+    .category = ActionCategory::Vent,
+};
 
 std::string VentAction::label() const
 {
