@@ -4,6 +4,7 @@
 #include "Core/CombatUtils.h"
 #include <algorithm>
 #include <utility>
+#include <random>
 
 Enemy::Enemy(std::string id,
     std::string name,
@@ -11,14 +12,12 @@ Enemy::Enemy(std::string id,
     Affinity affinity,
     int maxToughness,
     std::unique_ptr<IAIStrategy> aiStrategy,
-    std::map<Affinity, float> affinityModifiers,
-    std::optional<Drop> drop)
+    std::map<Affinity, float> affinityModifiers)
     : Unit{std::move(id), std::move(name), stats, affinity}
     , m_toughness{ maxToughness }
     , m_maxToughness{ maxToughness }
     , m_aiStrategy{ std::move(aiStrategy) }
     , m_affinityModifiers{ std::move(affinityModifiers) }
-    , m_drop{ std::move(drop) }
 {
 }
 
@@ -47,13 +46,22 @@ float Enemy::getAffinityModifier(Affinity a) const
     return (it != m_affinityModifiers.end()) ? it->second : 1.0f;
 }
 
-bool Enemy::hasDrop() const { return m_drop.has_value(); }
-const std::optional<Drop>& Enemy::getDrop() const { return m_drop; }
-
-std::optional<Drop> Enemy::dropLoot()
+void Enemy::addDrop(Drop drop)
 {
-    std::optional<Drop> result{ m_drop };
-    m_drop = std::nullopt;
+    m_dropPool.push_back(std::move(drop));
+}
+
+std::vector<Drop> Enemy::generateDrops(unsigned int seed) const
+{
+    std::mt19937 rng{seed};
+    std::uniform_real_distribution<float> dist{0.0f, 1.0f};
+
+    std::vector<Drop> result{};
+    for (const Drop &drop : m_dropPool)
+    {
+        if (drop.type == Drop::Type::GuaranteedItem || dist(rng) <= drop.dropChance)
+            result.push_back(drop);
+    }
     return result;
 }
 

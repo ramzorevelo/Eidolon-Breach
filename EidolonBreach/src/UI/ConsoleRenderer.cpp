@@ -3,6 +3,7 @@
 #include "Entities/Unit.h"
 #include "Entities/PlayableCharacter.h"
 #include "Entities/Enemy.h"
+#include "Core/Drop.h"
 #include "Core/IStatusEffect.h"
 #include "Battle/ResonanceField.h"
 #include <iostream>
@@ -47,11 +48,12 @@ void ConsoleRenderer::renderStunned(const std::string& enemyName)
     std::cout << enemyName << " is stunned and cannot act.\n";
 }
 
-void ConsoleRenderer::renderVictory(const std::string& enemyName, std::optional<Drop> drop)
+void ConsoleRenderer::renderVictory(const std::string &enemyName, std::optional<Drop> drop)
 {
-    std::cout << '\n' << enemyName << " is destroyed!\n";
-    if (drop.has_value())
-        std::cout << "Loot: " << drop->name << " (" << drop->goldValue << " gold)\n";
+    std::cout << '\n'
+              << enemyName << " is destroyed!\n";
+    if (drop.has_value() && drop->type == Drop::Type::Gold)
+        std::cout << "Loot: " << drop->goldAmount << " gold\n";
     std::cout << "=== VICTORY ===\n";
 }
 
