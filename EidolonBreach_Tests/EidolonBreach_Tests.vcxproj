@@ -22,10 +22,12 @@
     <ClCompile Include="..\EidolonBreach\src\Actions\BasicStrikeAction.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Actions\SkillAction.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Actions\UltimateAction.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Actions\UseConsumableAction.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Actions\VentAction.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Battle\Battle.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Battle\ResonanceField.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Battle\SpeedBasedTurnOrderCalculator.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Battle\TargetingHeuristics.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Core\Effects\BurnEffect.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Core\Effects\RegenEffect.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Core\Effects\ShieldEffect.cpp" />
@@ -39,13 +41,17 @@
     <ClCompile Include="..\EidolonBreach\src\Entities\StoneGolem.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Entities\Unit.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Entities\VampireBat.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Items\Inventory.cpp" />
     <ClCompile Include="..\EidolonBreach\src\UI\ConsoleRenderer.cpp" />
+    <ClCompile Include="tests\Actions\testActionCategory.cpp" />
     <ClCompile Include="tests\Actions\test_BasicStrikeAction.cpp" />
     <ClCompile Include="tests\Actions\test_SkillAction.cpp" />
     <ClCompile Include="tests\Actions\test_UltimateAction.cpp" />
+    <ClCompile Include="tests\Actions\test_UseConsumableAction.cpp" />
     <ClCompile Include="tests\Actions\test_VentActions.cpp" />
     <ClCompile Include="tests\Battle\test_ResonanceField.cpp" />
     <ClCompile Include="tests\Battle\test_SpeedBasedTurnOrderCalculator.cpp" />
+    <ClCompile Include="tests\Battle\test_TargetingHeuristics.cpp" />
     <ClCompile Include="tests\Battle\test_TurnOrder.cpp" />
     <ClCompile Include="tests\Core\Effects\test_BurnEffect.cpp" />
     <ClCompile Include="tests\Core\Effects\test_RegenEffect.cpp" />
@@ -55,6 +61,7 @@
     <ClCompile Include="tests\Core\test_ActionResult.cpp" />
     <ClCompile Include="tests\Core\test_Affinity.cpp" />
     <ClCompile Include="tests\Core\test_BattleState.cpp" />
+    <ClCompile Include="tests\Core\test_Drop.cpp" />
     <ClCompile Include="tests\Core\test_Stats.cpp" />
     <ClCompile Include="tests\Core\test_StatusEffectBase.cpp" />
     <ClCompile Include="tests\EidolonBreach_Tests.cpp" />
@@ -64,6 +71,8 @@
     <ClCompile Include="tests\Entities\test_PlayableCharacter.cpp" />
     <ClCompile Include="tests\Entities\test_Unit.cpp" />
     <ClCompile Include="tests\Entities\test_UnitEffects.cpp" />
+    <ClCompile Include="tests\Items\test_Equipment.cpp" />
+    <ClCompile Include="tests\Items\test_Inventory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\EidolonBreach\src\Core\ActionResult.h" />

@@ -30,6 +30,9 @@
     <Filter Include="Core\Effects">
       <UniqueIdentifier>{c85d8697-1075-4dff-b2b8-4b69b6576866}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Items">
+      <UniqueIdentifier>{581d3f18-5fb9-4bcf-ae4e-9f296792e757}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="tests\Actions\test_BasicStrikeAction.cpp">
@@ -164,6 +167,33 @@
     </ClCompile>
     <ClCompile Include="tests\Core\test_ActionResult.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Items\test_Equipment.cpp">
+      <Filter>Items</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Items\test_Inventory.cpp">
+      <Filter>Items</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Items\Inventory.cpp">
+      <Filter>Items</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Core\test_Drop.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Battle\test_TargetingHeuristics.cpp">
+      <Filter>Battle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Battle\TargetingHeuristics.cpp">
+      <Filter>Battle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Actions\UseConsumableAction.cpp">
+      <Filter>Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Actions\test_UseConsumableAction.cpp">
+      <Filter>Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Actions\testActionCategory.cpp">
+      <Filter>Actions</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
