@@ -18,7 +18,8 @@ SkillAction::SkillAction(float skillPower)
           .momentumGain = 0,
           .toughnessDamage = CombatConstants::kSkillToughDmg,
           .targetMode = TargetMode::SingleEnemy,
-          .affinity = Affinity::Blaze}}
+          .affinity = Affinity::Blaze,
+          .category = ActionCategory::ArchSkill}}
 {
 }
 

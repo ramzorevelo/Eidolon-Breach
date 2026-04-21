@@ -41,7 +41,7 @@ public:
      * Flat modifiers always precede percentage multipliers regardless of
      * the order in which effects were applied (see §2.12.3).
      */
-    [[nodiscard]] Stats getFinalStats() const;
+    [[nodiscard]] virtual Stats getFinalStats() const;
 
     int  getHp()    const;
     int  getMaxHp() const;
@@ -118,4 +118,15 @@ protected:
     Stats       m_stats;
     Affinity    m_affinity;
     std::vector<std::unique_ptr<IStatusEffect>> m_effects;
+    /**
+     * @brief Returns the flat affinity resistance for the given affinity.
+     *        Base implementation returns 0. PlayableCharacter overrides to
+     *        check equipment AffinityResistance effects.
+     * @param affinity The affinity of the incoming attack.
+     */
+    [[nodiscard]] virtual int getAffinityResistance(Affinity affinity) const
+    {
+        (void)affinity;
+        return 0;
+    }
 }; 

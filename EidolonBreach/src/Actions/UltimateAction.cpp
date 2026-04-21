@@ -18,7 +18,8 @@ UltimateAction::UltimateAction()
           .momentumGain = 0,
           .toughnessDamage = CombatConstants::kUltToughDmg,
           .targetMode = TargetMode::SingleEnemy,
-          .affinity = Affinity::Blaze}}
+          .affinity = Affinity::Blaze,
+          .category = ActionCategory::Ultimate}}
 {
 }
 

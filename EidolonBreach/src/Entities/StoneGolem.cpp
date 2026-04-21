@@ -18,6 +18,7 @@ StoneGolem::StoneGolem(std::string name, int maxHp, int maxToughness)
             maxToughness,
             std::make_unique<BasicAIStrategy>()}
 {
+    addDrop(Drop{Drop::Type::Gold, 20, {}, 1.0f});
 }
 
 ActionResult StoneGolem::performAttack()

@@ -136,7 +136,7 @@ bool Battle::checkAndHandleBattleEnd()
             {
                 if (auto *e = dynamic_cast<Enemy *>(u))
                 {
-                    m_renderer.renderVictory(e->getName(), e->dropLoot());
+                    m_renderer.renderVictory(e->getName(), std::nullopt);
                 }
             }
         }
