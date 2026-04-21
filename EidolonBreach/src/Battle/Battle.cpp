@@ -6,6 +6,7 @@
 #include "Core/EffectIds.h"
 #include "Entities/PlayableCharacter.h"
 #include "Core/ActionResult.h"
+#include "Items/Inventory.h"
 #include "Entities/Enemy.h"
 #include "UI/ConsoleRenderer.h"
 #include <algorithm>
@@ -52,8 +53,10 @@ bool Battle::isBattleOver() const
 
 void Battle::processPlayerTurn(Unit *unit, BattleState &state)
 {
-    // FIXME Phase 6: replace dynamic_cast with Unit::onTurnStart() virtual hook
-    // Tick arch skill cooldown at the start of each PC's turn.
+    if (!unit)
+        return;
+
+    // FIXME Phase 6: replace dynamic_cast with Unit::onTurnStart() virtual hook.
     if (auto *pc = dynamic_cast<PlayableCharacter *>(unit))
     {
         pc->tickArchSkillCooldown();
@@ -65,7 +68,6 @@ void Battle::processPlayerTurn(Unit *unit, BattleState &state)
     m_renderer.renderActionResult(unit->getName(), result);
     renderNewBreaks(breaksBefore, m_enemyParty);
 
-    // Apply spGained and exposureDelta from the result.
     if (auto *pc = dynamic_cast<PlayableCharacter *>(unit))
         processActionResult(*pc, m_playerParty, result);
 
@@ -125,21 +127,21 @@ void Battle::processEnemyTurn(Unit *unit, BattleState &state)
     }
 }
 
-bool Battle::checkAndHandleBattleEnd()
+bool Battle::checkAndHandleBattleEnd(BattleState &state)
 {
     if (m_enemyParty.isAllDead())
     {
+        collectDrops(state);
         for (std::size_t i{0}; i < m_enemyParty.size(); ++i)
         {
             Unit *u{m_enemyParty.getUnitAt(i)};
-            if (!u->isAlive())
+            if (u && !u->isAlive())
             {
                 if (auto *e = dynamic_cast<Enemy *>(u))
-                {
                     m_renderer.renderVictory(e->getName(), std::nullopt);
-                }
             }
         }
+        resetAllPcConsumableState();
         return true;
     }
 
@@ -148,11 +150,10 @@ bool Battle::checkAndHandleBattleEnd()
         for (std::size_t i{0}; i < m_playerParty.size(); ++i)
         {
             Unit *u{m_playerParty.getUnitAt(i)};
-            if (!u->isAlive())
-            {
+            if (u && !u->isAlive())
                 m_renderer.renderDefeat(u->getName());
-            }
         }
+        resetAllPcConsumableState();
         return true;
     }
     return false;
@@ -192,7 +193,7 @@ void Battle::run()
 
             if (!slot.unit->isAlive())
             {
-                if (checkAndHandleBattleEnd())
+                if ((checkAndHandleBattleEnd(state)))
                     resetAllPcConsumableState();
                     return;
                 continue;
@@ -207,7 +208,7 @@ void Battle::run()
                 processEnemyTurn(slot.unit, state);
             }
 
-            if (checkAndHandleBattleEnd())
+            if ((checkAndHandleBattleEnd(state)))
             {
                 resetAllPcConsumableState();
                 return;
@@ -226,4 +227,25 @@ void Battle::processActionResult(PlayableCharacter &actor,
 
     if (result.exposureDelta != 0)
         actor.modifyExposure(result.exposureDelta);
+}
+void Battle::collectDrops(BattleState &state)
+{
+    const unsigned int seed{static_cast<unsigned int>(state.turnNumber)};
+    for (std::size_t i{0}; i < m_enemyParty.size(); ++i)
+    {
+        Unit *u{m_enemyParty.getUnitAt(i)};
+        if (!u || u->isAlive())
+            continue;
+        if (auto *e = dynamic_cast<Enemy *>(u))
+        {
+            for (const Drop &drop : e->generateDrops(seed))
+            {
+                if (drop.type == Drop::Type::Gold ||
+                    drop.type == Drop::Type::GuaranteedItem)
+                {
+                    m_playerParty.getInventory().gold += drop.goldAmount;
+                }
+            }
+        }
+    }
 }
