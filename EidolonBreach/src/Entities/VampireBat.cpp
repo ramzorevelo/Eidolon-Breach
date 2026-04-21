@@ -11,13 +11,14 @@ namespace {
 }
 
 VampireBat::VampireBat(std::string name, int maxHp, int maxToughness)
-    : Enemy{ name + "_bat",
-             name,
-             Stats{ maxHp, maxHp, 14, 8, 14 },
-             Affinity::Blaze,
-             maxToughness,
-             std::make_unique<BasicAIStrategy>() }
+    : Enemy{name + "_bat",
+            name,
+            Stats{maxHp, maxHp, 14, 8, 14},
+            Affinity::Blaze,
+            maxToughness,
+            std::make_unique<BasicAIStrategy>()}
 {
+    addDrop(Drop{Drop::Type::Gold, 10, {}, 1.0f});
 }
 
 ActionResult VampireBat::performAttack()

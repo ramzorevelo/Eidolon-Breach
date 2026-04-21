@@ -7,6 +7,8 @@
 #include "Battle/BattleState.h"
 #include "Battle/ResonanceField.h"
 #include "Entities/Party.h"
+#include "Items/Item.h"
+#include <variant>
 #include "UI/IInputHandler.h"
 #include "Core/CombatConstants.h"
 #include "UI/IRenderer.h"
@@ -164,4 +166,141 @@ void PlayableCharacter::resetBattleConsumableState()
 {
     m_consumableCooldown = 0;
     m_consumableUsedThisBattle = false;
+}
+
+std::optional<Item> PlayableCharacter::equip(const Item &item)
+{
+    if (item.type != ItemType::Equipment || !item.equipSlot.has_value())
+        return std::nullopt;
+
+    // Apply ResonanceModifier immediately at equip time.
+    for (const ItemEffect &effect : item.effects)
+    {
+        if (const auto *rm = std::get_if<ResonanceModifier>(&effect))
+            m_resonanceContribution += rm->amount;
+    }
+
+    std::optional<Item> displaced{};
+    switch (*item.equipSlot)
+    {
+    case EquipSlot::Weapon:
+        displaced = std::move(m_equipment.weapon);
+        m_equipment.weapon = item;
+        break;
+    case EquipSlot::Armor:
+        displaced = std::move(m_equipment.armor);
+        m_equipment.armor = item;
+        break;
+    case EquipSlot::Accessory:
+        displaced = std::move(m_equipment.accessory);
+        m_equipment.accessory = item;
+        break;
+    }
+
+    // Reverse displaced item's ResonanceModifier.
+    if (displaced.has_value())
+    {
+        for (const ItemEffect &effect : displaced->effects)
+        {
+            if (const auto *rm = std::get_if<ResonanceModifier>(&effect))
+                m_resonanceContribution -= rm->amount;
+        }
+    }
+    return displaced;
+}
+
+std::optional<Item> PlayableCharacter::unequip(EquipSlot slot)
+{
+    std::optional<Item> removed{};
+    switch (slot)
+    {
+    case EquipSlot::Weapon:
+        removed = std::move(m_equipment.weapon);
+        break;
+    case EquipSlot::Armor:
+        removed = std::move(m_equipment.armor);
+        break;
+    case EquipSlot::Accessory:
+        removed = std::move(m_equipment.accessory);
+        break;
+    }
+
+    if (removed.has_value())
+    {
+        for (const ItemEffect &effect : removed->effects)
+        {
+            if (const auto *rm = std::get_if<ResonanceModifier>(&effect))
+                m_resonanceContribution -= rm->amount;
+        }
+    }
+    return removed;
+}
+
+Stats PlayableCharacter::getFinalStats() const
+{
+    // Pre-pass: flat StatModifier bonuses from equipped items.
+    Stats result{getBaseStats()};
+    auto applyStatMod = [&result](const Item &item)
+    {
+        for (const ItemEffect &effect : item.effects)
+        {
+            if (const auto *sm = std::get_if<StatModifier>(&effect))
+            {
+                switch (sm->stat)
+                {
+                case StatModifier::StatType::ATK:
+                    result.atk += sm->amount;
+                    break;
+                case StatModifier::StatType::DEF:
+                    result.def += sm->amount;
+                    break;
+                case StatModifier::StatType::HP:
+                    result.hp += sm->amount;
+                    result.maxHp += sm->amount;
+                    break;
+                case StatModifier::StatType::SPD:
+                    result.spd += sm->amount;
+                    break;
+                }
+            }
+        }
+    };
+
+    if (m_equipment.weapon.has_value())
+        applyStatMod(*m_equipment.weapon);
+    if (m_equipment.armor.has_value())
+        applyStatMod(*m_equipment.armor);
+    if (m_equipment.accessory.has_value())
+        applyStatMod(*m_equipment.accessory);
+
+    // Pass 1: flat additions from IStatusEffect.
+    for (const auto &effect : m_effects)
+        result = effect->modifyStatsFlat(result);
+    // Pass 2: percentage multipliers from IStatusEffect.
+    for (const auto &effect : m_effects)
+        result = effect->modifyStatsPct(result);
+
+    return result;
+}
+
+int PlayableCharacter::getAffinityResistance(Affinity affinity) const
+{
+    int total{0};
+    auto check = [&total, affinity](const std::optional<Item> &slot)
+    {
+        if (!slot.has_value())
+            return;
+        for (const ItemEffect &effect : slot->effects)
+        {
+            if (const auto *ar = std::get_if<AffinityResistance>(&effect))
+            {
+                if (ar->affinity == affinity)
+                    total += ar->flatReduction;
+            }
+        }
+    };
+    check(m_equipment.weapon);
+    check(m_equipment.armor);
+    check(m_equipment.accessory);
+    return total;
 }

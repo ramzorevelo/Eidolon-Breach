@@ -18,6 +18,7 @@ Slime::Slime(std::string name, int maxHp, int maxToughness)
             maxToughness,
             std::make_unique<BasicAIStrategy>()}
 {
+    addDrop(Drop{Drop::Type::Gold, 5, {}, 1.0f});
 }
 
 ActionResult Slime::performAttack()
