@@ -22,10 +22,12 @@
     <ClCompile Include="src\Actions\BasicStrikeAction.cpp" />
     <ClCompile Include="src\Actions\SkillAction.cpp" />
     <ClCompile Include="src\Actions\UltimateAction.cpp" />
+    <ClCompile Include="src\Actions\UseConsumableAction.cpp" />
     <ClCompile Include="src\Actions\VentAction.cpp" />
     <ClCompile Include="src\Battle\Battle.cpp" />
     <ClCompile Include="src\Battle\ResonanceField.cpp" />
     <ClCompile Include="src\Battle\SpeedBasedTurnOrderCalculator.cpp" />
+    <ClCompile Include="src\Battle\TargetingHeuristics.cpp" />
     <ClCompile Include="src\Core\Effects\BurnEffect.cpp" />
     <ClCompile Include="src\Core\Effects\RegenEffect.cpp" />
     <ClCompile Include="src\Core\Effects\ShieldEffect.cpp" />
@@ -50,12 +52,14 @@
     <ClInclude Include="src\Actions\SkillAction.h" />
     <ClInclude Include="src\Actions\SlotState.h" />
     <ClInclude Include="src\Actions\UltimateAction.h" />
+    <ClInclude Include="src\Actions\UseConsumableAction.h" />
     <ClInclude Include="src\Actions\VentAction.h" />
     <ClInclude Include="src\Battle\Battle.h" />
     <ClInclude Include="src\Battle\BattleState.h" />
     <ClInclude Include="src\Battle\ITurnOrderCalculator.h" />
     <ClInclude Include="src\Battle\ResonanceField.h" />
     <ClInclude Include="src\Battle\SpeedBasedTurnOrderCalculator.h" />
+    <ClInclude Include="src\Battle\TargetingHeuristics.h" />
     <ClInclude Include="src\Battle\TurnSlot.h" />
     <ClInclude Include="src\Core\ActionData.h" />
     <ClInclude Include="src\Core\ActionResult.h" />

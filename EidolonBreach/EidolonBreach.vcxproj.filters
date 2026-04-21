@@ -108,6 +108,12 @@
     <ClCompile Include="src\Items\Inventory.cpp">
       <Filter>Items</Filter>
     </ClCompile>
+    <ClCompile Include="src\Actions\UseConsumableAction.cpp">
+      <Filter>Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Battle\TargetingHeuristics.cpp">
+      <Filter>Battle</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Actions\BasicStrikeAction.h">
@@ -244,6 +250,12 @@
     </ClInclude>
     <ClInclude Include="src\Items\Item.h">
       <Filter>Items</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Actions\UseConsumableAction.h">
+      <Filter>Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Battle\TargetingHeuristics.h">
+      <Filter>Battle</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

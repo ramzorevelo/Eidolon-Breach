@@ -18,7 +18,9 @@ BasicStrikeAction::BasicStrikeAction()
           .momentumGain = 0,
           .toughnessDamage = CombatConstants::kBasicToughDmg,
           .targetMode = TargetMode::SingleEnemy,
-          .affinity = Affinity::Blaze}}
+          .affinity = Affinity::Blaze,
+          .category = ActionCategory::Basic
+      }}
 {
 }
 
