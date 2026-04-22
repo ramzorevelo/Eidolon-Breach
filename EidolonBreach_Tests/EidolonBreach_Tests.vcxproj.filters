@@ -198,6 +198,18 @@
     <ClCompile Include="tests\Entities\test_EnemyBreakMechanics.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
+    <ClCompile Include="tests\Core\test_EventBus.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Core\test_RunContext.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Core\RunContext.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Core\EventBus.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="external\doctest.h">
