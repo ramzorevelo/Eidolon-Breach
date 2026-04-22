@@ -8,6 +8,7 @@
 #include "UI/IRenderer.h"
 
 class ResonanceField;
+class Party;
 
 struct BattleState
 {
@@ -16,4 +17,8 @@ struct BattleState
     ResonanceField &resonanceField;
     IInputHandler &inputHandler;
     IRenderer &renderer;
+    /// Populated by Battle::run() — nullptr until then.
+    Party *playerParty{nullptr};
+    /// Populated by Battle::run() — nullptr until then.
+    Party *enemyParty{nullptr};
 };

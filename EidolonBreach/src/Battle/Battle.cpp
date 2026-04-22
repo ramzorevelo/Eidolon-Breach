@@ -34,14 +34,25 @@ std::vector<bool> Battle::snapshotBreakStates(const Party &party) const
     return states;
 }
 
-void Battle::renderNewBreaks(const std::vector<bool> &before, const Party &party) const
+void Battle::processNewBreaks(const std::vector<bool> &before,
+                              const Party &party,
+                              BattleState &state)
 {
     for (std::size_t i{0}; i < party.size() && i < before.size(); ++i)
     {
-        const Unit *u{party.getUnitAt(i)};
-        if (u && !before[i] && u->isBroken())
+        Unit *u{const_cast<Unit *>(party.getUnitAt(i))};
+        if (!u || before[i] || !u->isBroken())
+            continue;
+
+        m_renderer.renderBreak(u->getName());
+
+        // Fire the BreakEffect callback if one is registered on this enemy.
+        // dynamic_cast is permitted in Battle (UI/integration layer) per existing precedent.
+        if (auto *e{dynamic_cast<Enemy *>(u)})
         {
-            m_renderer.renderBreak(u->getName());
+            const BreakEffect &effect{e->getBreakEffect()};
+            if (effect.onBreak)
+                effect.onBreak(*e, state);
         }
     }
 }
@@ -66,7 +77,7 @@ void Battle::processPlayerTurn(Unit *unit, BattleState &state)
     auto breaksBefore{snapshotBreakStates(m_enemyParty)};
     ActionResult result{unit->takeTurn(m_playerParty, m_enemyParty, state)};
     m_renderer.renderActionResult(unit->getName(), result);
-    renderNewBreaks(breaksBefore, m_enemyParty);
+    processNewBreaks(breaksBefore, m_enemyParty, state);
 
     if (auto *pc = dynamic_cast<PlayableCharacter *>(unit))
         processActionResult(*pc, m_playerParty, result);
@@ -175,6 +186,8 @@ void Battle::run()
     m_renderer.renderMessage("\n=== BATTLE START ===");
     m_field.reset();
     BattleState state{0, 0, m_field, m_inputHandler, m_renderer};
+    state.playerParty = &m_playerParty;
+    state.enemyParty = &m_enemyParty;
 
     while (!isBattleOver())
     {

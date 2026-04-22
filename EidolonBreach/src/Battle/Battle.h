@@ -44,10 +44,14 @@ class Battle
     std::unique_ptr<ITurnOrderCalculator> m_turnOrderCalc;
 
     std::vector<bool> snapshotBreakStates(const Party &party) const;
-    void renderNewBreaks(const std::vector<bool> &before, const Party &party) const;
+    /**
+     * @brief Renders break notifications and fires BreakEffect callbacks for
+     *        any enemy that transitioned from not-broken to broken this action.
+     */
+    void processNewBreaks(const std::vector<bool> &before,
+                          const Party &party,
+                          BattleState &state);
     bool isBattleOver() const;
-    void processPlayerTurn(Unit *unit);
-    void processEnemyTurn(Unit *unit);
     bool checkAndHandleBattleEnd(BattleState &state);
     ResonanceField m_field{};
     void applyResonanceTrigger(Affinity affinity);
