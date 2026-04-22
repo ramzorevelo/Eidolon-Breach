@@ -195,6 +195,9 @@
     <ClCompile Include="tests\Actions\testActionCategory.cpp">
       <Filter>Actions</Filter>
     </ClCompile>
+    <ClCompile Include="tests\Entities\test_EnemyBreakMechanics.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="external\doctest.h">

@@ -13,7 +13,7 @@
 #include <memory>
 #include <vector>
 
-class Party;   // forward declaration – avoids circular headers
+class Party;   
 struct BattleState;
 /** Abstract base for all Units (players, enemies, summons). */
 class Unit
@@ -54,7 +54,7 @@ public:
      * remain in m_effects until the next tickEffects() cleans them up.
      * For DoT that should bypass shields, call takeTrueDamage() instead.
      */
-    void takeDamage(int amount);
+    virtual void takeDamage(int amount);
     void heal(int amount);
 
         // --- Direct damage (bypasses shield absorption — for DoT effects) ---
@@ -62,7 +62,7 @@ public:
      * @brief Reduces HP without running the shield absorption pass.
      * Use for DoT ticks (BurnEffect::onTick). Direct attacks call takeDamage().
      */
-    void takeTrueDamage(int amount);
+    virtual void takeTrueDamage(int amount);
 
     // --- Effect Management ---
     /**
@@ -109,7 +109,7 @@ public:
     // Toughness helpers – default implementations are no-ops so that
     // PlayableCharacter does not need to override them.
     virtual bool isBroken()                const { return false; }
-    virtual void applyToughnessHit(int)          {}
+    virtual void applyToughnessHit(int, Affinity = Affinity::Aether) {}
     virtual void recoverFromBreak()               {}
 
 protected:

@@ -53,7 +53,7 @@ ActionResult UltimateAction::execute(PlayableCharacter &user,
                                                         t->getFinalStats(),
                                                         m_data.scaling);
             t->takeDamage(result.value);
-            t->applyToughnessHit(m_data.toughnessDamage);
+            t->applyToughnessHit(m_data.toughnessDamage, m_data.affinity);
         }
     }
     return result;

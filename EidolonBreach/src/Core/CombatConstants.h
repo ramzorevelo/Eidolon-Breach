@@ -18,6 +18,7 @@ constexpr int kArchSkillCooldownTurns{2};
 constexpr int kSlot1UnlockLevel{20};
 constexpr int kSlot2UnlockLevel{40};
 
-// Consumable cooldown (Hotfix 5)
+// Consumable cooldown
 constexpr int kConsumableCooldownTurns{1};
+constexpr float kBrokenDamageBonus{1.5f}; ///< HP damage multiplier while enemy is broken.
 } // namespace CombatConstants

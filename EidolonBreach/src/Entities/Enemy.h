@@ -5,61 +5,106 @@
  * @brief Base class for all enemy units.
  */
 
-#include "Entities/Unit.h"
+#include "Core/Affinity.h"
+#include "Core/CombatConstants.h"
 #include "Core/Drop.h"
 #include "Entities/IAIStrategy.h"
-#include "Core/Drop.h"
-#include "Core/Affinity.h"
+#include "Entities/Unit.h"
+#include <functional>
 #include <map>
 #include <memory>
-#include <optional>
+#include <string>
+#include <vector>
+
+struct BattleState;
+class Enemy;
+
+/**
+ * @brief Fired once when an enemy's Toughness gauge first hits zero.
+ *        Battle calls onBreak immediately after detecting isBroken().
+ *        state.playerParty / state.enemyParty are nullptr until Phase 6;
+ *        all callbacks must null-check before dereferencing them.
+ */
+struct BreakEffect
+{
+    std::string id{};
+    std::string displayName{};
+    std::function<void(Enemy &, BattleState &)> onBreak{};
+
+    BreakEffect() = default;
+    BreakEffect(std::string id_,
+                std::string displayName_,
+                std::function<void(Enemy &, BattleState &)> callback)
+        : id{std::move(id_)}, displayName{std::move(displayName_)}, onBreak{std::move(callback)}
+    {
+    }
+};
 
 class Enemy : public Unit
 {
-public:
+  public:
     Enemy(std::string id,
-        std::string name,
-        Stats stats,
-        Affinity affinity,
-        int maxToughness,
-        std::unique_ptr<IAIStrategy> aiStrategy,
-        std::map<Affinity, float> affinityModifiers = {}
-    );
+          std::string name,
+          Stats stats,
+          Affinity affinity,
+          int maxToughness,
+          std::unique_ptr<IAIStrategy> aiStrategy,
+          std::map<Affinity, float> affinityModifiers = {});
 
+    // Toughness
     bool isBroken() const override;
-    void applyToughnessHit(int amount) override;
+    /**
+     * @brief Reduce toughness by amount × getAffinityModifier(sourceAffinity).
+     *        Sets isBroken() and resets toughness to max when gauge hits 0.
+     *        The BreakEffect callback is fired by Battle, not here.
+     */
+    void applyToughnessHit(int amount, Affinity sourceAffinity = Affinity::Aether) override;
     void recoverFromBreak() override;
 
-    int getToughness() const;
-    int getMaxToughness() const;
+    [[nodiscard]] int getToughness() const;
+    [[nodiscard]] int getMaxToughness() const;
+    [[nodiscard]] float getAffinityModifier(Affinity a) const;
 
-    float getAffinityModifier(Affinity a) const;
+    // Break effect
+    void setBreakEffect(BreakEffect effect);
+    [[nodiscard]] const BreakEffect &getBreakEffect() const;
+    [[nodiscard]] float getBrokenDamageBonus() const;
 
-
-    /**
-     * @brief Register a drop entry for this enemy.
-     *        Called during enemy construction to build the drop pool.
-     */
+    // Drops
     void addDrop(Drop drop);
-
-    /**
-     * @brief Roll drops and return those that land.
-     *        Rolls each Drop::dropChance independently using std::mt19937.
-     *        GuaranteedItem drops always land. Called by Battle on enemy defeat.
-     * @param seed  RNG seed. Pass a stable per-battle seed for determinism in tests.
-     */
     [[nodiscard]] std::vector<Drop> generateDrops(unsigned int seed = 0u) const;
-
 
     ActionResult takeTurn(Party &allies, Party &enemies, BattleState &state) override;
 
-protected:
+    /**
+     * @brief Overrides Unit::takeDamage to apply the broken damage bonus
+     *        (kBrokenDamageBonus × amount) while isBroken() is true.
+     */
+    void takeDamage(int amount) override;
+
+    /**
+     * @brief Overrides Unit::takeTrueDamage with the same broken bonus logic.
+     *        DoT that fires during the break window still benefits the party.
+     */
+    void takeTrueDamage(int amount) override;
+
+    /**
+     * @brief Called by the enemy's own BreakEffect callback for per-subclass
+     *        post-break behaviour (e.g. VampireBat activates bloodless).
+     *        Default: no-op.
+     */
+    virtual void onBreakCallback() {}
+
+  protected:
     virtual ActionResult performAttack();
 
-private:
+  private:
     int m_toughness{};
     int m_maxToughness{};
-    bool m_isBroken{ false };
+    bool m_isBroken{false};
+    int m_brokenTurnsRemaining{0};
+    float m_brokenDamageBonus{CombatConstants::kBrokenDamageBonus};
+    BreakEffect m_breakEffect{};
     std::unique_ptr<IAIStrategy> m_aiStrategy;
     std::map<Affinity, float> m_affinityModifiers;
     std::vector<Drop> m_dropPool{};
