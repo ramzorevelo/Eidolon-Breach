@@ -114,6 +114,12 @@
     <ClCompile Include="src\Battle\TargetingHeuristics.cpp">
       <Filter>Battle</Filter>
     </ClCompile>
+    <ClCompile Include="src\Core\RunContext.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\EventBus.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Actions\BasicStrikeAction.h">
@@ -256,6 +262,18 @@
     </ClInclude>
     <ClInclude Include="src\Battle\TargetingHeuristics.h">
       <Filter>Battle</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\RunContext.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\BehaviorSignal.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\BattleEvents.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\EventBus.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

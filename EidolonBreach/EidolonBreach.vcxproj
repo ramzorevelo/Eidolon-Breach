@@ -32,6 +32,8 @@
     <ClCompile Include="src\Core\Effects\RegenEffect.cpp" />
     <ClCompile Include="src\Core\Effects\ShieldEffect.cpp" />
     <ClCompile Include="src\Core\Effects\SlowEffect.cpp" />
+    <ClCompile Include="src\Core\EventBus.cpp" />
+    <ClCompile Include="src\Core\RunContext.cpp" />
     <ClCompile Include="src\Core\StatusEffectBase.cpp" />
     <ClCompile Include="src\Entities\Enemy.cpp" />
     <ClCompile Include="src\Entities\IAIStrategy.cpp" />
@@ -64,6 +66,8 @@
     <ClInclude Include="src\Core\ActionData.h" />
     <ClInclude Include="src\Core\ActionResult.h" />
     <ClInclude Include="src\Core\Affinity.h" />
+    <ClInclude Include="src\Core\BattleEvents.h" />
+    <ClInclude Include="src\Core\BehaviorSignal.h" />
     <ClInclude Include="src\Core\CombatConstants.h" />
     <ClInclude Include="src\Core\CombatUtils.h" />
     <ClInclude Include="src\Core\Drop.h" />
@@ -72,9 +76,11 @@
     <ClInclude Include="src\Core\Effects\RegenEffect.h" />
     <ClInclude Include="src\Core\Effects\ShieldEffect.h" />
     <ClInclude Include="src\Core\Effects\SlowEffect.h" />
+    <ClInclude Include="src\Core\EventBus.h" />
     <ClInclude Include="src\Core\IStatusEffect.h" />
     <ClInclude Include="src\Core\PartyResources.h" />
     <ClInclude Include="src\Core\ResourceStats.h" />
+    <ClInclude Include="src\Core\RunContext.h" />
     <ClInclude Include="src\Core\ScalingStat.h" />
     <ClInclude Include="src\Core\Stats.h" />
     <ClInclude Include="src\Core\StatusEffectBase.h" />
