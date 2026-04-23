@@ -412,7 +412,10 @@ void Battle::resetAllPcConsumableState()
     {
         Unit *u{m_playerParty.getUnitAt(i)};
         if (auto *pc = dynamic_cast<PlayableCharacter *>(u))
+        {
             pc->resetBattleConsumableState();
+            pc->resetArchSkillCooldown();
+        }
     }
 }
 

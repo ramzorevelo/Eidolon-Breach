@@ -169,6 +169,11 @@ void PlayableCharacter::resetBattleConsumableState()
     m_consumableUsedThisBattle = false;
 }
 
+void PlayableCharacter::resetArchSkillCooldown()
+{
+    m_archSkillCooldown = 0;
+}
+
 std::optional<Item> PlayableCharacter::equip(const Item &item)
 {
     if (item.type != ItemType::Equipment || !item.equipSlot.has_value())

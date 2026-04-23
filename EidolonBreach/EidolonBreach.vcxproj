@@ -34,8 +34,16 @@
     <ClCompile Include="src\Core\Effects\ShieldEffect.cpp" />
     <ClCompile Include="src\Core\Effects\SlowEffect.cpp" />
     <ClCompile Include="src\Core\EventBus.cpp" />
+    <ClCompile Include="src\Core\MetaProgress.cpp" />
     <ClCompile Include="src\Core\RunContext.cpp" />
     <ClCompile Include="src\Core\StatusEffectBase.cpp" />
+    <ClCompile Include="src\Dungeon\BattleNode.cpp" />
+    <ClCompile Include="src\Dungeon\BossNode.cpp" />
+    <ClCompile Include="src\Dungeon\Dungeon.cpp" />
+    <ClCompile Include="src\Dungeon\EliteNode.cpp" />
+    <ClCompile Include="src\Dungeon\EventNode.cpp" />
+    <ClCompile Include="src\Dungeon\RestNode.cpp" />
+    <ClCompile Include="src\Dungeon\TreasureNode.cpp" />
     <ClCompile Include="src\Entities\Enemy.cpp" />
     <ClCompile Include="src\Entities\IAIStrategy.cpp" />
     <ClCompile Include="src\Entities\Party.cpp" />
@@ -80,6 +88,7 @@
     <ClInclude Include="src\Core\Effects\SlowEffect.h" />
     <ClInclude Include="src\Core\EventBus.h" />
     <ClInclude Include="src\Core\IStatusEffect.h" />
+    <ClInclude Include="src\Core\MetaProgress.h" />
     <ClInclude Include="src\Core\PartyResources.h" />
     <ClInclude Include="src\Core\ResourceStats.h" />
     <ClInclude Include="src\Core\RunContext.h" />
@@ -88,6 +97,14 @@
     <ClInclude Include="src\Core\StatusEffectBase.h" />
     <ClInclude Include="src\Core\TargetInfo.h" />
     <ClInclude Include="src\Core\TargetMode.h" />
+    <ClInclude Include="src\Dungeon\BattleNode.h" />
+    <ClInclude Include="src\Dungeon\BossNode.h" />
+    <ClInclude Include="src\Dungeon\Dungeon.h" />
+    <ClInclude Include="src\Dungeon\EliteNode.h" />
+    <ClInclude Include="src\Dungeon\EventNode.h" />
+    <ClInclude Include="src\Dungeon\MapNode.h" />
+    <ClInclude Include="src\Dungeon\RestNode.h" />
+    <ClInclude Include="src\Dungeon\TreasureNode.h" />
     <ClInclude Include="src\Entities\Enemy.h" />
     <ClInclude Include="src\Entities\IAIStrategy.h" />
     <ClInclude Include="src\Entities\Party.h" />
@@ -162,6 +179,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)src;</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -177,6 +195,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)src;</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
