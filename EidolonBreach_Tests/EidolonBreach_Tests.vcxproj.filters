@@ -210,6 +210,12 @@
     <ClCompile Include="..\EidolonBreach\src\Core\EventBus.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Battle\FormationManager.cpp">
+      <Filter>Battle</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Battle\test_FormationManager.cpp">
+      <Filter>Battle</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="external\doctest.h">
