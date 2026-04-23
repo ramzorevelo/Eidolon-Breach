@@ -5,6 +5,8 @@
 #include "Entities/PlayableCharacter.h"
 #include "Entities/StoneGolem.h"
 #include "Entities/VampireBat.h"
+#include "Core/EventBus.h"
+#include "Core/RunContext.h"
 #include <iostream>
 #include <memory>
 #include <UI/ConsoleRenderer.h>
@@ -45,7 +47,9 @@ int main()
 
     ConsoleRenderer renderer{};
     ConsoleInputHandler inputHandler{};
-    Battle battle{playerParty, enemyParty, renderer, inputHandler};
+    RunContext runContext{};
+    EventBus eventBus{};
+    Battle battle{playerParty, enemyParty, renderer, inputHandler, runContext, eventBus};
     battle.run();
 
     return 0;

@@ -11,6 +11,7 @@
  */
 
 #include <string>
+#include "Core/Affinity.h"
 
 struct ActionResult
 {
@@ -24,7 +25,7 @@ struct ActionResult
     Type type{Type::Damage};
     int value{0};
     std::string flavorText{};
-
-    int spGained{0};      ///< SP added to party pool by this action.
-    int exposureDelta{0}; ///< Exposure change for the acting character.
+    int spGained{0};
+    int exposureDelta{0};
+    Affinity actionAffinity{Affinity::Aether};
 };

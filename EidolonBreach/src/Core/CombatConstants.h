@@ -21,4 +21,21 @@ constexpr int kSlot2UnlockLevel{40};
 // Consumable cooldown
 constexpr int kConsumableCooldownTurns{1};
 constexpr float kBrokenDamageBonus{1.5f}; ///< HP damage multiplier while enemy is broken.
+// Exposure thresholds
+constexpr int kExposureThreshold50{50};
+constexpr int kExposureThreshold75{75};
+constexpr int kExposureThreshold100{100};
+
+// Depth and environmental modifiers
+constexpr int kFloorDepthExposureModifier{5};
+constexpr int kEliteExposureSpike{15};
+constexpr float kFloorAffinityToughnessBonus{0.10f};
+constexpr float kFloorAffinityResonanceBonus{0.10f};
+constexpr int kPurgeExposureReduction{30};
+
+// Stance crystallization
+constexpr int kCrystallizationThreshold{10};
+
+// Supportive signal surplus threshold
+constexpr int kSupportiveSpSurplusThreshold{20};
 } // namespace CombatConstants

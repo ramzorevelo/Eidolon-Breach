@@ -118,11 +118,12 @@ ActionResult PlayableCharacter::takeTurn(Party &allies,
     std::size_t actionIdx{selectActionIndex(allies, state.inputHandler)};
     std::optional<TargetInfo> target{selectTarget(enemies, state.inputHandler)};
 
+    const Affinity actionAffinity{m_abilities[actionIdx]->getAffinity()};
     ActionResult result{m_abilities[actionIdx]->execute(*this, allies, enemies, target)};
 
-    state.resonanceField.addContribution(
-        m_abilities[actionIdx]->getAffinity(),
-        m_resonanceContribution);
+    // Resonance contribution is handled by Battle::applyResonanceContribution()
+    // to allow floor-affinity bonuses to be applied before submission.
+    result.actionAffinity = actionAffinity;
     ++state.turnNumber;
 
     return result;

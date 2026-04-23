@@ -63,6 +63,12 @@ class Enemy : public Unit
 
     [[nodiscard]] int getToughness() const;
     [[nodiscard]] int getMaxToughness() const;
+    /**
+     * @brief Scale maxToughness (and current toughness) by the given factor.
+     *        Used by BattleNode to apply floor-affinity toughness modifiers at spawn.
+     * @param factor Multiplier (e.g. 1.10f for +10%, 0.90f for -10%).
+     */
+    void scaleMaxToughness(float factor);
     [[nodiscard]] float getAffinityModifier(Affinity a) const;
 
     // Break effect

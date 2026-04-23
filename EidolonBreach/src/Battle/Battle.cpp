@@ -1,58 +1,91 @@
+/**
+ * @file Battle.cpp
+ * @brief Battle orchestration implementation.
+ */
+
 #include "Battle/Battle.h"
 #include "Battle/SpeedBasedTurnOrderCalculator.h"
+#include "Core/BattleEvents.h"
+#include "Core/CombatConstants.h"
+#include "Core/EffectIds.h"
 #include "Core/Effects/BurnEffect.h"
 #include "Core/Effects/ShieldEffect.h"
 #include "Core/Effects/SlowEffect.h"
-#include "Core/EffectIds.h"
-#include "Entities/PlayableCharacter.h"
-#include "Core/ActionResult.h"
-#include "Items/Inventory.h"
+#include "Core/EventBus.h"
+#include "Core/RunContext.h"
 #include "Entities/Enemy.h"
-#include "UI/ConsoleRenderer.h"
+#include "Entities/PlayableCharacter.h"
+#include "Items/Inventory.h"
 #include <algorithm>
-#include <iostream>
 
 Battle::Battle(Party &playerParty,
                Party &enemyParty,
                IRenderer &renderer,
                IInputHandler &inputHandler,
+               RunContext &runContext,
+               EventBus &eventBus,
                std::unique_ptr<ITurnOrderCalculator> turnOrderCalc)
-    : m_playerParty{playerParty}, m_enemyParty{enemyParty}, m_renderer{renderer}, m_inputHandler{inputHandler}, m_turnOrderCalc{turnOrderCalc ? std::move(turnOrderCalc)
-                                                                                                                                              : std::make_unique<SpeedBasedTurnOrderCalculator>()}
+    : m_playerParty{playerParty},
+      m_enemyParty{enemyParty},
+      m_runContext{runContext},
+      m_eventBus{eventBus},
+      m_turnOrderCalc{turnOrderCalc ? std::move(turnOrderCalc)
+                                    : std::make_unique<SpeedBasedTurnOrderCalculator>()},
+      m_renderer{renderer},
+      m_inputHandler{inputHandler}
 {
 }
 
-std::vector<bool> Battle::snapshotBreakStates(const Party &party) const
+void Battle::run()
 {
-    std::vector<bool> states{};
-    states.reserve(party.size());
-    for (std::size_t i{0}; i < party.size(); ++i)
-    {
-        const Unit *u{party.getUnitAt(i)};
-        states.push_back(u ? u->isBroken() : false);
-    }
-    return states;
+    m_field.reset();
+    BattleState state{0, 0, Affinity::Aether, m_field, m_inputHandler,
+                      m_renderer, m_runContext, m_eventBus};
+    state.playerParty = &m_playerParty;
+    state.enemyParty = &m_enemyParty;
+
+    m_eventBus.emit(BattleStartedEvent{&state});
+    m_renderer.renderMessage("\n=== BATTLE START ===");
+
+    runBattleLoop(state);
+
+    const bool playerWon{m_enemyParty.isAllDead()};
+    m_eventBus.emit(BattleEndedEvent{playerWon, &state});
+    m_eventBus.clearBattleScope();
+    resetAllPcConsumableState();
 }
 
-void Battle::processNewBreaks(const std::vector<bool> &before,
-                              const Party &party,
-                              BattleState &state)
+void Battle::runBattleLoop(BattleState &state)
 {
-    for (std::size_t i{0}; i < party.size() && i < before.size(); ++i)
+    while (!isBattleOver())
     {
-        Unit *u{const_cast<Unit *>(party.getUnitAt(i))};
-        if (!u || before[i] || !u->isBroken())
-            continue;
+        m_renderer.renderPartyStatus(m_playerParty, m_enemyParty);
+        auto turnOrder{m_turnOrderCalc->calculate(m_playerParty, m_enemyParty)};
 
-        m_renderer.renderBreak(u->getName());
-
-        // Fire the BreakEffect callback if one is registered on this enemy.
-        // dynamic_cast is permitted in Battle (UI/integration layer) per existing precedent.
-        if (auto *e{dynamic_cast<Enemy *>(u)})
+        for (const auto &slot : turnOrder)
         {
-            const BreakEffect &effect{e->getBreakEffect()};
-            if (effect.onBreak)
-                effect.onBreak(*e, state);
+            if (!slot.unit->isAlive() || isBattleOver())
+                continue;
+
+            for (const std::string &msg : slot.unit->tickEffects())
+                m_renderer.renderMessage(msg);
+
+            if (!slot.unit->isAlive())
+            {
+                checkNewDeaths(snapshotAliveStates(m_enemyParty),
+                               m_enemyParty, nullptr, state);
+                if (isBattleOver())
+                    return;
+                continue;
+            }
+
+            if (slot.isPlayer)
+                processPlayerTurn(slot.unit, state);
+            else
+                processEnemyTurn(slot.unit, state);
+
+            if (checkAndHandleBattleEnd(state))
+                return;
         }
     }
 }
@@ -62,38 +95,113 @@ bool Battle::isBattleOver() const
     return m_playerParty.isAllDead() || m_enemyParty.isAllDead();
 }
 
+bool Battle::checkAndHandleBattleEnd(BattleState &state)
+{
+    if (m_enemyParty.isAllDead())
+    {
+        collectDrops(state);
+        for (std::size_t i{0}; i < m_enemyParty.size(); ++i)
+        {
+            const Unit *u{m_enemyParty.getUnitAt(i)};
+            if (u && !u->isAlive())
+                m_renderer.renderVictory(u->getName(), std::nullopt);
+        }
+        return true;
+    }
+    if (m_playerParty.isAllDead())
+    {
+        for (std::size_t i{0}; i < m_playerParty.size(); ++i)
+        {
+            const Unit *u{m_playerParty.getUnitAt(i)};
+            if (u && !u->isAlive())
+                m_renderer.renderDefeat(u->getName());
+        }
+        return true;
+    }
+    return false;
+}
+
 void Battle::processPlayerTurn(Unit *unit, BattleState &state)
 {
     if (!unit)
         return;
 
-    // FIXME Phase 6: replace dynamic_cast with Unit::onTurnStart() virtual hook.
-    if (auto *pc = dynamic_cast<PlayableCharacter *>(unit))
+    auto *pc{dynamic_cast<PlayableCharacter *>(unit)};
+    if (pc)
     {
         pc->tickArchSkillCooldown();
         pc->tickConsumableCooldown();
     }
 
-    auto breaksBefore{snapshotBreakStates(m_enemyParty)};
-    ActionResult result{unit->takeTurn(m_playerParty, m_enemyParty, state)};
-    m_renderer.renderActionResult(unit->getName(), result);
-    processNewBreaks(breaksBefore, m_enemyParty, state);
+    auto enemyAliveBefore{snapshotAliveStates(m_enemyParty)};
+    auto enemyBreaksBefore{snapshotBreakStates(m_enemyParty)};
 
-    if (auto *pc = dynamic_cast<PlayableCharacter *>(unit))
-        processActionResult(*pc, m_playerParty, result);
+    const ActionResult result{unit->takeTurn(m_playerParty, m_enemyParty, state)};
+    m_renderer.renderActionResult(unit->getName(), result);
+
+    processNewBreaks(enemyBreaksBefore, m_enemyParty, result.actionAffinity, state);
+    checkNewDeaths(enemyAliveBefore, m_enemyParty, unit, state);
+
+    if (pc)
+    {
+        applyResonanceContribution(*pc, result.actionAffinity, state);
+        processActionResult(*pc, m_playerParty, result, state);
+
+        // Determine the action that was used from the action result metadata.
+        const auto &abilities{pc->getAbilities()};
+        for (const auto &ability : abilities)
+        {
+            if (ability->getAffinity() == result.actionAffinity)
+            {
+                applyBehaviorSignals(*pc, *ability, result, state);
+                break;
+            }
+        }
+    }
 
     if (state.resonanceField.isReady())
     {
-        Affinity triggered{state.resonanceField.trigger()};
-        applyResonanceTrigger(triggered);
+        const Affinity triggered{state.resonanceField.trigger()};
+        applyResonanceTrigger(triggered, state);
         m_renderer.renderMessage(">> Resonance Field: " +
                                  affinityToString(triggered) + " triggered! <<");
     }
     m_renderer.renderResonanceField(state.resonanceField);
 }
 
-void Battle::applyResonanceTrigger(Affinity affinity)
+void Battle::processEnemyTurn(Unit *unit, BattleState &state)
 {
+    auto playerAliveBefore{snapshotAliveStates(m_playerParty)};
+    const ActionResult result{unit->takeTurn(m_enemyParty, m_playerParty, state)};
+
+    if (result.type == ActionResult::Type::Skip)
+        m_renderer.renderStunned(unit->getName());
+    else
+        m_renderer.renderActionResult(unit->getName(), result);
+
+    checkNewDeaths(playerAliveBefore, m_playerParty, unit, state);
+}
+
+void Battle::applyResonanceContribution(PlayableCharacter &pc,
+                                        Affinity actionAffinity,
+                                        BattleState &state)
+{
+    int contribution{pc.getResonanceContribution()};
+    if (actionAffinity == state.floorAffinity)
+    {
+        contribution = static_cast<int>(
+            static_cast<float>(contribution) *
+            (1.0f + CombatConstants::kFloorAffinityResonanceBonus));
+    }
+    state.resonanceField.addContribution(actionAffinity, contribution);
+    m_runContext.recordFieldVotes(actionAffinity,
+                                  state.resonanceField.getVotes(actionAffinity));
+}
+
+void Battle::applyResonanceTrigger(Affinity affinity, BattleState &state)
+{
+    state.eventBus.emit(ResonanceFieldTriggeredEvent{affinity, &state});
+
     switch (affinity)
     {
     case Affinity::Blaze:
@@ -105,8 +213,6 @@ void Battle::applyResonanceTrigger(Affinity affinity)
             u->applyEffect(std::make_unique<SlowEffect>(0.30f, 2));
         break;
     case Affinity::Tempest:
-        // Dynamic cast permitted here: no generic momentum interface on Unit
-        // until Phase 9 (IPassiveTrait). Flagged for Phase 9 revisit.
         for (Unit *u : m_playerParty.getAliveUnits())
             if (auto *pc = dynamic_cast<PlayableCharacter *>(u))
                 pc->gainEnergy(20);
@@ -124,52 +230,181 @@ void Battle::applyResonanceTrigger(Affinity affinity)
     }
 }
 
-
-void Battle::processEnemyTurn(Unit *unit, BattleState &state)
+void Battle::processActionResult(PlayableCharacter &actor,
+                                 Party &allies,
+                                 const ActionResult &result,
+                                 BattleState &state)
 {
-    ActionResult result{unit->takeTurn(m_enemyParty, m_playerParty, state)};
-    if (result.type == ActionResult::Type::Skip)
+    if (result.spGained != 0)
+        allies.gainSp(result.spGained);
+
+    if (result.exposureDelta != 0)
     {
-        m_renderer.renderStunned(unit->getName());
+        const int oldExposure{actor.getExposure()};
+        actor.modifyExposure(result.exposureDelta);
+        checkExposureThresholds(actor, oldExposure, actor.getExposure(), state);
+    }
+}
+
+void Battle::checkExposureThresholds(PlayableCharacter &pc,
+                                     int oldExposure,
+                                     int newExposure,
+                                     BattleState &state)
+{
+    for (int threshold : {CombatConstants::kExposureThreshold50,
+                          CombatConstants::kExposureThreshold75,
+                          CombatConstants::kExposureThreshold100})
+    {
+        if (oldExposure < threshold && newExposure >= threshold)
+            state.eventBus.emit(ExposureThresholdEvent{&pc, threshold, &state});
+    }
+}
+
+void Battle::applyBehaviorSignals(PlayableCharacter &pc,
+                                  const IAction &action,
+                                  const ActionResult &result,
+                                  BattleState &state)
+{
+    applyActionCategorySignals(pc, action, result);
+    applyContextualSignals(pc);
+    checkCrystallization(pc, state);
+}
+
+void Battle::applyActionCategorySignals(PlayableCharacter &pc,
+                                        const IAction &action,
+                                        const ActionResult &result)
+{
+    const ActionData &data{action.getActionData()};
+    RunCharacterState &cs{m_runContext.getCharacterState(pc.getId())};
+
+    if (data.category == ActionCategory::Basic ||
+        data.category == ActionCategory::ArchSkill)
+        ++cs.signalCounts[BehaviorSignal::Aggressive];
+
+    if (data.category == ActionCategory::Slot)
+        ++cs.signalCounts[BehaviorSignal::Methodical];
+
+    if (data.category == ActionCategory::Vent)
+        ++cs.signalCounts[BehaviorSignal::Reactive];
+
+    if (data.category == ActionCategory::Consumable &&
+        result.type == ActionResult::Type::Heal)
+        ++cs.signalCounts[BehaviorSignal::Supportive];
+
+    if (result.spGained > 0)
+    {
+        cs.totalSpGenerated += result.spGained;
+        const int surplus{cs.totalSpGenerated - cs.totalSpSpent};
+        if (surplus >= CombatConstants::kSupportiveSpSurplusThreshold)
+            ++cs.signalCounts[BehaviorSignal::Supportive];
+    }
+}
+
+void Battle::applyContextualSignals(PlayableCharacter &pc)
+{
+    RunCharacterState &cs{m_runContext.getCharacterState(pc.getId())};
+    const bool highExposure{pc.getExposure() >= CombatConstants::kExposureThreshold50};
+    const int thirtyPctHp{pc.getFinalStats().maxHp * 30 / 100};
+    const bool lowHp{pc.getHp() <= thirtyPctHp};
+
+    if (highExposure || lowHp)
+        ++cs.signalCounts[BehaviorSignal::Sacrificial];
+
+    if (pc.getExposure() < 40)
+    {
+        ++cs.consecutiveLowExposureTurns;
+        if (cs.consecutiveLowExposureTurns >= 3)
+            ++cs.signalCounts[BehaviorSignal::Reactive];
     }
     else
     {
-        m_renderer.renderActionResult(unit->getName(), result);
+        cs.consecutiveLowExposureTurns = 0;
     }
 }
 
-bool Battle::checkAndHandleBattleEnd(BattleState &state)
+void Battle::checkCrystallization(PlayableCharacter &pc, BattleState &state)
 {
-    if (m_enemyParty.isAllDead())
-    {
-        collectDrops(state);
-        for (std::size_t i{0}; i < m_enemyParty.size(); ++i)
-        {
-            Unit *u{m_enemyParty.getUnitAt(i)};
-            if (u && !u->isAlive())
-            {
-                if (auto *e = dynamic_cast<Enemy *>(u))
-                    m_renderer.renderVictory(e->getName(), std::nullopt);
-            }
-        }
-        resetAllPcConsumableState();
-        return true;
-    }
+    RunCharacterState &cs{m_runContext.getCharacterState(pc.getId())};
+    if (cs.crystallizedStanceId.has_value())
+        return;
 
-    if (m_playerParty.isAllDead())
+    int dominantCount{0};
+    for (const auto &[signal, count] : cs.signalCounts)
+        dominantCount = std::max(dominantCount, count);
+
+    const float ratio{static_cast<float>(dominantCount) /
+                      static_cast<float>(CombatConstants::kCrystallizationThreshold)};
+    cs.synchronicityProgress = std::min(100, static_cast<int>(ratio * 100.0f));
+
+    if (dominantCount >= CombatConstants::kCrystallizationThreshold)
     {
-        for (std::size_t i{0}; i < m_playerParty.size(); ++i)
-        {
-            Unit *u{m_playerParty.getUnitAt(i)};
-            if (u && !u->isAlive())
-                m_renderer.renderDefeat(u->getName());
-        }
-        resetAllPcConsumableState();
-        return true;
+        cs.crystallizedStanceId = "";
+        cs.synchronicityProgress = 0;
+        state.eventBus.emit(StanceCrystallizedEvent{&pc, ""});
     }
-    return false;
 }
 
+std::vector<bool> Battle::snapshotAliveStates(const Party &party) const
+{
+    std::vector<bool> states{};
+    states.reserve(party.size());
+    for (std::size_t i{0}; i < party.size(); ++i)
+    {
+        const Unit *u{party.getUnitAt(i)};
+        states.push_back(u != nullptr && u->isAlive());
+    }
+    return states;
+}
+
+std::vector<bool> Battle::snapshotBreakStates(const Party &party) const
+{
+    std::vector<bool> states{};
+    states.reserve(party.size());
+    for (std::size_t i{0}; i < party.size(); ++i)
+    {
+        const Unit *u{party.getUnitAt(i)};
+        states.push_back(u != nullptr && u->isBroken());
+    }
+    return states;
+}
+
+void Battle::checkNewDeaths(const std::vector<bool> &aliveBefore,
+                            const Party &party,
+                            Unit *attacker,
+                            BattleState &state)
+{
+    for (std::size_t i{0}; i < party.size() && i < aliveBefore.size(); ++i)
+    {
+        Unit *u{const_cast<Unit *>(party.getUnitAt(i))};
+        if (!u || !aliveBefore[i] || u->isAlive())
+            continue;
+        state.eventBus.emit(UnitDefeatedEvent{u, attacker, &state});
+    }
+}
+
+void Battle::processNewBreaks(const std::vector<bool> &before,
+                              const Party &party,
+                              Affinity actionAffinity,
+                              BattleState &state)
+{
+    for (std::size_t i{0}; i < party.size() && i < before.size(); ++i)
+    {
+        Unit *u{const_cast<Unit *>(party.getUnitAt(i))};
+        if (!u || before[i] || !u->isBroken())
+            continue;
+
+        m_renderer.renderBreak(u->getName());
+        state.eventBus.emit(BreakTriggeredEvent{
+            dynamic_cast<Enemy *>(u), actionAffinity, &state});
+
+        if (auto *e{dynamic_cast<Enemy *>(u)})
+        {
+            const BreakEffect &effect{e->getBreakEffect()};
+            if (effect.onBreak)
+                effect.onBreak(*e, state);
+        }
+    }
+}
 
 void Battle::resetAllPcConsumableState()
 {
@@ -181,66 +416,6 @@ void Battle::resetAllPcConsumableState()
     }
 }
 
-void Battle::run()
-{
-    m_renderer.renderMessage("\n=== BATTLE START ===");
-    m_field.reset();
-    BattleState state{0, 0, m_field, m_inputHandler, m_renderer};
-    state.playerParty = &m_playerParty;
-    state.enemyParty = &m_enemyParty;
-
-    while (!isBattleOver())
-    {
-        m_renderer.renderPartyStatus(m_playerParty, m_enemyParty);
-        auto turnOrder{m_turnOrderCalc->calculate(m_playerParty, m_enemyParty)};
-
-        for (const auto &slot : turnOrder)
-        {
-            if (!slot.unit->isAlive())
-                continue;
-            if (isBattleOver())
-                break;
-
-            for (const std::string &msg : slot.unit->tickEffects())
-                m_renderer.renderMessage(msg);
-
-            if (!slot.unit->isAlive())
-            {
-                if ((checkAndHandleBattleEnd(state)))
-                    resetAllPcConsumableState();
-                    return;
-                continue;
-            }
-
-            if (slot.isPlayer)
-            {
-                processPlayerTurn(slot.unit, state);
-            }
-            else
-            {
-                processEnemyTurn(slot.unit, state);
-            }
-
-            if ((checkAndHandleBattleEnd(state)))
-            {
-                resetAllPcConsumableState();
-                return;
-            }
-        }
-    }
-}
-
-
-void Battle::processActionResult(PlayableCharacter &actor,
-                                 Party &allies,
-                                 const ActionResult &result)
-{
-    if (result.spGained != 0)
-        allies.gainSp(result.spGained);
-
-    if (result.exposureDelta != 0)
-        actor.modifyExposure(result.exposureDelta);
-}
 void Battle::collectDrops(BattleState &state)
 {
     const unsigned int seed{static_cast<unsigned int>(state.turnNumber)};
@@ -252,13 +427,9 @@ void Battle::collectDrops(BattleState &state)
         if (auto *e = dynamic_cast<Enemy *>(u))
         {
             for (const Drop &drop : e->generateDrops(seed))
-            {
                 if (drop.type == Drop::Type::Gold ||
                     drop.type == Drop::Type::GuaranteedItem)
-                {
                     m_playerParty.getInventory().gold += drop.goldAmount;
-                }
-            }
         }
     }
 }
