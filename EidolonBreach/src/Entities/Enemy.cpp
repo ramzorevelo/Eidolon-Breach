@@ -106,6 +106,12 @@ std::vector<Drop> Enemy::generateDrops(unsigned int seed) const
     return result;
 }
 
+void Enemy::scaleMaxToughness(float factor)
+{
+    m_maxToughness = std::max(1, static_cast<int>(static_cast<float>(m_maxToughness) * factor));
+    m_toughness = m_maxToughness;
+}
+
 ActionResult Enemy::takeTurn(Party & /*allies*/, Party &targets, BattleState & /*state*/)
 {
     if (m_isBroken)

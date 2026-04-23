@@ -11,6 +11,8 @@
 #include <memory>
 #include <UI/test_NullRenderer.h>
 #include <UI/test_NullInputHandler.h>
+#include "Core/EventBus.h"
+#include "Core/RunContext.h"
 
 TEST_CASE("Enemy: toughness break and recovery")
 {
@@ -50,7 +52,9 @@ TEST_CASE("Enemy: takeTurn returns Skip when broken")
     ResonanceField field{};
     NullInputHandler inputHandler{};
     NullRenderer renderer{};
-    BattleState state{0, 0, field, inputHandler, renderer};
+    RunContext runContext{};
+    EventBus eventBus{};
+    BattleState state{0, 0, Affinity::Aether, field, inputHandler, renderer, runContext, eventBus};
 
     ActionResult result = e->takeTurn(enemyParty, playerParty, state);
     CHECK(result.type == ActionResult::Type::Skip);
@@ -96,7 +100,9 @@ TEST_CASE("Enemy::takeTurn applies DEF reduction to damage")
     ResonanceField field{};
     NullInputHandler inputHandler{};
     NullRenderer renderer{};
-    BattleState state{0, 0, field, inputHandler, renderer};
+    RunContext runContext{};
+    EventBus eventBus{};
+    BattleState state{0, 0, Affinity::Aether, field, inputHandler, renderer, runContext, eventBus};
 
     // Force enemy turn (targets first alive player unit via AI)
     enemyPtr->takeTurn(enemyParty, playerParty, state);

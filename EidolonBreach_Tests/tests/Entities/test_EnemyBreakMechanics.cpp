@@ -16,6 +16,8 @@
 #include "Entities/VampireBat.h"
 #include "UI/test_NullInputHandler.h"
 #include "UI/test_NullRenderer.h"
+#include "Core/EventBus.h"
+#include "Core/RunContext.h"
 #include "doctest.h"
 #include "test_helpers.h"
 #include <memory>
@@ -39,13 +41,19 @@ std::unique_ptr<Enemy> makeEnemyWithModifiers(
         std::move(modifiers));
 }
 
+// Thread-local stubs so makeBattleState can return a BattleState by value
+// without requiring the caller to manage RunContext/EventBus lifetime.
+RunContext g_testRunContext{};
+EventBus g_testEventBus{};
+
 BattleState makeBattleState(ResonanceField &field,
                             NullInputHandler &input,
                             NullRenderer &renderer,
                             Party *playerParty = nullptr,
                             Party *enemyParty = nullptr)
 {
-    BattleState state{0, 0, field, input, renderer};
+    BattleState state{0, 0, Affinity::Aether, field, input, renderer,
+                      g_testRunContext, g_testEventBus};
     state.playerParty = playerParty;
     state.enemyParty = enemyParty;
     return state;
@@ -279,9 +287,11 @@ TEST_CASE("BreakEffect: callback receives the correct Enemy reference")
     e->applyToughnessHit(10, Affinity::Aether);
 
     ResonanceField field{};
-    NullInputHandler input{};
+    NullInputHandler inputHandler{};
     NullRenderer renderer{};
-    BattleState state{0, 0, field, input, renderer};
+    RunContext runContext{};
+    EventBus eventBus{};
+    BattleState state{0, 0, Affinity::Aether, field, inputHandler, renderer, runContext, eventBus};
     const BreakEffect &effect{e->getBreakEffect()};
     if (effect.onBreak)
         effect.onBreak(*e, state);
@@ -297,9 +307,11 @@ TEST_CASE("BreakEffect: empty callback is a safe no-op")
     CHECK(e->isBroken()); // just verify break happened
 
     ResonanceField field{};
-    NullInputHandler input{};
+    NullInputHandler inputHandler{};
     NullRenderer renderer{};
-    BattleState state{0, 0, field, input, renderer};
+    RunContext runContext{};
+    EventBus eventBus{};
+    BattleState state{0, 0, Affinity::Aether, field, inputHandler, renderer, runContext, eventBus};
     const BreakEffect &effect{e->getBreakEffect()};
     // Must not throw or crash when onBreak is empty.
     if (effect.onBreak)

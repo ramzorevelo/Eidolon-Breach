@@ -12,6 +12,8 @@
 #include <memory>
 #include <UI/test_NullRenderer.h>
 #include <UI/test_NullInputHandler.h>
+#include "Core/EventBus.h"
+#include "Core/RunContext.h"
 
 TEST_CASE("Battle integration: turn order uses injected calculator")
 {
@@ -28,7 +30,9 @@ TEST_CASE("Battle integration: turn order uses injected calculator")
 
     NullRenderer renderer{};
     NullInputHandler inputHandler{};
-    Battle battle{playerParty, enemyParty, renderer, inputHandler};
+    RunContext runContext{};
+    EventBus eventBus{};
+    Battle battle{playerParty, enemyParty, renderer, inputHandler, runContext, eventBus};
     // The default calculator is SpeedBasedTurnOrderCalculator.
     // We can't easily test the full run() without mock input,
     // but we can verify the calculator is present.
