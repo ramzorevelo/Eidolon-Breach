@@ -33,6 +33,9 @@
     <Filter Include="Items">
       <UniqueIdentifier>{581d3f18-5fb9-4bcf-ae4e-9f296792e757}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Dungeon">
+      <UniqueIdentifier>{d4ae6c4f-dc2e-4e8e-a258-aa04054ef5dc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="tests\Actions\test_BasicStrikeAction.cpp">

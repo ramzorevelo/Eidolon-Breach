@@ -11,6 +11,7 @@
 #include <map>
 #include <optional>
 #include <string>
+#include <string_view>
 
 /** Per-character run state used to track Stance crystallization progress. */
 struct RunCharacterState

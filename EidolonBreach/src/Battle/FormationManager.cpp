@@ -53,7 +53,7 @@ int FormationManager::applyPush(Unit *unit,
         return 0;
 
     const int target{pos + delta};
-    const int clamped{std::clamp(target, 0, kMaxSlots - 1)};
+    const int clamped{std::max(0, std::min(kMaxSlots - 1, target))};
 
     if (clamped != pos)
         swap(unit, clamped);

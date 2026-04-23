@@ -118,6 +118,9 @@ class PlayableCharacter : public Unit
     /** @brief Resets m_consumableCooldown and m_consumableUsedThisBattle. Called at battle end. */
     void resetBattleConsumableState();
 
+    /** @brief Resets arch skill cooldown to 0. Call at battle end. */
+    void resetArchSkillCooldown();
+
     [[nodiscard]] int getConsumableCooldown() const
     {
         return m_consumableCooldown;

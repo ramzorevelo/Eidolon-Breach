@@ -34,6 +34,9 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="Dungeon">
+      <UniqueIdentifier>{5040fb14-5f4e-4a85-93e9-9fcc7b7ee69f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -122,6 +125,30 @@
     </ClCompile>
     <ClCompile Include="src\Battle\FormationManager.cpp">
       <Filter>Battle</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Dungeon\BattleNode.cpp">
+      <Filter>Dungeon</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Dungeon\BossNode.cpp">
+      <Filter>Dungeon</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Dungeon\Dungeon.cpp">
+      <Filter>Dungeon</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Dungeon\EliteNode.cpp">
+      <Filter>Dungeon</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Dungeon\EventNode.cpp">
+      <Filter>Dungeon</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Dungeon\RestNode.cpp">
+      <Filter>Dungeon</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Dungeon\TreasureNode.cpp">
+      <Filter>Dungeon</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\MetaProgress.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -280,6 +307,33 @@
     </ClInclude>
     <ClInclude Include="src\Battle\FormationManager.h">
       <Filter>Battle</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Dungeon\BattleNode.h">
+      <Filter>Dungeon</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Dungeon\BossNode.h">
+      <Filter>Dungeon</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Dungeon\Dungeon.h">
+      <Filter>Dungeon</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Dungeon\EliteNode.h">
+      <Filter>Dungeon</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Dungeon\EventNode.h">
+      <Filter>Dungeon</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Dungeon\MapNode.h">
+      <Filter>Dungeon</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Dungeon\RestNode.h">
+      <Filter>Dungeon</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Dungeon\TreasureNode.h">
+      <Filter>Dungeon</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\MetaProgress.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
