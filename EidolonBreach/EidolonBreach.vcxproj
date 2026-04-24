@@ -60,6 +60,7 @@
     <ClCompile Include="src\Vestiges\EchoingStrikeVestige.cpp" />
     <ClCompile Include="src\Vestiges\FlameResonanceVestige.cpp" />
     <ClCompile Include="src\Vestiges\ToughnessBreakerVestige.cpp" />
+    <ClCompile Include="src\Vestiges\VestigeFactory.cpp" />
     <ClCompile Include="src\Vestiges\VestigeOfTheUnbound.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -129,6 +130,7 @@
     <ClInclude Include="src\Vestiges\FlameResonanceVestige.h" />
     <ClInclude Include="src\Vestiges\IVestige.h" />
     <ClInclude Include="src\Vestiges\ToughnessBreakerVestige.h" />
+    <ClInclude Include="src\Vestiges\VestigeFactory.h" />
     <ClInclude Include="src\Vestiges\VestigeOfTheUnbound.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

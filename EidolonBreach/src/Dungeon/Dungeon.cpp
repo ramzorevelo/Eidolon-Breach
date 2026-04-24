@@ -142,7 +142,7 @@ std::unique_ptr<MapNode> Dungeon::makeNode(int layer,
         return std::make_unique<BattleNode>(pickEnemyFactory(rng), floorAffinity);
     if (roll < eW + battleW + restW)
         return std::make_unique<RestNode>();
-    return std::make_unique<TreasureNode>(gold);
+    return std::make_unique<TreasureNode>(gold, rng());
 }
 
 void Dungeon::buildGraph(std::uint32_t seed,

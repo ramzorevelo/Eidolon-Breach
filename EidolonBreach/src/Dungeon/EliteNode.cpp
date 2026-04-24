@@ -8,6 +8,7 @@
 #include "Entities/Party.h"
 #include "Entities/PlayableCharacter.h"
 #include "Entities/Unit.h"
+#include "Vestiges/VestigeFactory.h"
 #include <iostream>
 
 EliteNode::EliteNode(std::function<void(Party &)> populateEnemies,
@@ -33,6 +34,17 @@ void EliteNode::enter(Party &party,
     }
 
     BattleNode::enter(party, meta, runCtx, eventBus);
+
+    // Award a Corrupted vestige for defeating an Elite.
+    if (!party.isAllDead())
+    {
+        std::mt19937 rng{static_cast<std::uint32_t>(party.size())};
+        auto vestige{VestigeFactory::makeRandom(VestigeFactory::Rarity::Corrupted, rng)};
+        std::cout << "A Corrupted vestige manifests: [" << vestige->getName() << "]\n"
+                  << vestige->getDescription() << '\n';
+        if (!party.addVestige(std::move(vestige)))
+            std::cout << "Party is at vestige capacity. Vestige lost.\n";
+    }
 }
 
 std::string EliteNode::description() const

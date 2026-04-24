@@ -168,6 +168,9 @@
     <ClCompile Include="src\Vestiges\VestigeOfTheUnbound.cpp">
       <Filter>Vestiges</Filter>
     </ClCompile>
+    <ClCompile Include="src\Vestiges\VestigeFactory.cpp">
+      <Filter>Vestiges</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Actions\BasicStrikeAction.h">
@@ -369,6 +372,9 @@
       <Filter>Vestiges</Filter>
     </ClInclude>
     <ClInclude Include="src\Vestiges\VestigeOfTheUnbound.h">
+      <Filter>Vestiges</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Vestiges\VestigeFactory.h">
       <Filter>Vestiges</Filter>
     </ClInclude>
   </ItemGroup>
