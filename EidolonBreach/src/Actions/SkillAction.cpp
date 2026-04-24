@@ -42,6 +42,7 @@ ActionResult SkillAction::execute(PlayableCharacter &user,
     user.consumeArchSkill();
 
     ActionResult result{ActionResult::Type::Damage, 0};
+    result.spCost = m_data.spCost; // recorded so EchoingStrikeVestige can refund   
     if (target && target->type == TargetInfo::Type::Enemy)
     {
         Unit *t{enemies.getUnitAt(target->index)};
@@ -53,6 +54,8 @@ ActionResult SkillAction::execute(PlayableCharacter &user,
                                                         m_data.scaling);
             t->takeDamage(result.value);
             t->applyToughnessHit(m_data.toughnessDamage, m_data.affinity);
+            result.toughnessDamage = m_data.toughnessDamage;
+            result.targetEnemyIndex = static_cast<int>(target->index);
         }
     }
     return result;

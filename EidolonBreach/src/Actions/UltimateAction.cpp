@@ -54,6 +54,8 @@ ActionResult UltimateAction::execute(PlayableCharacter &user,
                                                         m_data.scaling);
             t->takeDamage(result.value);
             t->applyToughnessHit(m_data.toughnessDamage, m_data.affinity);
+            result.targetEnemyIndex = static_cast<int>(target->index);
+
         }
     }
     return result;
