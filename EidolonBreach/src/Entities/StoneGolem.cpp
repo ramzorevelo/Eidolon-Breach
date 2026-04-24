@@ -46,7 +46,7 @@ ActionResult StoneGolem::performAttack()
     if (m_turnCount % kGolemHeavySlamInterval == 0)
     {
         ActionResult r{ActionResult::Type::Damage, kGolemHeavySlamDamage};
-        r.flavorText = ">> Stone Golem raises both fists -- GROUND SLAM! <<";
+        r.flavorText = ">> " + getName() + " raises both fists -- GROUND SLAM! <<";
         return r;
     }
     return ActionResult{ActionResult::Type::Damage, kGolemBaseDamage};

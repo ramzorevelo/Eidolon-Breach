@@ -43,7 +43,7 @@ ActionResult Slime::performAttack()
     if (m_turnCount % kSlimeRegenInterval == 0)
     {
         ActionResult r{ActionResult::Type::Heal, kSlimeRegenAmount};
-        r.flavorText = ">> Slime absorbs the moisture -- REGENERATE! <<";
+        r.flavorText = ">> " + getName() + " absorbs the moisture -- REGENERATE! <<";
         return r;
     }
     return ActionResult{ActionResult::Type::Damage, kSlimeBaseDamage};

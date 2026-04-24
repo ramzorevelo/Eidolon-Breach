@@ -68,7 +68,7 @@ ActionResult VampireBat::performAttack()
     {
         heal(kBatLifedrainHeal);
         ActionResult r{ActionResult::Type::Damage, kBatLifedrainDamage};
-        r.flavorText = ">> Vampire Bat drains your life force! <<";
+        r.flavorText = ">> " + getName() + " drains your life force! <<";
         return r;
     }
     return ActionResult{ActionResult::Type::Damage, kBatBaseDamage};
