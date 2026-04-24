@@ -28,4 +28,24 @@ struct ActionResult
     int spGained{0};
     int exposureDelta{0};
     Affinity actionAffinity{Affinity::Aether};
+    /**
+     * @brief Base toughness damage dealt by this action (before affinity scaling).
+     *        Set by actions that call applyToughnessHit. Read by ToughnessBreakerVestige.
+     *        0 if the action deals no toughness damage.
+     */
+    int toughnessDamage{0};
+
+    /**
+     * @brief SP cost paid by this action. Set by Slot Skill actions.
+     *        Read by EchoingStrikeVestige to refund after a Resonance Field trigger.
+     *        0 for free actions (Basic, Arch Skill, Ultimate).
+     */
+    int spCost{0};
+
+    /**
+     * @brief Index into the enemy party of the primary target, or -1 if no
+     *        enemy target was selected (e.g. heals, Vent, Skip).
+     *        Used by ToughnessBreakerVestige to locate the target unit.
+     */
+    int targetEnemyIndex{-1};
 };
