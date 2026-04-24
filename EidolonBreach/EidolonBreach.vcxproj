@@ -56,6 +56,11 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\UI\ConsoleInputHandler.cpp" />
     <ClCompile Include="src\UI\ConsoleRenderer.cpp" />
+    <ClCompile Include="src\Vestiges\AttunistGambitVestige.cpp" />
+    <ClCompile Include="src\Vestiges\EchoingStrikeVestige.cpp" />
+    <ClCompile Include="src\Vestiges\FlameResonanceVestige.cpp" />
+    <ClCompile Include="src\Vestiges\ToughnessBreakerVestige.cpp" />
+    <ClCompile Include="src\Vestiges\VestigeOfTheUnbound.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Actions\BasicStrikeAction.h" />
@@ -119,7 +124,12 @@
     <ClInclude Include="src\UI\ConsoleRenderer.h" />
     <ClInclude Include="src\UI\IInputHandler.h" />
     <ClInclude Include="src\UI\IRenderer.h" />
+    <ClInclude Include="src\Vestiges\AttunistGambitVestige.h" />
+    <ClInclude Include="src\Vestiges\EchoingStrikeVestige.h" />
+    <ClInclude Include="src\Vestiges\FlameResonanceVestige.h" />
     <ClInclude Include="src\Vestiges\IVestige.h" />
+    <ClInclude Include="src\Vestiges\ToughnessBreakerVestige.h" />
+    <ClInclude Include="src\Vestiges\VestigeOfTheUnbound.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

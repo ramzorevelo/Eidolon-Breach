@@ -153,6 +153,21 @@
     <ClCompile Include="src\Core\MetaProgress.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="src\Vestiges\EchoingStrikeVestige.cpp">
+      <Filter>Vestiges</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Vestiges\FlameResonanceVestige.cpp">
+      <Filter>Vestiges</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Vestiges\ToughnessBreakerVestige.cpp">
+      <Filter>Vestiges</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Vestiges\AttunistGambitVestige.cpp">
+      <Filter>Vestiges</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Vestiges\VestigeOfTheUnbound.cpp">
+      <Filter>Vestiges</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Actions\BasicStrikeAction.h">
@@ -339,6 +354,21 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Vestiges\IVestige.h">
+      <Filter>Vestiges</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Vestiges\EchoingStrikeVestige.h">
+      <Filter>Vestiges</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Vestiges\FlameResonanceVestige.h">
+      <Filter>Vestiges</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Vestiges\ToughnessBreakerVestige.h">
+      <Filter>Vestiges</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Vestiges\AttunistGambitVestige.h">
+      <Filter>Vestiges</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Vestiges\VestigeOfTheUnbound.h">
       <Filter>Vestiges</Filter>
     </ClInclude>
   </ItemGroup>
