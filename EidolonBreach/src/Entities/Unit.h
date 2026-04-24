@@ -112,6 +112,17 @@ public:
     virtual void applyToughnessHit(int, Affinity = Affinity::Aether) {}
     virtual void recoverFromBreak()               {}
 
+    /**
+     * @brief Returns the toughness affinity modifier for the given affinity.
+     *        Base implementation returns 1.0f (neutral — no weakness or resistance).
+     *        Enemy overrides this to expose its affinity modifier map without
+     *        requiring a downcast at call sites in Vestiges/.
+     */
+    [[nodiscard]] virtual float getToughnessAffinityModifier(Affinity /*affinity*/) const
+    {
+        return 1.0f;
+    }
+
 protected:
     std::string m_id;
     std::string m_name;

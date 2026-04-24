@@ -37,6 +37,9 @@
     <Filter Include="Dungeon">
       <UniqueIdentifier>{5040fb14-5f4e-4a85-93e9-9fcc7b7ee69f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Vestiges">
+      <UniqueIdentifier>{c4eda504-ef97-43d5-a1b9-e15b80670c48}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -334,6 +337,9 @@
     </ClInclude>
     <ClInclude Include="src\Core\MetaProgress.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Vestiges\IVestige.h">
+      <Filter>Vestiges</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -119,6 +119,7 @@
     <ClInclude Include="src\UI\ConsoleRenderer.h" />
     <ClInclude Include="src\UI\IInputHandler.h" />
     <ClInclude Include="src\UI\IRenderer.h" />
+    <ClInclude Include="src\Vestiges\IVestige.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

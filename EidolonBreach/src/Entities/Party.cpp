@@ -49,3 +49,16 @@ bool Party::useSp(int amount) {
 	m_resources.sp -= amount;
 	return true;
 }
+
+bool Party::addVestige(std::unique_ptr<IVestige> vestige)
+{
+    if (m_vestiges.size() >= static_cast<std::size_t>(kMaxVestiges))
+        return false;
+    m_vestiges.push_back(std::move(vestige));
+    return true;
+}
+
+const std::vector<std::unique_ptr<IVestige>> &Party::getVestiges() const
+{
+    return m_vestiges;
+}
