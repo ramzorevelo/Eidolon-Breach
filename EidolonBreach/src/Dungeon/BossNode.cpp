@@ -4,7 +4,6 @@
  */
 
 #include "Dungeon/BossNode.h"
-#include "Core/BattleEvents.h"
 #include "Core/EventBus.h"
 #include "Entities/Party.h"
 #include "Core/CombatConstants.h"
@@ -23,7 +22,11 @@ void BossNode::enter(Party &party,
                      EventBus &eventBus)
 {
     std::cout << "\n=== BOSS ENCOUNTER ===\n"
-              << "Exposure spikes by " << CombatConstants::kEliteExposureSpike
+              << "The final guardian of the breach awaits.\n"
+              << "Press Enter to proceed...";
+    std::cin.get();
+
+    std::cout << "Exposure spikes by " << CombatConstants::kEliteExposureSpike
               << " for all party members!\n";
 
     for (std::size_t i{0}; i < party.size(); ++i)
@@ -34,10 +37,6 @@ void BossNode::enter(Party &party,
     }
 
     BattleNode::enter(party, meta, runCtx, eventBus);
-
-    const bool playerWon{!party.isAllDead()};
-    eventBus.emit(RunCompletedEvent{playerWon, 0});
-    eventBus.clearRunScope();
 }
 
 std::string BossNode::description() const
