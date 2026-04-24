@@ -59,14 +59,17 @@ class Dungeon
                                                     int numLayers,
                                                     DungeonDifficulty difficulty,
                                                     std::mt19937 &rng,
-                                                    bool noElite = false) const;
+                                                    bool noElite = false,
+                                                    bool noRest = false,
+                                                    bool noTreasure = false) const;
 
     void connectLayers(int layerIndex, std::mt19937 &rng);
 
-    bool presentChoices(Party &party,
-                        MetaProgress &meta,
-                        int layerIndex,
-                        const std::vector<int> &reachable);
+    /// Returns the chosen node index, or -1 if the party died inside the node.
+    int presentChoices(Party &party,
+                       MetaProgress &meta,
+                       int layerIndex,
+                       const std::vector<int> &reachable);
 
     [[nodiscard]] std::vector<int> getReachableIndices(
         int layerIndex,

@@ -119,7 +119,9 @@ std::unique_ptr<MapNode> Dungeon::makeNode(int layer,
                                            int numLayers,
                                            DungeonDifficulty difficulty,
                                            std::mt19937 &rng,
-                                           bool noElite) const
+                                           bool noElite,
+                                           bool noRest,
+                                           bool noTreasure) const
 {
     const Affinity floorAffinity{
         m_floorAffinities[static_cast<std::size_t>(layer)]};
@@ -127,8 +129,8 @@ std::unique_ptr<MapNode> Dungeon::makeNode(int layer,
 
     const int eW{noElite ? 0 : eliteWeight(layer, numLayers, difficulty)};
     const int battleW{10 - eW / 2};
-    const int restW{3};
-    const int treasureW{2};
+    const int restW{noRest ? 0 : 3};
+    const int treasureW{noTreasure ? 0 : 2};
     const int totalW{eW + battleW + restW + treasureW};
 
     std::uniform_int_distribution<int> dist{0, totalW - 1};
@@ -151,6 +153,8 @@ void Dungeon::buildGraph(std::uint32_t seed,
     std::uniform_int_distribution<int> widthDist{1, 3};
 
     bool prevLayerHadElite{false};
+    bool prevLayerHadRest{false};
+    bool prevLayerHadTreasure{false};
 
     for (int layer{0}; layer < numLayers; ++layer)
     {
@@ -168,12 +172,17 @@ void Dungeon::buildGraph(std::uint32_t seed,
                                       populateBossParty, floorAffinity),
                                   {}});
             prevLayerHadElite = false;
+            prevLayerHadRest = false;
+            prevLayerHadTreasure = false;
         }
         else if (isPreBossFloor)
         {
+            // Always a single Rest node. Gives the player guaranteed recovery
+            // before the boss regardless of prior path.
             layerNodes.push_back({std::make_unique<RestNode>(), {}});
-            layerNodes.push_back({std::make_unique<TreasureNode>(30 + layer * 5), {}});
             prevLayerHadElite = false;
+            prevLayerHadRest = true;
+            prevLayerHadTreasure = false;
         }
         else if (isEliteGateFloor)
         {
@@ -181,20 +190,33 @@ void Dungeon::buildGraph(std::uint32_t seed,
                                       pickEliteFactory(rng), floorAffinity),
                                   {}});
             prevLayerHadElite = true;
+            prevLayerHadRest = false;
+            prevLayerHadTreasure = false;
         }
         else
         {
             const int width{widthDist(rng)};
             bool thisLayerHadElite{false};
+            bool thisLayerHadRest{false};
+            bool thisLayerHadTreasure{false};
+            const bool isPreEliteGate{layer == numLayers - 4};
             for (int i{0}; i < width; ++i)
             {
-                layerNodes.push_back(
-                    {makeNode(layer, numLayers, difficulty, rng, prevLayerHadElite), {}});
-                if (dynamic_cast<EliteNode *>(
-                        layerNodes.back().content.get()) != nullptr)
+                auto node{makeNode(layer, numLayers, difficulty, rng,
+                                   prevLayerHadElite || isPreEliteGate,
+                                   prevLayerHadRest,
+                                   prevLayerHadTreasure)};
+                if (dynamic_cast<EliteNode *>(node.get()))
                     thisLayerHadElite = true;
+                if (dynamic_cast<RestNode *>(node.get()))
+                    thisLayerHadRest = true;
+                if (dynamic_cast<TreasureNode *>(node.get()))
+                    thisLayerHadTreasure = true;
+                layerNodes.push_back({std::move(node), {}});
             }
             prevLayerHadElite = thisLayerHadElite;
+            prevLayerHadRest = thisLayerHadRest;
+            prevLayerHadTreasure = thisLayerHadTreasure;
         }
 
         m_layers.push_back(std::move(layerNodes));
@@ -230,15 +252,23 @@ void Dungeon::connectLayers(int layerIndex, std::mt19937 &rng)
     for (int j{0}; j < nextSize; ++j)
     {
         bool reachable{false};
-        for (const auto &node : current)
+        for (const auto &node : current){
             for (int idx : node.nextIndices)
+            {
+
                 if (idx == j)
                 {
                     reachable = true;
                     break;
                 }
+            }
+    }
         if (!reachable)
-            current[0].nextIndices.push_back(j);
+        {
+            auto &indices{current[0].nextIndices};
+            if (std::find(indices.begin(), indices.end(), j) == indices.end())
+                indices.push_back(j);
+        }
     }
 }
 
@@ -280,12 +310,16 @@ bool Dungeon::run(Party &party, MetaProgress &meta)
                   << affinityToString(m_floorAffinities[static_cast<std::size_t>(layer)])
                   << " ---\n";
 
-        if (!presentChoices(party, meta, layer, reachable))
+        const int chosen{presentChoices(party, meta, layer, reachable)};
+        if (chosen == -1)
+        {
             break;
+        }
 
         ++floorsCleared;
         meta.highestFloorReached = std::max(meta.highestFloorReached, floorsCleared);
-        reachable = getReachableIndices(layer, reachable);
+        // Traverse only from the node the player actually entered.
+        reachable = getReachableIndices(layer, std::vector<int>{chosen});
     }
 
     const bool playerWon{!party.isAllDead() &&
@@ -296,14 +330,13 @@ bool Dungeon::run(Party &party, MetaProgress &meta)
     return playerWon;
 }
 
-bool Dungeon::presentChoices(Party &party,
-                             MetaProgress &meta,
-                             int layerIndex,
-                             const std::vector<int> &reachable)
+int Dungeon::presentChoices(Party &party,
+                            MetaProgress &meta,
+                            int layerIndex,
+                            const std::vector<int> &reachable)
 {
     const auto &layer{m_layers[static_cast<std::size_t>(layerIndex)]};
 
-    // Collect the distinct reachable nodes for this layer.
     std::vector<int> choices{};
     for (int idx : reachable)
         if (idx < static_cast<int>(layer.size()))
@@ -312,12 +345,14 @@ bool Dungeon::presentChoices(Party &party,
     if (choices.empty())
         choices.push_back(0);
 
+    int chosenIndex{choices[0]};
+
     if (choices.size() == 1)
     {
         std::cout << "Path: "
-                  << layer[static_cast<std::size_t>(choices[0])].content->description()
+                  << layer[static_cast<std::size_t>(chosenIndex)].content->description()
                   << "\n";
-        layer[static_cast<std::size_t>(choices[0])].content->enter(
+        layer[static_cast<std::size_t>(chosenIndex)].content->enter(
             party, meta, m_runContext, m_eventBus);
     }
     else
@@ -335,9 +370,10 @@ bool Dungeon::presentChoices(Party &party,
         if (pick < 1 || pick > choices.size())
             pick = 1;
 
-        layer[static_cast<std::size_t>(choices[pick - 1])].content->enter(
+        chosenIndex = choices[pick - 1];
+        layer[static_cast<std::size_t>(chosenIndex)].content->enter(
             party, meta, m_runContext, m_eventBus);
     }
 
-    return !party.isAllDead();
+    return party.isAllDead() ? -1 : chosenIndex;
 }
