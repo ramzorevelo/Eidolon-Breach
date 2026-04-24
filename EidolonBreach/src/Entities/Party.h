@@ -11,7 +11,8 @@
 #include <vector>
 #include <memory>
 #include <cstddef>
-
+#include "Vestiges/IVestige.h"
+class IVestige;
  /** Collection of Units (player party or enemy group). */
 class Party {
 public:
@@ -38,7 +39,17 @@ public:
     {
         return m_inventory;
     }
+    static constexpr int kMaxVestiges{5};
 
+    /**
+     * @brief Add a vestige to the party's collection.
+     * @return true if added successfully; false if at kMaxVestiges capacity.
+     *         The caller is responsible for presenting the discard UI on false.
+     */
+    bool addVestige(std::unique_ptr<IVestige> vestige);
+
+    /** @return Read-only view of all held vestiges. */
+    [[nodiscard]] const std::vector<std::unique_ptr<IVestige>> &getVestiges() const;
 
 private:
 	std::vector<std::unique_ptr<Unit>> m_units;
@@ -46,4 +57,5 @@ private:
 
 	static constexpr int kDefaultMaxSp{ 100 };
     Inventory m_inventory{};
+    std::vector<std::unique_ptr<IVestige>> m_vestiges{};
 };

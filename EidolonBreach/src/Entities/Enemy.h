@@ -60,6 +60,7 @@ class Enemy : public Unit
      */
     void applyToughnessHit(int amount, Affinity sourceAffinity = Affinity::Aether) override;
     void recoverFromBreak() override;
+    [[nodiscard]] float getToughnessAffinityModifier(Affinity affinity) const override;
 
     [[nodiscard]] int getToughness() const;
     [[nodiscard]] int getMaxToughness() const;

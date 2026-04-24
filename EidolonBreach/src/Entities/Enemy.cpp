@@ -54,6 +54,12 @@ float Enemy::getAffinityModifier(Affinity a) const
     return (it != m_affinityModifiers.end()) ? it->second : 1.0f;
 }
 
+float Enemy::getToughnessAffinityModifier(Affinity affinity) const
+{
+    // Delegates to the existing affinity modifier map — no separate data needed.
+    return getAffinityModifier(affinity);
+}
+
 void Enemy::setBreakEffect(BreakEffect effect)
 {
     m_breakEffect = std::move(effect);
