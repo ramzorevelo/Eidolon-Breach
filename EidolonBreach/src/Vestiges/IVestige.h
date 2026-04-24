@@ -28,12 +28,10 @@ class IVestige
   public:
     virtual ~IVestige() = default;
 
-    virtual void onBattleStart(Battle &battle, BattleState &state) {}
-    virtual void onTurnStart(PlayableCharacter &activeCharacter, BattleState &state) {}
-    virtual void onAction(PlayableCharacter &actor,
-                          ActionResult &result,
-                          BattleState &state) {}
-    virtual void onBattleEnd(BattleState &state) {}
+    virtual void onBattleStart(Battle &, BattleState &) {}
+    virtual void onTurnStart(PlayableCharacter &, BattleState &) {}
+    virtual void onAction(PlayableCharacter &, ActionResult &, BattleState &) {}
+    virtual void onBattleEnd(BattleState &) {}
 
     [[nodiscard]] virtual std::string getName() const = 0;
     [[nodiscard]] virtual std::string getDescription() const = 0;

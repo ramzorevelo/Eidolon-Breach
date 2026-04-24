@@ -45,12 +45,14 @@ void Battle::run()
     state.enemyParty = &m_enemyParty;
 
     m_eventBus.emit(BattleStartedEvent{&state});
+    callVestigeOnBattleStart(state);
     m_renderer.renderMessage("\n=== BATTLE START ===");
 
     runBattleLoop(state);
 
     const bool playerWon{m_enemyParty.isAllDead()};
     m_eventBus.emit(BattleEndedEvent{playerWon, &state});
+    callVestigeOnBattleEnd(state);
     m_eventBus.clearBattleScope();
     resetAllPcConsumableState();
 }
@@ -136,12 +138,25 @@ void Battle::processPlayerTurn(Unit *unit, BattleState &state)
     {
         pc->tickArchSkillCooldown();
         pc->tickConsumableCooldown();
+        // onTurnStart fires before the character chooses an action.
+        for (auto &v : m_playerParty.getVestiges())
+            v->onTurnStart(*pc, state);
     }
 
     auto enemyAliveBefore{snapshotAliveStates(m_enemyParty)};
     auto enemyBreaksBefore{snapshotBreakStates(m_enemyParty)};
 
-    const ActionResult result{unit->takeTurn(m_playerParty, m_enemyParty, state)};
+    // result is non-const so vestige onAction hooks can modify it.
+    ActionResult result{unit->takeTurn(m_playerParty, m_enemyParty, state)};
+
+    // onAction fires after execute() but before result is processed.
+    // Vestiges may apply bonus toughness, refund SP, or modify exposureDelta here.
+    if (pc)
+    {
+        for (auto &v : m_playerParty.getVestiges())
+            v->onAction(*pc, result, state);
+    }
+
     m_renderer.renderActionResult(unit->getName(), result);
 
     processNewBreaks(enemyBreaksBefore, m_enemyParty, result.actionAffinity, state);
@@ -440,4 +455,16 @@ void Battle::collectDrops(BattleState &state)
                     m_playerParty.getInventory().gold += drop.goldAmount;
         }
     }
+}
+
+void Battle::callVestigeOnBattleStart(BattleState &state)
+{
+    for (auto &v : m_playerParty.getVestiges())
+        v->onBattleStart(*this, state);
+}
+
+void Battle::callVestigeOnBattleEnd(BattleState &state)
+{
+    for (auto &v : m_playerParty.getVestiges())
+        v->onBattleEnd(state);
 }

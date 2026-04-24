@@ -101,5 +101,7 @@ class Battle
                           BattleState &state);
 
     void resetAllPcConsumableState();
+    void callVestigeOnBattleStart(BattleState &state);
+    void callVestigeOnBattleEnd(BattleState &state);
     void collectDrops(BattleState &state);
 };
