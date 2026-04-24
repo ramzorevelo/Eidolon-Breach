@@ -59,7 +59,6 @@ void Battle::runBattleLoop(BattleState &state)
 {
     while (!isBattleOver())
     {
-        m_renderer.renderPartyStatus(m_playerParty, m_enemyParty);
         auto turnOrder{m_turnOrderCalc->calculate(m_playerParty, m_enemyParty)};
 
         for (const auto &slot : turnOrder)
@@ -67,14 +66,20 @@ void Battle::runBattleLoop(BattleState &state)
             if (!slot.unit->isAlive() || isBattleOver())
                 continue;
 
+            m_renderer.renderPartyStatus(m_playerParty, m_enemyParty);
+
+            // Snapshot both sides BEFORE ticking so DoT kills are detected correctly.
+            const auto enemyAliveBefore{snapshotAliveStates(m_enemyParty)};
+            const auto playerAliveBefore{snapshotAliveStates(m_playerParty)};
+
             for (const std::string &msg : slot.unit->tickEffects())
                 m_renderer.renderMessage(msg);
 
             if (!slot.unit->isAlive())
             {
-                checkNewDeaths(snapshotAliveStates(m_enemyParty),
-                               m_enemyParty, nullptr, state);
-                if (isBattleOver())
+                checkNewDeaths(enemyAliveBefore, m_enemyParty, nullptr, state);
+                checkNewDeaths(playerAliveBefore, m_playerParty, nullptr, state);
+                if (checkAndHandleBattleEnd(state))
                     return;
                 continue;
             }
