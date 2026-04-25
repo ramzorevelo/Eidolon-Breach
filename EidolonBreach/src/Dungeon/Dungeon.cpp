@@ -4,6 +4,7 @@
  */
 
 #include "Dungeon/Dungeon.h"
+#include "Core/AchievementSystem.h"
 #include "Core/BattleEvents.h"
 #include "Core/CombatConstants.h"
 #include "Core/MetaProgress.h"
@@ -47,6 +48,7 @@ void populateBossParty(Party &p)
     p.addUnit(std::make_unique<StoneGolem>("Breach Warden", 200, 90));
     p.addUnit(std::make_unique<VampireBat>("Shard Wraith", 120, 50));
 }
+
 
 using EnemyFactory = std::function<void(Party &)>;
 
@@ -95,12 +97,16 @@ int eliteWeight(int layer, int numLayers, DungeonDifficulty difficulty)
 }
 } // namespace
 
+Dungeon::Dungeon() = default;
+Dungeon::~Dungeon() = default;
+
 void Dungeon::generate(std::uint32_t seed,
                        int numLayers,
                        DungeonDifficulty difficulty)
 {
     m_difficulty = difficulty;
     m_runContext.reset();
+    m_achievements = std::make_unique<AchievementSystem>(m_eventBus);
     m_layers.clear();
     assignFloorAffinities(seed, numLayers);
     buildGraph(seed, numLayers, difficulty);

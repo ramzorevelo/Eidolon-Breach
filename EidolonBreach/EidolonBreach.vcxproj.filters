@@ -171,6 +171,9 @@
     <ClCompile Include="src\Vestiges\VestigeFactory.cpp">
       <Filter>Vestiges</Filter>
     </ClCompile>
+    <ClCompile Include="src\Core\AchievementSystem.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Actions\BasicStrikeAction.h">
@@ -376,6 +379,9 @@
     </ClInclude>
     <ClInclude Include="src\Vestiges\VestigeFactory.h">
       <Filter>Vestiges</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\AchievementSystem.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

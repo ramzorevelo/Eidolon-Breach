@@ -29,6 +29,7 @@
     <ClCompile Include="src\Battle\ResonanceField.cpp" />
     <ClCompile Include="src\Battle\SpeedBasedTurnOrderCalculator.cpp" />
     <ClCompile Include="src\Battle\TargetingHeuristics.cpp" />
+    <ClCompile Include="src\Core\AchievementSystem.cpp" />
     <ClCompile Include="src\Core\Effects\BurnEffect.cpp" />
     <ClCompile Include="src\Core\Effects\RegenEffect.cpp" />
     <ClCompile Include="src\Core\Effects\ShieldEffect.cpp" />
@@ -79,6 +80,7 @@
     <ClInclude Include="src\Battle\SpeedBasedTurnOrderCalculator.h" />
     <ClInclude Include="src\Battle\TargetingHeuristics.h" />
     <ClInclude Include="src\Battle\TurnSlot.h" />
+    <ClInclude Include="src\Core\AchievementSystem.h" />
     <ClInclude Include="src\Core\ActionData.h" />
     <ClInclude Include="src\Core\ActionResult.h" />
     <ClInclude Include="src\Core\Affinity.h" />
