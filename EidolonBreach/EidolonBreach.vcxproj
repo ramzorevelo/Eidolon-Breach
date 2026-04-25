@@ -29,6 +29,7 @@
     <ClCompile Include="src\Battle\FormationManager.cpp" />
     <ClCompile Include="src\Battle\ResonanceField.cpp" />
     <ClCompile Include="src\Battle\SpeedBasedTurnOrderCalculator.cpp" />
+    <ClCompile Include="src\Battle\StanceModifiers.cpp" />
     <ClCompile Include="src\Battle\TargetingHeuristics.cpp" />
     <ClCompile Include="src\Core\AchievementSystem.cpp" />
     <ClCompile Include="src\Core\Effects\BurnEffect.cpp" />
@@ -82,8 +83,10 @@
     <ClInclude Include="src\Battle\ITurnOrderCalculator.h" />
     <ClInclude Include="src\Battle\ResonanceField.h" />
     <ClInclude Include="src\Battle\SpeedBasedTurnOrderCalculator.h" />
+    <ClInclude Include="src\Battle\StanceModifiers.h" />
     <ClInclude Include="src\Battle\TargetingHeuristics.h" />
     <ClInclude Include="src\Battle\TurnSlot.h" />
+    <ClInclude Include="src\Characters\Lyra.h" />
     <ClInclude Include="src\Core\AchievementSystem.h" />
     <ClInclude Include="src\Core\ActionData.h" />
     <ClInclude Include="src\Core\ActionResult.h" />

@@ -13,12 +13,14 @@
 #include "UI/IRenderer.h"
 #include <memory>
 #include <vector>
+#include "Core/BehaviorSignal.h"
 
 class RunContext;
 class EventBus;
 class PlayableCharacter;
 class IAction;
 class SummonRegistry;
+struct RunCharacterState;
 
 class Battle
 {
@@ -119,4 +121,12 @@ class Battle
 
     /** @return Number of alive Summons currently in the player party. */
     [[nodiscard]] int countActiveSummons() const;
+
+    /**
+     * @brief Resolve and cache a stance ID for pc if the crystallization threshold
+     *        is met and no stance is yet set. Called from checkCrystallization.
+     * @return The dominant BehaviorSignal or BehaviorSignal::Aggressive as fallback.
+     */
+    [[nodiscard]] static BehaviorSignal findDominantSignal(
+        const RunCharacterState &cs);
 };

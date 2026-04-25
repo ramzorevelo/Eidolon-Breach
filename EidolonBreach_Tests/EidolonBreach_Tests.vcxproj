@@ -29,6 +29,7 @@
     <ClCompile Include="..\EidolonBreach\src\Battle\FormationManager.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Battle\ResonanceField.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Battle\SpeedBasedTurnOrderCalculator.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Battle\StanceModifiers.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Battle\TargetingHeuristics.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Core\Effects\BurnEffect.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Core\Effects\RegenEffect.cpp" />
@@ -64,6 +65,7 @@
     <ClCompile Include="tests\Battle\test_FormationManager.cpp" />
     <ClCompile Include="tests\Battle\test_ResonanceField.cpp" />
     <ClCompile Include="tests\Battle\test_SpeedBasedTurnOrderCalculator.cpp" />
+    <ClCompile Include="tests\Battle\test_StanceModifiers.cpp" />
     <ClCompile Include="tests\Battle\test_TargetingHeuristics.cpp" />
     <ClCompile Include="tests\Battle\test_TurnOrder.cpp" />
     <ClCompile Include="tests\Core\Effects\test_BurnEffect.cpp" />
@@ -85,6 +87,7 @@
     <ClCompile Include="tests\Entities\test_Exposure.cpp" />
     <ClCompile Include="tests\Entities\test_Party.cpp" />
     <ClCompile Include="tests\Entities\test_PlayableCharacter.cpp" />
+    <ClCompile Include="tests\Entities\test_Summon.cpp" />
     <ClCompile Include="tests\Entities\test_Unit.cpp" />
     <ClCompile Include="tests\Entities\test_UnitEffects.cpp" />
     <ClCompile Include="tests\Items\test_Equipment.cpp" />

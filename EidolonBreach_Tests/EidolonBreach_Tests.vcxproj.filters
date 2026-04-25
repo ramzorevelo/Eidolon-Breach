@@ -255,6 +255,15 @@
     <ClCompile Include="..\EidolonBreach\src\Actions\EmberCallAction.cpp">
       <Filter>Actions</Filter>
     </ClCompile>
+    <ClCompile Include="tests\Battle\test_StanceModifiers.cpp">
+      <Filter>Battle</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Entities\test_Summon.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Battle\StanceModifiers.cpp">
+      <Filter>Battle</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="external\doctest.h">
