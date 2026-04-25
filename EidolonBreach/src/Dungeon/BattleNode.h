@@ -10,6 +10,7 @@
 #include <functional>
 
 class Party;
+class SummonRegistry;
 
 class BattleNode : public MapNode
 {
@@ -21,7 +22,8 @@ class BattleNode : public MapNode
      */
     explicit BattleNode(std::function<void(Party &)> populateEnemies,
                         Affinity floorAffinity = Affinity::Aether,
-                        int xpReward = 10);
+                        int xpReward = 10,
+                        const SummonRegistry *summonRegistry = nullptr);
 
     void enter(Party &party, MetaProgress &meta,
                RunContext &runCtx, EventBus &eventBus) override;
@@ -40,4 +42,5 @@ class BattleNode : public MapNode
 
   private:
     std::function<void(Party &)> m_populateEnemies;
+    const SummonRegistry *m_summonRegistry{nullptr};
 };

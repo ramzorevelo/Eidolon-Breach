@@ -11,8 +11,9 @@
 #include <iostream>
 
 BossNode::BossNode(std::function<void(Party &)> populateEnemies,
-                   Affinity floorAffinity)
-    : EliteNode{std::move(populateEnemies), floorAffinity}
+                   Affinity floorAffinity,
+                   const SummonRegistry *summonRegistry)
+    : EliteNode{std::move(populateEnemies), floorAffinity, summonRegistry}
 {
 }
 

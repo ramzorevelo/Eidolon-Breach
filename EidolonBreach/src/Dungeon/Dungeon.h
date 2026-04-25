@@ -18,6 +18,7 @@
 class AchievementSystem;
 class Party;
 class MetaProgress;
+class SummonRegistry;
 
 
 /** One node in the dungeon graph. */
@@ -46,9 +47,9 @@ class Dungeon
      * @param numLayers  Total floor count including boss floor.
      * @param difficulty Controls elite spawn weight and reward scaling.
      */
-    void generate(std::uint32_t seed,
-                  int numLayers,
-                  DungeonDifficulty difficulty = DungeonDifficulty::Normal);
+    void generate(std::uint32_t seed, int numLayers,
+                  DungeonDifficulty difficulty = DungeonDifficulty::Normal,
+                  SummonRegistry *summonRegistry = nullptr);
 
     /**
      * @brief Run the dungeon. Returns true if the player clears the boss.
@@ -85,4 +86,5 @@ class Dungeon
     std::vector<Affinity> m_floorAffinities{};
     DungeonDifficulty m_difficulty{DungeonDifficulty::Normal};
     std::unique_ptr<AchievementSystem> m_achievements{};
+    SummonRegistry *m_summonRegistry{nullptr}; ///< Non-owning; owned by main().
 };

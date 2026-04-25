@@ -11,7 +11,8 @@ class EliteNode : public BattleNode
 {
   public:
     explicit EliteNode(std::function<void(Party &)> populateEnemies,
-                       Affinity floorAffinity = Affinity::Aether);
+                       Affinity floorAffinity = Affinity::Aether,
+                       const SummonRegistry *summonRegistry = nullptr);
 
     void enter(Party &party, MetaProgress &meta,
                RunContext &runCtx, EventBus &eventBus) override;

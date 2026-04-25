@@ -6,6 +6,8 @@
 #include "Actions/BasicStrikeAction.h"
 #include "Actions/SkillAction.h"
 #include "Actions/UltimateAction.h"
+#include "Summons/Ignis.h"
+#include "Summons/SummonRegistry.h"
 #include "Core/MetaProgress.h"
 #include "Dungeon/Dungeon.h"
 #include "Entities/PlayableCharacter.h"
@@ -41,10 +43,13 @@ int main()
     conduit->addAbility(std::make_unique<UltimateAction>());
     playerParty.addUnit(std::move(conduit));
 
+    SummonRegistry summonRegistry{};
+    Ignis::registerIgnis(summonRegistry);
+
     MetaProgress meta{};
 
     Dungeon dungeon{};
-    dungeon.generate(12345u, 9, DungeonDifficulty::Normal);
+    dungeon.generate(12345u, 9, DungeonDifficulty::Normal, &summonRegistry);
 
     const bool won{dungeon.run(playerParty, meta)};
     std::cout << (won ? "\n=== RUN COMPLETE ===\n" : "\n=== DEFEATED ===\n");
