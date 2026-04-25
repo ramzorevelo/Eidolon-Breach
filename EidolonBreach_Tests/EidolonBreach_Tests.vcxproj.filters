@@ -252,6 +252,9 @@
     <ClCompile Include="..\EidolonBreach\src\Entities\Summon.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Actions\EmberCallAction.cpp">
+      <Filter>Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="external\doctest.h">

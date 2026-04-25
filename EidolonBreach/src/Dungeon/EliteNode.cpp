@@ -12,8 +12,9 @@
 #include <iostream>
 
 EliteNode::EliteNode(std::function<void(Party &)> populateEnemies,
-                     Affinity floorAffinity)
-    : BattleNode{std::move(populateEnemies), floorAffinity, 20}
+                     Affinity floorAffinity,
+                     const SummonRegistry *summonRegistry)
+    : BattleNode{std::move(populateEnemies), floorAffinity, 20, summonRegistry}
 {
 }
 

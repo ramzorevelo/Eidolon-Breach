@@ -183,6 +183,9 @@
     <ClCompile Include="src\Entities\Summon.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
+    <ClCompile Include="src\Actions\EmberCallAction.cpp">
+      <Filter>Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Actions\BasicStrikeAction.h">
@@ -403,6 +406,12 @@
     </ClInclude>
     <ClInclude Include="src\Entities\Summon.h">
       <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Summons\Ignis.h">
+      <Filter>Summons</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Actions\EmberCallAction.h">
+      <Filter>Actions</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

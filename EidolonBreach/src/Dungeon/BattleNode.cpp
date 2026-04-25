@@ -17,14 +17,17 @@
 #include "UI/ConsoleInputHandler.h"
 #include "UI/ConsoleRenderer.h"
 #include <iostream>
+#include "Summons/SummonRegistry.h"
 #include <limits>
 
 BattleNode::BattleNode(std::function<void(Party &)> populateEnemies,
                        Affinity floorAffinity,
-                       int xpReward)
+                       int xpReward,
+                       const SummonRegistry *summonRegistry)
     : m_populateEnemies{std::move(populateEnemies)},
       m_floorAffinity{floorAffinity},
-      m_xpReward{xpReward}
+      m_xpReward{xpReward},
+      m_summonRegistry{summonRegistry}
 {
 }
 
@@ -43,7 +46,7 @@ void BattleNode::enter(Party &party,
     ConsoleRenderer renderer{};
     ConsoleInputHandler inputHandler{};
     Battle battle{party, enemyParty, renderer, inputHandler,
-                  runCtx, eventBus};
+                  runCtx, eventBus, nullptr, m_summonRegistry};
     battle.run();
 
     if (enemyParty.isAllDead())

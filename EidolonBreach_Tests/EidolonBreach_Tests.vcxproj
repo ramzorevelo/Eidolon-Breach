@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\EidolonBreach\src\Actions\BasicStrikeAction.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Actions\EmberCallAction.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Actions\SkillAction.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Actions\UltimateAction.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Actions\UseConsumableAction.cpp" />

@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Actions\BasicStrikeAction.cpp" />
+    <ClCompile Include="src\Actions\EmberCallAction.cpp" />
     <ClCompile Include="src\Actions\SkillAction.cpp" />
     <ClCompile Include="src\Actions\UltimateAction.cpp" />
     <ClCompile Include="src\Actions\UseConsumableAction.cpp" />
@@ -68,6 +69,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Actions\BasicStrikeAction.h" />
+    <ClInclude Include="src\Actions\EmberCallAction.h" />
     <ClInclude Include="src\Actions\IAction.h" />
     <ClInclude Include="src\Actions\SkillAction.h" />
     <ClInclude Include="src\Actions\SlotState.h" />
@@ -126,6 +128,7 @@
     <ClInclude Include="src\Entities\VampireBat.h" />
     <ClInclude Include="src\Items\Inventory.h" />
     <ClInclude Include="src\Items\Item.h" />
+    <ClInclude Include="src\Summons\Ignis.h" />
     <ClInclude Include="src\Summons\SummonAction.h" />
     <ClInclude Include="src\Summons\SummonDefinition.h" />
     <ClInclude Include="src\Summons\SummonRegistry.h" />

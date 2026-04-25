@@ -18,6 +18,7 @@
 #include "Entities/Slime.h"
 #include "Entities/StoneGolem.h"
 #include "Entities/VampireBat.h"
+#include "Summons/SummonRegistry.h"
 #include <algorithm>
 #include <iostream>
 #include <limits>
@@ -102,8 +103,10 @@ Dungeon::~Dungeon() = default;
 
 void Dungeon::generate(std::uint32_t seed,
                        int numLayers,
-                       DungeonDifficulty difficulty)
+                       DungeonDifficulty difficulty,
+                       SummonRegistry *summonRegistry)
 {
+    m_summonRegistry = summonRegistry;
     m_difficulty = difficulty;
     m_runContext.reset();
     m_achievements = std::make_unique<AchievementSystem>(m_eventBus);
@@ -143,9 +146,9 @@ std::unique_ptr<MapNode> Dungeon::makeNode(int layer,
     const int roll{dist(rng)};
 
     if (roll < eW)
-        return std::make_unique<EliteNode>(pickEliteFactory(rng), floorAffinity);
+        return std::make_unique<EliteNode>(pickEliteFactory(rng), floorAffinity, m_summonRegistry);
     if (roll < eW + battleW)
-        return std::make_unique<BattleNode>(pickEnemyFactory(rng), floorAffinity);
+        return std::make_unique<BattleNode>(pickEnemyFactory(rng), floorAffinity, 10, m_summonRegistry);
     if (roll < eW + battleW + restW)
         return std::make_unique<RestNode>();
     return std::make_unique<TreasureNode>(gold, rng());
@@ -175,7 +178,7 @@ void Dungeon::buildGraph(std::uint32_t seed,
         if (isBossFloor)
         {
             layerNodes.push_back({std::make_unique<BossNode>(
-                                      populateBossParty, floorAffinity),
+                                      populateBossParty, floorAffinity, m_summonRegistry),
                                   {}});
             prevLayerHadElite = false;
             prevLayerHadRest = false;
@@ -193,7 +196,7 @@ void Dungeon::buildGraph(std::uint32_t seed,
         else if (isEliteGateFloor)
         {
             layerNodes.push_back({std::make_unique<EliteNode>(
-                                      pickEliteFactory(rng), floorAffinity),
+                                      pickEliteFactory(rng), floorAffinity, m_summonRegistry),
                                   {}});
             prevLayerHadElite = true;
             prevLayerHadRest = false;
