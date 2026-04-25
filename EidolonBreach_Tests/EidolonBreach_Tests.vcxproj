@@ -42,9 +42,11 @@
     <ClCompile Include="..\EidolonBreach\src\Entities\PlayableCharacter.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Entities\Slime.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Entities\StoneGolem.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Entities\Summon.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Entities\Unit.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Entities\VampireBat.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Items\Inventory.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Summons\SummonRegistry.cpp" />
     <ClCompile Include="..\EidolonBreach\src\UI\ConsoleRenderer.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Vestiges\AttunistGambitVestige.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Vestiges\EchoingStrikeVestige.cpp" />

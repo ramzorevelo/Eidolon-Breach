@@ -17,6 +17,8 @@
 #include "Entities/PlayableCharacter.h"
 #include "Items/Inventory.h"
 #include <algorithm>
+#include "Entities/Summon.h"
+#include "Summons/SummonRegistry.h"
 
 Battle::Battle(Party &playerParty,
                Party &enemyParty,
@@ -24,7 +26,8 @@ Battle::Battle(Party &playerParty,
                IInputHandler &inputHandler,
                RunContext &runContext,
                EventBus &eventBus,
-               std::unique_ptr<ITurnOrderCalculator> turnOrderCalc)
+               std::unique_ptr<ITurnOrderCalculator> turnOrderCalc,
+               const SummonRegistry *summonRegistry)
     : m_playerParty{playerParty},
       m_enemyParty{enemyParty},
       m_runContext{runContext},
@@ -32,7 +35,8 @@ Battle::Battle(Party &playerParty,
       m_turnOrderCalc{turnOrderCalc ? std::move(turnOrderCalc)
                                     : std::make_unique<SpeedBasedTurnOrderCalculator>()},
       m_renderer{renderer},
-      m_inputHandler{inputHandler}
+      m_inputHandler{inputHandler},
+      m_summonRegistry{summonRegistry}
 {
 }
 
@@ -162,10 +166,16 @@ void Battle::processPlayerTurn(Unit *unit, BattleState &state)
     processNewBreaks(enemyBreaksBefore, m_enemyParty, result.actionAffinity, state);
     checkNewDeaths(enemyAliveBefore, m_enemyParty, unit, state);
 
+    // Resonance contribution applies to all player-side units (PCs and Summons).
+    applyResonanceContribution(*unit, result.actionAffinity, state);
+
     if (pc)
     {
-        applyResonanceContribution(*pc, result.actionAffinity, state);
         processActionResult(*pc, m_playerParty, result, state);
+        if (result.summonEffect.has_value())
+        {
+            processSummonEffect(*result.summonEffect, pc->getResonanceContribution(), state);
+        }
 
         // Determine the action that was used from the action result metadata.
         const auto &abilities{pc->getAbilities()};
@@ -202,11 +212,14 @@ void Battle::processEnemyTurn(Unit *unit, BattleState &state)
     checkNewDeaths(playerAliveBefore, m_playerParty, unit, state);
 }
 
-void Battle::applyResonanceContribution(PlayableCharacter &pc,
+void Battle::applyResonanceContribution(Unit &unit,
                                         Affinity actionAffinity,
                                         BattleState &state)
 {
-    int contribution{pc.getResonanceContribution()};
+    int contribution{unit.getResonanceContribution()};
+    if (contribution == 0)
+        return; // Enemies and units with no contribution (e.g. base Unit) are skipped.
+
     if (actionAffinity == state.floorAffinity)
     {
         contribution = static_cast<int>(
@@ -467,4 +480,41 @@ void Battle::callVestigeOnBattleEnd(BattleState &state)
 {
     for (auto &v : m_playerParty.getVestiges())
         v->onBattleEnd(state);
+}
+
+void Battle::processSummonEffect(const SummonEffect &effect,
+                                 int summonerContribution,
+                                 BattleState &state)
+{
+    if (!m_summonRegistry)
+        return;
+
+    if (countActiveSummons() >= CombatConstants::kMaxActiveSummons)
+    {
+        state.renderer.renderMessage("No room for another Manifestation — limit reached.");
+        return;
+    }
+
+    const SummonDefinition *def{m_summonRegistry->find(effect.summonId)};
+    if (!def)
+    {
+        state.renderer.renderMessage("Unknown summon id: " + effect.summonId);
+        return;
+    }
+
+    auto summon{std::make_unique<Summon>(*def, summonerContribution)};
+    state.renderer.renderMessage(def->displayName + " manifests!");
+    m_playerParty.addUnit(std::move(summon));
+}
+
+int Battle::countActiveSummons() const
+{
+    int count{0};
+    for (std::size_t i{0}; i < m_playerParty.size(); ++i)
+    {
+        const Unit *u{m_playerParty.getUnitAt(i)};
+        if (u && u->isAlive() && u->isSummon())
+            ++count;
+    }
+    return count;
 }

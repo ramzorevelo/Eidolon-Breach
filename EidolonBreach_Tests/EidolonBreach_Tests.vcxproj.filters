@@ -39,6 +39,9 @@
     <Filter Include="Vestiges">
       <UniqueIdentifier>{3e0d678e-548b-436b-9877-a945c2dc02a3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Summons">
+      <UniqueIdentifier>{9743ac8f-c529-4022-9c04-85e7f8037460}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="tests\Actions\test_BasicStrikeAction.cpp">
@@ -242,6 +245,12 @@
     </ClCompile>
     <ClCompile Include="tests\Vestiges\test_Vestiges.cpp">
       <Filter>Vestiges</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Summons\SummonRegistry.cpp">
+      <Filter>Summons</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Entities\Summon.cpp">
+      <Filter>Entities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
