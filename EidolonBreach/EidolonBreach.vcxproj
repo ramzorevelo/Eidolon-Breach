@@ -55,6 +55,7 @@
     <ClCompile Include="src\Entities\VampireBat.cpp" />
     <ClCompile Include="src\Items\Inventory.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Summons\SummonRegistry.cpp" />
     <ClCompile Include="src\UI\ConsoleInputHandler.cpp" />
     <ClCompile Include="src\UI\ConsoleRenderer.cpp" />
     <ClCompile Include="src\Vestiges\AttunistGambitVestige.cpp" />
@@ -123,6 +124,9 @@
     <ClInclude Include="src\Entities\VampireBat.h" />
     <ClInclude Include="src\Items\Inventory.h" />
     <ClInclude Include="src\Items\Item.h" />
+    <ClInclude Include="src\Summons\SummonAction.h" />
+    <ClInclude Include="src\Summons\SummonDefinition.h" />
+    <ClInclude Include="src\Summons\SummonRegistry.h" />
     <ClInclude Include="src\UI\ConsoleInputHandler.h" />
     <ClInclude Include="src\UI\ConsoleRenderer.h" />
     <ClInclude Include="src\UI\IInputHandler.h" />

@@ -40,6 +40,9 @@
     <Filter Include="Vestiges">
       <UniqueIdentifier>{c4eda504-ef97-43d5-a1b9-e15b80670c48}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Summons">
+      <UniqueIdentifier>{19f5f76b-4c10-4d0d-a93d-ea3b0e9eab79}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -173,6 +176,9 @@
     </ClCompile>
     <ClCompile Include="src\Core\AchievementSystem.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Summons\SummonRegistry.cpp">
+      <Filter>Summons</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -382,6 +388,15 @@
     </ClInclude>
     <ClInclude Include="src\Core\AchievementSystem.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Summons\SummonAction.h">
+      <Filter>Summons</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Summons\SummonDefinition.h">
+      <Filter>Summons</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Summons\SummonRegistry.h">
+      <Filter>Summons</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
