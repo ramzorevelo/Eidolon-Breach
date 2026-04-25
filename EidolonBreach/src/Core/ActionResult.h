@@ -12,6 +12,17 @@
 
 #include <string>
 #include "Core/Affinity.h"
+#include <optional>
+
+/**
+ * @brief Signals that the executing action spawned a Manifestation.
+ *        Set by summoner skill actions; processed by Battle::processSummonEffect().
+ */
+struct SummonEffect
+{
+    std::string summonId{};   ///< Key into SummonRegistry.
+    int preferredPosition{3}; ///< 0-indexed party slot; Battle clamps to first available.
+};
 
 struct ActionResult
 {
@@ -48,4 +59,9 @@ struct ActionResult
      *        Used by ToughnessBreakerVestige to locate the target unit.
      */
     int targetEnemyIndex{-1};
+    /**
+     * @brief Populated by summoner skill actions when a Manifestation is spawned.
+     *        Processed by Battle after execute() returns; never set by the action itself.
+     */
+    std::optional<SummonEffect> summonEffect{};
 };

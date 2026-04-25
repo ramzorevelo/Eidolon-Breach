@@ -18,6 +18,7 @@ class RunContext;
 class EventBus;
 class PlayableCharacter;
 class IAction;
+class SummonRegistry;
 
 class Battle
 {
@@ -38,7 +39,8 @@ class Battle
            IInputHandler &inputHandler,
            RunContext &runContext,
            EventBus &eventBus,
-           std::unique_ptr<ITurnOrderCalculator> turnOrderCalc = nullptr);
+           std::unique_ptr<ITurnOrderCalculator> turnOrderCalc = nullptr,
+           const SummonRegistry *summonRegistry = nullptr);
 
     void run();
 
@@ -56,6 +58,7 @@ class Battle
     IRenderer &m_renderer;
     IInputHandler &m_inputHandler;
     ResonanceField m_field{};
+    const SummonRegistry *m_summonRegistry{nullptr};
 
     void runBattleLoop(BattleState &state);
     bool isBattleOver() const;
@@ -64,7 +67,7 @@ class Battle
     void processPlayerTurn(Unit *unit, BattleState &state);
     void processEnemyTurn(Unit *unit, BattleState &state);
 
-    void applyResonanceContribution(PlayableCharacter &pc,
+    void applyResonanceContribution(Unit &unit,
                                     Affinity actionAffinity,
                                     BattleState &state);
     void applyResonanceTrigger(Affinity affinity, BattleState &state);
@@ -104,4 +107,16 @@ class Battle
     void callVestigeOnBattleStart(BattleState &state);
     void callVestigeOnBattleEnd(BattleState &state);
     void collectDrops(BattleState &state);
+    /**
+     * @brief Spawn a Summon from the registry if the party cap allows.
+     *        No-op when m_summonRegistry is nullptr or the id is not registered.
+     * @param effect             The SummonEffect from the action result.
+     * @param summonerContribution The acting PC's resonanceContribution at spawn time.
+     */
+    void processSummonEffect(const SummonEffect &effect,
+                             int summonerContribution,
+                             BattleState &state);
+
+    /** @return Number of alive Summons currently in the player party. */
+    [[nodiscard]] int countActiveSummons() const;
 };

@@ -39,4 +39,5 @@ constexpr int kCrystallizationThreshold{10};
 // Supportive signal surplus threshold
 constexpr int kSupportiveSpSurplusThreshold{20};
 constexpr int kMaxFormationSlots{5};
+constexpr int kMaxActiveSummons{2};		
 } // namespace CombatConstants
