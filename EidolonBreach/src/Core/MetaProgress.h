@@ -6,6 +6,9 @@
  */
 
 #include <string_view>
+#include <map>
+#include <string>
+#include <vector>
 
 class MetaProgress
 {
@@ -19,4 +22,5 @@ class MetaProgress
 
     int currency{0};
     int highestFloorReached{0};
+    std::map<std::string, std::vector<std::string>> masteryEventLog{};
 };

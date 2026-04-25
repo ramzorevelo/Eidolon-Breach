@@ -19,6 +19,8 @@
 #include <algorithm>
 #include "Entities/Summon.h"
 #include "Summons/SummonRegistry.h"
+#include "Battle/StanceModifiers.h"
+#include "Characters/Lyra.h"
 
 Battle::Battle(Party &playerParty,
                Party &enemyParty,
@@ -218,7 +220,7 @@ void Battle::applyResonanceContribution(Unit &unit,
 {
     int contribution{unit.getResonanceContribution()};
     if (contribution == 0)
-        return; // Enemies and units with no contribution (e.g. base Unit) are skipped.
+        return;
 
     if (actionAffinity == state.floorAffinity)
     {
@@ -226,6 +228,19 @@ void Battle::applyResonanceContribution(Unit &unit,
             static_cast<float>(contribution) *
             (1.0f + CombatConstants::kFloorAffinityResonanceBonus));
     }
+
+    // Apply Stance modifier if the unit is a PC with a crystallized Stance.
+    if (const auto *pc{dynamic_cast<const PlayableCharacter *>(&unit)})
+    {
+        const RunCharacterState *cs{m_runContext.findCharacterState(pc->getId())};
+        if (cs && cs->crystallizedStanceId.has_value() &&
+            !cs->crystallizedStanceId->empty())
+        {
+            contribution = StanceModifiers::applyResonanceModifier(
+                *cs->crystallizedStanceId, *pc, actionAffinity, contribution, state);
+        }
+    }
+
     state.resonanceField.addContribution(actionAffinity, contribution);
     m_runContext.recordFieldVotes(actionAffinity,
                                   state.resonanceField.getVotes(actionAffinity));
@@ -371,9 +386,17 @@ void Battle::checkCrystallization(PlayableCharacter &pc, BattleState &state)
 
     if (dominantCount >= CombatConstants::kCrystallizationThreshold)
     {
-        cs.crystallizedStanceId = "";
+        const BehaviorSignal dominant{findDominantSignal(cs)};
+        const std::string resolvedId{
+            StanceModifiers::resolveStanceId(pc.getId(), dominant)};
+
+        cs.crystallizedStanceId = resolvedId;
         cs.synchronicityProgress = 0;
-        state.eventBus.emit(StanceCrystallizedEvent{&pc, ""});
+        state.eventBus.emit(StanceCrystallizedEvent{&pc, resolvedId});
+
+        if (!resolvedId.empty())
+            state.renderer.renderMessage(
+                pc.getName() + " crystallizes stance: " + resolvedId);
     }
 }
 
@@ -505,6 +528,21 @@ void Battle::processSummonEffect(const SummonEffect &effect,
     auto summon{std::make_unique<Summon>(*def, summonerContribution)};
     state.renderer.renderMessage(def->displayName + " manifests!");
     m_playerParty.addUnit(std::move(summon));
+}
+
+BehaviorSignal Battle::findDominantSignal(const RunCharacterState &cs)
+{
+    BehaviorSignal dominant{BehaviorSignal::Aggressive};
+    int highestCount{0};
+    for (const auto &[signal, count] : cs.signalCounts)
+    {
+        if (count > highestCount)
+        {
+            highestCount = count;
+            dominant = signal;
+        }
+    }
+    return dominant;
 }
 
 int Battle::countActiveSummons() const

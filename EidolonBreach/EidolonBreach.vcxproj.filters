@@ -43,6 +43,9 @@
     <Filter Include="Summons">
       <UniqueIdentifier>{19f5f76b-4c10-4d0d-a93d-ea3b0e9eab79}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Characters">
+      <UniqueIdentifier>{c4d2a347-8f5a-4a90-9805-684e06205cf5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -185,6 +188,9 @@
     </ClCompile>
     <ClCompile Include="src\Actions\EmberCallAction.cpp">
       <Filter>Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Battle\StanceModifiers.cpp">
+      <Filter>Battle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -412,6 +418,12 @@
     </ClInclude>
     <ClInclude Include="src\Actions\EmberCallAction.h">
       <Filter>Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Characters\Lyra.h">
+      <Filter>Characters</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Battle\StanceModifiers.h">
+      <Filter>Battle</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
