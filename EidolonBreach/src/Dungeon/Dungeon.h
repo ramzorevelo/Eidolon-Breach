@@ -15,8 +15,10 @@
 #include <random>
 #include <vector>
 
+class AchievementSystem;
 class Party;
 class MetaProgress;
+
 
 /** One node in the dungeon graph. */
 struct DungeonGraphNode
@@ -36,6 +38,8 @@ enum class DungeonDifficulty
 class Dungeon
 {
   public:
+    Dungeon();
+    ~Dungeon();
     /**
      * @brief Generate a graph-based map from a reproducible seed.
      * @param seed       Unsigned 32-bit seed — never pass a signed int.
@@ -80,4 +84,5 @@ class Dungeon
     std::vector<std::vector<DungeonGraphNode>> m_layers{};
     std::vector<Affinity> m_floorAffinities{};
     DungeonDifficulty m_difficulty{DungeonDifficulty::Normal};
+    std::unique_ptr<AchievementSystem> m_achievements{};
 };
