@@ -82,7 +82,7 @@ class PlayableCharacter : public Unit
     /** Displays action menu, reads player input, executes chosen action. */
     ActionResult takeTurn(Party &allies, Party &enemies, BattleState &state) override;
 
-    int getResonanceContribution() const
+    [[nodiscard]] int getResonanceContribution() const override
     {
         return m_resonanceContribution;
     }
