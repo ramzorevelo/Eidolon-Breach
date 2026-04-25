@@ -46,6 +46,12 @@
     <ClCompile Include="..\EidolonBreach\src\Entities\VampireBat.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Items\Inventory.cpp" />
     <ClCompile Include="..\EidolonBreach\src\UI\ConsoleRenderer.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Vestiges\AttunistGambitVestige.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Vestiges\EchoingStrikeVestige.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Vestiges\FlameResonanceVestige.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Vestiges\ToughnessBreakerVestige.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Vestiges\VestigeFactory.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Vestiges\VestigeOfTheUnbound.cpp" />
     <ClCompile Include="tests\Actions\testActionCategory.cpp" />
     <ClCompile Include="tests\Actions\test_BasicStrikeAction.cpp" />
     <ClCompile Include="tests\Actions\test_SkillAction.cpp" />
@@ -80,6 +86,7 @@
     <ClCompile Include="tests\Entities\test_UnitEffects.cpp" />
     <ClCompile Include="tests\Items\test_Equipment.cpp" />
     <ClCompile Include="tests\Items\test_Inventory.cpp" />
+    <ClCompile Include="tests\Vestiges\test_Vestiges.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\EidolonBreach\src\Core\ActionResult.h" />

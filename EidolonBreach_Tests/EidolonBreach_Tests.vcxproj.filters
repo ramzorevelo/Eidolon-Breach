@@ -36,6 +36,9 @@
     <Filter Include="Dungeon">
       <UniqueIdentifier>{d4ae6c4f-dc2e-4e8e-a258-aa04054ef5dc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Vestiges">
+      <UniqueIdentifier>{3e0d678e-548b-436b-9877-a945c2dc02a3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="tests\Actions\test_BasicStrikeAction.cpp">
@@ -218,6 +221,27 @@
     </ClCompile>
     <ClCompile Include="tests\Battle\test_FormationManager.cpp">
       <Filter>Battle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Vestiges\AttunistGambitVestige.cpp">
+      <Filter>Vestiges</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Vestiges\EchoingStrikeVestige.cpp">
+      <Filter>Vestiges</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Vestiges\FlameResonanceVestige.cpp">
+      <Filter>Vestiges</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Vestiges\ToughnessBreakerVestige.cpp">
+      <Filter>Vestiges</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Vestiges\VestigeFactory.cpp">
+      <Filter>Vestiges</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Vestiges\VestigeOfTheUnbound.cpp">
+      <Filter>Vestiges</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Vestiges\test_Vestiges.cpp">
+      <Filter>Vestiges</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
