@@ -111,6 +111,24 @@ public:
     virtual bool isBroken()                const { return false; }
     virtual void applyToughnessHit(int, Affinity = Affinity::Aether) {}
     virtual void recoverFromBreak()               {}
+    /**
+     * @return true when this unit is a player-side Manifestation (Summon).
+     *         Used by Battle to count active summons and enforce the party cap.
+     */
+    [[nodiscard]] virtual bool isSummon() const
+    {
+        return false;
+    }
+
+    /**
+     * @return The unit's Resonance Field contribution value.
+     *         Base implementation returns 0 (enemies never contribute).
+     *         Overridden by PlayableCharacter and Summon.
+     */
+    [[nodiscard]] virtual int getResonanceContribution() const
+    {
+        return 0;
+    }
 
     /**
      * @brief Returns the toughness affinity modifier for the given affinity.

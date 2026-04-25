@@ -51,6 +51,7 @@
     <ClCompile Include="src\Entities\PlayableCharacter.cpp" />
     <ClCompile Include="src\Entities\Slime.cpp" />
     <ClCompile Include="src\Entities\StoneGolem.cpp" />
+    <ClCompile Include="src\Entities\Summon.cpp" />
     <ClCompile Include="src\Entities\Unit.cpp" />
     <ClCompile Include="src\Entities\VampireBat.cpp" />
     <ClCompile Include="src\Items\Inventory.cpp" />
@@ -120,6 +121,7 @@
     <ClInclude Include="src\Entities\PlayableCharacter.h" />
     <ClInclude Include="src\Entities\Slime.h" />
     <ClInclude Include="src\Entities\StoneGolem.h" />
+    <ClInclude Include="src\Entities\Summon.h" />
     <ClInclude Include="src\Entities\Unit.h" />
     <ClInclude Include="src\Entities\VampireBat.h" />
     <ClInclude Include="src\Items\Inventory.h" />

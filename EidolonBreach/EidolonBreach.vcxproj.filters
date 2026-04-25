@@ -180,6 +180,9 @@
     <ClCompile Include="src\Summons\SummonRegistry.cpp">
       <Filter>Summons</Filter>
     </ClCompile>
+    <ClCompile Include="src\Entities\Summon.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Actions\BasicStrikeAction.h">
@@ -397,6 +400,9 @@
     </ClInclude>
     <ClInclude Include="src\Summons\SummonRegistry.h">
       <Filter>Summons</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Entities\Summon.h">
+      <Filter>Entities</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
