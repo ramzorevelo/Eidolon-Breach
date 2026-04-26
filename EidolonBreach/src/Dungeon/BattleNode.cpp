@@ -38,7 +38,14 @@ void BattleNode::enter(Party &party,
 {
     std::cout << "Press Enter to begin battle...";
     std::cin.get();
+    runBattle(party, meta, runCtx, eventBus);
+}
 
+void BattleNode::runBattle(Party &party,
+                           MetaProgress &meta,
+                           RunContext &runCtx,
+                           EventBus &eventBus)
+{
     Party enemyParty{};
     m_populateEnemies(enemyParty);
     applyFloorAffinityModifiers(enemyParty);

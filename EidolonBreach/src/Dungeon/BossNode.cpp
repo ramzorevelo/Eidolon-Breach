@@ -37,7 +37,7 @@ void BossNode::enter(Party &party,
             pc->modifyExposure(CombatConstants::kEliteExposureSpike);
     }
 
-    BattleNode::enter(party, meta, runCtx, eventBus);
+    runBattle(party, meta, runCtx, eventBus);
 }
 
 std::string BossNode::description() const

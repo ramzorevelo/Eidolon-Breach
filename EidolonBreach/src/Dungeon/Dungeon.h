@@ -66,7 +66,8 @@ class Dungeon
                                                     std::mt19937 &rng,
                                                     bool noElite = false,
                                                     bool noRest = false,
-                                                    bool noTreasure = false) const;
+                                                    bool noTreasure = false,
+                                                    bool noBattle = false) const;
 
     void connectLayers(int layerIndex, std::mt19937 &rng);
 

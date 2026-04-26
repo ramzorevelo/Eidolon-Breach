@@ -132,16 +132,23 @@ std::unique_ptr<MapNode> Dungeon::makeNode(int layer,
                                            std::mt19937 &rng,
                                            bool noElite,
                                            bool noRest,
-                                           bool noTreasure) const
+                                           bool noTreasure,
+                                           bool noBattle) const
 {
     const Affinity floorAffinity{
         m_floorAffinities[static_cast<std::size_t>(layer)]};
     const int gold{20 + layer * 5};
 
     const int eW{noElite ? 0 : eliteWeight(layer, numLayers, difficulty)};
-    const int battleW{10 - eW / 2};
-    const int restW{noRest ? 0 : 3};
-    const int treasureW{noTreasure ? 0 : 2};
+    const int battleW{noBattle ? 0 : 3};
+    int restW{noRest ? 0 : 4};
+    const int treasureW{noTreasure ? 0 : 3};
+
+    // Fallback: if all other weights are zero, always allow rest to prevent
+    // a dead-end where the only option would be an illegal empty distribution.
+    if (eW == 0 && battleW == 0 && treasureW == 0)
+        restW = 4;
+
     const int totalW{eW + battleW + restW + treasureW};
 
     std::uniform_int_distribution<int> dist{0, totalW - 1};
@@ -161,11 +168,11 @@ void Dungeon::buildGraph(std::uint32_t seed,
                          DungeonDifficulty difficulty)
 {
     std::mt19937 rng{seed};
-    std::uniform_int_distribution<int> widthDist{1, 3};
 
     bool prevLayerHadElite{false};
     bool prevLayerHadRest{false};
     bool prevLayerHadTreasure{false};
+    int consecutiveBattleFloors{0};
 
     for (int layer{0}; layer < numLayers; ++layer)
     {
@@ -206,17 +213,22 @@ void Dungeon::buildGraph(std::uint32_t seed,
         }
         else
         {
-            const int width{widthDist(rng)};
+            // Early floors always offer branching. Near-boss floors may collapse to 1 node.
+            const int minWidth{(layer < numLayers - 5) ? 2 : 1};
+            std::uniform_int_distribution<int> localWidthDist{minWidth, 3};
+            const int width{localWidthDist(rng)};
             bool thisLayerHadElite{false};
             bool thisLayerHadRest{false};
             bool thisLayerHadTreasure{false};
             const bool isPreEliteGate{layer == numLayers - 4};
+            const bool noBattle{consecutiveBattleFloors >= 2};
             for (int i{0}; i < width; ++i)
             {
                 auto node{makeNode(layer, numLayers, difficulty, rng,
-                                   prevLayerHadElite || isPreEliteGate,
+                                   layer < 2 || prevLayerHadElite || isPreEliteGate,
                                    prevLayerHadRest,
-                                   prevLayerHadTreasure)};
+                                   prevLayerHadTreasure,
+                                   noBattle)};
                 if (dynamic_cast<EliteNode *>(node.get()))
                     thisLayerHadElite = true;
                 if (dynamic_cast<RestNode *>(node.get()))
@@ -228,6 +240,9 @@ void Dungeon::buildGraph(std::uint32_t seed,
             prevLayerHadElite = thisLayerHadElite;
             prevLayerHadRest = thisLayerHadRest;
             prevLayerHadTreasure = thisLayerHadTreasure;
+            const bool allBattleThisLayer{
+                !thisLayerHadElite && !thisLayerHadRest && !thisLayerHadTreasure};
+            consecutiveBattleFloors = allBattleThisLayer ? consecutiveBattleFloors + 1 : 0;
         }
 
         m_layers.push_back(std::move(layerNodes));

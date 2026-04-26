@@ -24,6 +24,7 @@ void RestNode::enter(Party &party,
 
     int choice{3};
     std::cin >> choice;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
     switch (choice)
     {
