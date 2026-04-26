@@ -39,5 +39,11 @@ constexpr int kCrystallizationThreshold{10};
 // Supportive signal surplus threshold
 constexpr int kSupportiveSpSurplusThreshold{20};
 constexpr int kMaxFormationSlots{5};
-constexpr int kMaxActiveSummons{2};		
+constexpr int kMaxActiveSummons{2};
+
+// Character leveling (Classic mode)
+constexpr int kXpPerLevel{50};       ///< Flat XP cost per level. Level N needs (N-1)*50 total XP.
+constexpr int kXpStandardBattle{10}; ///< XP awarded per standard battle victory.
+constexpr int kXpBossBattle{50};     ///< XP awarded for boss victory.
+constexpr int kMaxEchoes{5};         ///< Maximum Resonance Echoes per character.
 } // namespace CombatConstants

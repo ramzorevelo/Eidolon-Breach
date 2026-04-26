@@ -15,7 +15,7 @@ void CharacterRegistry::loadFromJson(const std::string &jsonPath,
 {
     m_abilityRegistry = &abilityRegistry;
     const nlohmann::json j{DataLoader::loadJson(jsonPath)};
-    for (const auto &entry : j) // array iteration preserves order
+    for (const auto &entry : j) 
     {
         const std::string id{entry.at("id").get<std::string>()};
         m_blueprints[id] = parseBlueprint(id, entry);

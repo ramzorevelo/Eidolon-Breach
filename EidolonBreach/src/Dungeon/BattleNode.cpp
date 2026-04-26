@@ -61,8 +61,20 @@ void BattleNode::runBattle(Party &party,
         for (std::size_t i{0}; i < party.size(); ++i)
         {
             Unit *u{party.getUnitAt(i)};
-            if (u && u->isAlive())
-                meta.gainXP(u->getId(), m_xpReward);
+            if (!u || !u->isAlive())
+                continue;
+
+            const int newLevel{meta.gainXP(u->getId(), m_xpReward)};
+
+            // Apply slot unlocks if the character just crossed a threshold.
+            auto *pc{dynamic_cast<PlayableCharacter *>(u)};
+            if (!pc)
+                continue;
+
+            if (newLevel >= CombatConstants::kSlot1UnlockLevel)
+                pc->tryUnlockSlot(0);
+            if (newLevel >= CombatConstants::kSlot2UnlockLevel)
+                pc->tryUnlockSlot(1);
         }
     }
 }

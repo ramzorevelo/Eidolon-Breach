@@ -8,6 +8,7 @@
 #include "Actions/UltimateAction.h"
 #include "Characters/AbilityRegistry.h"
 #include "Characters/CharacterRegistry.h"
+#include "Core/CombatConstants.h"
 #include "Core/MetaProgress.h"
 #include "Dungeon/Dungeon.h"
 #include "Entities/PlayableCharacter.h"
@@ -15,8 +16,10 @@
 #include "Entities/Party.h"
 #include "Summons/Ignis.h"
 #include "Summons/SummonRegistry.h"
+#include <algorithm>
 #include <iostream>
 #include <memory>
+#include <random>
 
 /** Register all playable abilities before the CharacterRegistry loads characters. */
 static AbilityRegistry buildAbilityRegistry()
@@ -31,7 +34,6 @@ static AbilityRegistry buildAbilityRegistry()
     reg.registerAbility("ultimate_default",
                         []
                         { return std::make_unique<UltimateAction>(); });
-    // Add new abilities here as new characters are defined.
     return reg;
 }
 
@@ -48,6 +50,13 @@ int main()
     SummonRegistry summonRegistry{};
     Ignis::registerIgnis(summonRegistry);
 
+    // --- MetaProgress ---
+    MetaProgress meta{MetaProgress::loadFromFile("save.json")};
+
+    // Unlock starting characters if this is a fresh save.
+    for (const std::string &id : characterRegistry.getIds())
+        meta.unlockCharacter(id);
+
     // --- Party ---
     Party playerParty{};
     playerParty.gainSp(50);
@@ -60,12 +69,20 @@ int main()
     }
 
     // --- Run ---
-    MetaProgress meta{};
+    const std::uint32_t seed{static_cast<std::uint32_t>(std::random_device{}())};
+    std::cout << "Run seed: " << seed << '\n';
+
     Dungeon dungeon{};
-    dungeon.generate(12345u, 9, DungeonDifficulty::Normal, &summonRegistry);
+    dungeon.generate(seed, 9, DungeonDifficulty::Normal, &summonRegistry);
 
     const bool won{dungeon.run(playerParty, meta)};
     std::cout << (won ? "\n=== RUN COMPLETE ===\n" : "\n=== DEFEATED ===\n");
+
+    meta.highestFloorReached = std::max(meta.highestFloorReached,
+                                        static_cast<int>(won ? 9 : 0));
+    meta.saveToFile("save.json");
+    std::cout << "Progress saved. Highest floor reached: "
+              << meta.highestFloorReached << '\n';
 
     return 0;
 }
