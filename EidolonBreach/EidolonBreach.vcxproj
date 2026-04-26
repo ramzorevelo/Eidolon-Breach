@@ -31,6 +31,8 @@
     <ClCompile Include="src\Battle\SpeedBasedTurnOrderCalculator.cpp" />
     <ClCompile Include="src\Battle\StanceModifiers.cpp" />
     <ClCompile Include="src\Battle\TargetingHeuristics.cpp" />
+    <ClCompile Include="src\Characters\AbilityRegistry.cpp" />
+    <ClCompile Include="src\Characters\CharacterRegistry.cpp" />
     <ClCompile Include="src\Core\AchievementSystem.cpp" />
     <ClCompile Include="src\Core\DataLoader.cpp" />
     <ClCompile Include="src\Core\Effects\BurnEffect.cpp" />
@@ -91,6 +93,8 @@
     <ClInclude Include="src\Battle\StanceModifiers.h" />
     <ClInclude Include="src\Battle\TargetingHeuristics.h" />
     <ClInclude Include="src\Battle\TurnSlot.h" />
+    <ClInclude Include="src\Characters\AbilityRegistry.h" />
+    <ClInclude Include="src\Characters\CharacterRegistry.h" />
     <ClInclude Include="src\Characters\Lyra.h" />
     <ClInclude Include="src\Core\AchievementSystem.h" />
     <ClInclude Include="src\Core\ActionData.h" />
@@ -157,6 +161,7 @@
     <ClInclude Include="src\Vestiges\VestigeOfTheUnbound.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="data\characters.json" />
     <None Include="data\encounters.json" />
     <None Include="data\enemies.json" />
     <None Include="data\items.json" />

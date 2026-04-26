@@ -210,6 +210,12 @@
     <ClCompile Include="src\Entities\EnemyRegistry.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
+    <ClCompile Include="src\Characters\AbilityRegistry.cpp">
+      <Filter>Characters</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Characters\CharacterRegistry.cpp">
+      <Filter>Characters</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Actions\BasicStrikeAction.h">
@@ -458,6 +464,12 @@
     <ClInclude Include="nlohmann\json.hpp">
       <Filter>nlohmann</Filter>
     </ClInclude>
+    <ClInclude Include="src\Characters\AbilityRegistry.h">
+      <Filter>Characters</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Characters\CharacterRegistry.h">
+      <Filter>Characters</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="data\items.json">
@@ -467,6 +479,9 @@
       <Filter>data</Filter>
     </None>
     <None Include="data\enemies.json">
+      <Filter>data</Filter>
+    </None>
+    <None Include="data\characters.json">
       <Filter>data</Filter>
     </None>
   </ItemGroup>

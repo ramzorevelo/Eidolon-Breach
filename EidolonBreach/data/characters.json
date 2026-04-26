@@ -1,0 +1,32 @@
+{
+  "striker_1": {
+    "name": "Striker",
+    "affinity": "Blaze",
+    "maxHp": 80,
+    "atk": 22,
+    "def": 5,
+    "spd": 14,
+    "resonanceContribution": 10,
+    "passiveTrait": "",
+    "abilities": {
+      "basic": "basic_strike",
+      "archSkill": "arch_skill_default",
+      "ultimate": "ultimate_default"
+    }
+  },
+  "conduit_1": {
+    "name": "Conduit",
+    "affinity": "Terra",
+    "maxHp": 110,
+    "atk": 10,
+    "def": 15,
+    "spd": 9,
+    "resonanceContribution": 8,
+    "passiveTrait": "",
+    "abilities": {
+      "basic": "basic_strike",
+      "archSkill": "arch_skill_default",
+      "ultimate": "ultimate_default"
+    }
+  }
+}

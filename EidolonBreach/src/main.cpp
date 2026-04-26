@@ -1,57 +1,68 @@
 /**
  * @file main.cpp
- * @brief Entry point. Constructs the player party and runs a dungeon.
+ * @brief Entry point. Loads registries from data/ and runs a dungeon.
  */
 
 #include "Actions/BasicStrikeAction.h"
 #include "Actions/SkillAction.h"
 #include "Actions/UltimateAction.h"
-#include "Summons/Ignis.h"
-#include "Summons/SummonRegistry.h"
+#include "Characters/AbilityRegistry.h"
+#include "Characters/CharacterRegistry.h"
 #include "Core/MetaProgress.h"
 #include "Dungeon/Dungeon.h"
 #include "Entities/PlayableCharacter.h"
+#include "Entities/Enemy.h"
 #include "Entities/Party.h"
+#include "Summons/Ignis.h"
+#include "Summons/SummonRegistry.h"
 #include <iostream>
 #include <memory>
 
+/** Register all playable abilities before the CharacterRegistry loads characters. */
+static AbilityRegistry buildAbilityRegistry()
+{
+    AbilityRegistry reg{};
+    reg.registerAbility("basic_strike",
+                        []
+                        { return std::make_unique<BasicStrikeAction>(); });
+    reg.registerAbility("arch_skill_default",
+                        []
+                        { return std::make_unique<SkillAction>(2.0f); });
+    reg.registerAbility("ultimate_default",
+                        []
+                        { return std::make_unique<UltimateAction>(); });
+    // Add new abilities here as new characters are defined.
+    return reg;
+}
+
 int main()
 {
-    std::cout << "=== EIDOLON BREACH ===\n"
-              << "Striker + Conduit vs the dungeon.\n\n";
+    std::cout << "=== EIDOLON BREACH ===\n\n";
 
-    Party playerParty{};
-    playerParty.gainSp(50);
+    // --- Registries ---
+    AbilityRegistry abilityRegistry{buildAbilityRegistry()};
 
-    auto striker{std::make_unique<PlayableCharacter>(
-        "striker_1", "Striker",
-        Stats{80, 80, 22, 5, 14},
-        Affinity::Blaze,
-        10)};
-    striker->addAbility(std::make_unique<BasicStrikeAction>());
-    striker->addAbility(std::make_unique<SkillAction>(2.0f));
-    striker->addAbility(std::make_unique<UltimateAction>());
-    playerParty.addUnit(std::move(striker));
-
-    auto conduit{std::make_unique<PlayableCharacter>(
-        "conduit_1", "Conduit",
-        Stats{110, 110, 10, 15, 9},
-        Affinity::Terra,
-        8)};
-    conduit->addAbility(std::make_unique<BasicStrikeAction>());
-    conduit->addAbility(std::make_unique<SkillAction>(2.0f));
-    conduit->addAbility(std::make_unique<UltimateAction>());
-    playerParty.addUnit(std::move(conduit));
+    CharacterRegistry characterRegistry{};
+    characterRegistry.loadFromJson("data/characters.json", abilityRegistry);
 
     SummonRegistry summonRegistry{};
     Ignis::registerIgnis(summonRegistry);
 
-    MetaProgress meta{};
+    // --- Party ---
+    Party playerParty{};
+    playerParty.gainSp(50);
 
+    for (const std::string &id : characterRegistry.getIds())
+    {
+        auto pc{characterRegistry.create(id)};
+        if (pc)
+            playerParty.addUnit(std::move(pc));
+    }
+
+    // --- Run ---
+    MetaProgress meta{};
     Dungeon dungeon{};
-    const std::uint32_t seed{static_cast<std::uint32_t>(std::random_device{}())};
-    std::cout << "Run seed: " << seed << '\n'; // Reproduce a specific run
-    dungeon.generate(seed, 9, DungeonDifficulty::Normal, &summonRegistry);
+    dungeon.generate(12345u, 9, DungeonDifficulty::Normal, &summonRegistry);
 
     const bool won{dungeon.run(playerParty, meta)};
     std::cout << (won ? "\n=== RUN COMPLETE ===\n" : "\n=== DEFEATED ===\n");
