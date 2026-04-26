@@ -42,6 +42,9 @@
     <Filter Include="Summons">
       <UniqueIdentifier>{9743ac8f-c529-4022-9c04-85e7f8037460}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Characters">
+      <UniqueIdentifier>{6e070a3e-e194-4ede-bdd3-fb92eb8fd4ee}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="tests\Actions\test_BasicStrikeAction.cpp">
@@ -263,6 +266,33 @@
     </ClCompile>
     <ClCompile Include="..\EidolonBreach\src\Battle\StanceModifiers.cpp">
       <Filter>Battle</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Items\test_ItemRegistry.cpp">
+      <Filter>Items</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Items\ItemRegistry.cpp">
+      <Filter>Items</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Entities\EnemyRegistry.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Entities\test_EnemyRegistry.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Characters\test_CharacterRegistry.cpp">
+      <Filter>Characters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Characters\AbilityRegistry.cpp">
+      <Filter>Characters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Characters\CharacterRegistry.cpp">
+      <Filter>Characters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Core\DataLoader.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Dungeon\EncounterTable.cpp">
+      <Filter>Dungeon</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
