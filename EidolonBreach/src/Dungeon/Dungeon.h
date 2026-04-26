@@ -10,6 +10,8 @@
 #include "Core/EventBus.h"
 #include "Core/RunContext.h"
 #include "Dungeon/MapNode.h"
+#include "Dungeon/EncounterTable.h"
+#include "Entities/EnemyRegistry.h"
 #include <cstdint>
 #include <memory>
 #include <random>
@@ -88,4 +90,6 @@ class Dungeon
     DungeonDifficulty m_difficulty{DungeonDifficulty::Normal};
     std::unique_ptr<AchievementSystem> m_achievements{};
     SummonRegistry *m_summonRegistry{nullptr}; ///< Non-owning; owned by main().
+    EnemyRegistry m_enemyRegistry{};
+    EncounterTable m_encounterTable{};
 };

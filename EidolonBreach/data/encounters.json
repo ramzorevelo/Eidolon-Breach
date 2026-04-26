@@ -1,0 +1,32 @@
+{
+  "standard": [
+    {
+      "id": "slime_pair",
+      "enemies": [ "slime_alpha", "slime_beta" ]
+    },
+    {
+      "id": "bat_solo",
+      "enemies": [ "vampire_bat" ]
+    },
+    {
+      "id": "mixed_1",
+      "enemies": [ "slime_alpha", "vampire_bat" ]
+    }
+  ],
+  "elite": [
+    {
+      "id": "golem_solo",
+      "enemies": [ "stone_golem" ]
+    },
+    {
+      "id": "bat_elite",
+      "enemies": [ "vampire_bat" ]
+    }
+  ],
+  "boss": [
+    {
+      "id": "final_boss",
+      "enemies": [ "breach_warden", "shard_wraith" ]
+    }
+  ]
+}

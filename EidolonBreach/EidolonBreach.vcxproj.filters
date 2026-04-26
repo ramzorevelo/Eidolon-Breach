@@ -46,6 +46,12 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="nlohmann">
+      <UniqueIdentifier>{069265f7-5eeb-4b4f-9742-17577d708dc8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="data">
+      <UniqueIdentifier>{2371734d-a1dc-4f7c-9604-f27a2c66721c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -191,6 +197,18 @@
     </ClCompile>
     <ClCompile Include="src\Battle\StanceModifiers.cpp">
       <Filter>Battle</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\DataLoader.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Items\ItemRegistry.cpp">
+      <Filter>Items</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Dungeon\EncounterTable.cpp">
+      <Filter>Dungeon</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Entities\EnemyRegistry.cpp">
+      <Filter>Entities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -425,5 +443,31 @@
     <ClInclude Include="src\Battle\StanceModifiers.h">
       <Filter>Battle</Filter>
     </ClInclude>
+    <ClInclude Include="src\Core\DataLoader.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Items\ItemRegistry.h">
+      <Filter>Items</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Dungeon\EncounterTable.h">
+      <Filter>Dungeon</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Entities\EnemyRegistry.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="nlohmann\json.hpp">
+      <Filter>nlohmann</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="data\items.json">
+      <Filter>data</Filter>
+    </None>
+    <None Include="data\encounters.json">
+      <Filter>data</Filter>
+    </None>
+    <None Include="data\enemies.json">
+      <Filter>data</Filter>
+    </None>
   </ItemGroup>
 </Project>
