@@ -46,4 +46,6 @@ constexpr int kXpPerLevel{50};       ///< Flat XP cost per level. Level N needs 
 constexpr int kXpStandardBattle{10}; ///< XP awarded per standard battle victory.
 constexpr int kXpBossBattle{50};     ///< XP awarded for boss victory.
 constexpr int kMaxEchoes{5};         ///< Maximum Resonance Echoes per character.
+
+constexpr int kMaxPlayerCharacters{3}; ///< Maximum Synchrons in a player party.
 } // namespace CombatConstants
