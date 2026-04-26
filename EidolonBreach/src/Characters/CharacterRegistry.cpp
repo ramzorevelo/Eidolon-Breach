@@ -1,0 +1,94 @@
+/**
+ * @file CharacterRegistry.cpp
+ * @brief CharacterRegistry implementation.
+ */
+
+#include "Characters/CharacterRegistry.h"
+#include "Characters/AbilityRegistry.h"
+#include "Core/Affinity.h"
+#include "Core/DataLoader.h"
+#include "Entities/PlayableCharacter.h"
+#include <stdexcept>
+
+void CharacterRegistry::loadFromJson(const std::string &jsonPath,
+                                     const AbilityRegistry &abilityRegistry)
+{
+    m_abilityRegistry = &abilityRegistry;
+    const nlohmann::json j{DataLoader::loadJson(jsonPath)};
+    for (auto it = j.begin(); it != j.end(); ++it)
+    {
+        m_blueprints[it.key()] = parseBlueprint(it.key(), it.value());
+        m_orderedIds.push_back(it.key());
+    }
+}
+
+std::unique_ptr<PlayableCharacter>
+CharacterRegistry::create(std::string_view characterId) const
+{
+    auto it = m_blueprints.find(std::string{characterId});
+    if (it == m_blueprints.end())
+        return nullptr;
+
+    const CharacterBlueprint &bp{it->second};
+    Stats stats{bp.maxHp, bp.maxHp, bp.atk, bp.def, bp.spd};
+    auto pc{std::make_unique<PlayableCharacter>(
+        bp.id, bp.name, stats, parseAffinity(bp.affinity),
+        bp.resonanceContribution, bp.passiveTrait)};
+
+    // Resolve abilities; log warning for unregistered IDs but do not throw,
+    // so partial configurations can still be tested.
+    if (m_abilityRegistry)
+    {
+        if (auto basic{m_abilityRegistry->create(bp.basicId)})
+            pc->addAbility(std::move(basic));
+        if (auto arch{m_abilityRegistry->create(bp.archSkillId)})
+            pc->addAbility(std::move(arch));
+        if (auto ult{m_abilityRegistry->create(bp.ultimateId)})
+            pc->addAbility(std::move(ult));
+    }
+    return pc;
+}
+
+const std::vector<std::string> &CharacterRegistry::getIds() const
+{
+    return m_orderedIds;
+}
+
+bool CharacterRegistry::contains(std::string_view characterId) const
+{
+    return m_blueprints.count(std::string{characterId}) > 0;
+}
+
+CharacterRegistry::CharacterBlueprint
+CharacterRegistry::parseBlueprint(const std::string &id, const nlohmann::json &j)
+{
+    CharacterBlueprint bp{};
+    bp.id = id;
+    bp.name = j.at("name").get<std::string>();
+    bp.affinity = j.at("affinity").get<std::string>();
+    bp.maxHp = j.at("maxHp").get<int>();
+    bp.atk = j.at("atk").get<int>();
+    bp.def = j.at("def").get<int>();
+    bp.spd = j.at("spd").get<int>();
+    bp.resonanceContribution = j.value("resonanceContribution", 10);
+    bp.passiveTrait = j.value("passiveTrait", "");
+
+    const auto &abilities = j.at("abilities");
+    bp.basicId = abilities.value("basic", "basic_strike");
+    bp.archSkillId = abilities.value("archSkill", "arch_skill_default");
+    bp.ultimateId = abilities.value("ultimate", "ultimate_default");
+    return bp;
+}
+
+Affinity CharacterRegistry::parseAffinity(const std::string &s)
+{
+    if (s == "Blaze")
+        return Affinity::Blaze;
+    if (s == "Frost")
+        return Affinity::Frost;
+    if (s == "Tempest")
+        return Affinity::Tempest;
+    if (s == "Terra")
+        return Affinity::Terra;
+    return Affinity::Aether;
+}
