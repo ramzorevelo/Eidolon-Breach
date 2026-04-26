@@ -32,6 +32,7 @@
     <ClCompile Include="src\Battle\StanceModifiers.cpp" />
     <ClCompile Include="src\Battle\TargetingHeuristics.cpp" />
     <ClCompile Include="src\Core\AchievementSystem.cpp" />
+    <ClCompile Include="src\Core\DataLoader.cpp" />
     <ClCompile Include="src\Core\Effects\BurnEffect.cpp" />
     <ClCompile Include="src\Core\Effects\RegenEffect.cpp" />
     <ClCompile Include="src\Core\Effects\ShieldEffect.cpp" />
@@ -44,10 +45,12 @@
     <ClCompile Include="src\Dungeon\BossNode.cpp" />
     <ClCompile Include="src\Dungeon\Dungeon.cpp" />
     <ClCompile Include="src\Dungeon\EliteNode.cpp" />
+    <ClCompile Include="src\Dungeon\EncounterTable.cpp" />
     <ClCompile Include="src\Dungeon\EventNode.cpp" />
     <ClCompile Include="src\Dungeon\RestNode.cpp" />
     <ClCompile Include="src\Dungeon\TreasureNode.cpp" />
     <ClCompile Include="src\Entities\Enemy.cpp" />
+    <ClCompile Include="src\Entities\EnemyRegistry.cpp" />
     <ClCompile Include="src\Entities\IAIStrategy.cpp" />
     <ClCompile Include="src\Entities\Party.cpp" />
     <ClCompile Include="src\Entities\PlayableCharacter.cpp" />
@@ -57,6 +60,7 @@
     <ClCompile Include="src\Entities\Unit.cpp" />
     <ClCompile Include="src\Entities\VampireBat.cpp" />
     <ClCompile Include="src\Items\Inventory.cpp" />
+    <ClCompile Include="src\Items\ItemRegistry.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Summons\SummonRegistry.cpp" />
     <ClCompile Include="src\UI\ConsoleInputHandler.cpp" />
@@ -69,6 +73,7 @@
     <ClCompile Include="src\Vestiges\VestigeOfTheUnbound.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="nlohmann\json.hpp" />
     <ClInclude Include="src\Actions\BasicStrikeAction.h" />
     <ClInclude Include="src\Actions\EmberCallAction.h" />
     <ClInclude Include="src\Actions\IAction.h" />
@@ -95,6 +100,7 @@
     <ClInclude Include="src\Core\BehaviorSignal.h" />
     <ClInclude Include="src\Core\CombatConstants.h" />
     <ClInclude Include="src\Core\CombatUtils.h" />
+    <ClInclude Include="src\Core\DataLoader.h" />
     <ClInclude Include="src\Core\Drop.h" />
     <ClInclude Include="src\Core\EffectIds.h" />
     <ClInclude Include="src\Core\Effects\BurnEffect.h" />
@@ -116,11 +122,13 @@
     <ClInclude Include="src\Dungeon\BossNode.h" />
     <ClInclude Include="src\Dungeon\Dungeon.h" />
     <ClInclude Include="src\Dungeon\EliteNode.h" />
+    <ClInclude Include="src\Dungeon\EncounterTable.h" />
     <ClInclude Include="src\Dungeon\EventNode.h" />
     <ClInclude Include="src\Dungeon\MapNode.h" />
     <ClInclude Include="src\Dungeon\RestNode.h" />
     <ClInclude Include="src\Dungeon\TreasureNode.h" />
     <ClInclude Include="src\Entities\Enemy.h" />
+    <ClInclude Include="src\Entities\EnemyRegistry.h" />
     <ClInclude Include="src\Entities\IAIStrategy.h" />
     <ClInclude Include="src\Entities\Party.h" />
     <ClInclude Include="src\Entities\PlayableCharacter.h" />
@@ -131,6 +139,7 @@
     <ClInclude Include="src\Entities\VampireBat.h" />
     <ClInclude Include="src\Items\Inventory.h" />
     <ClInclude Include="src\Items\Item.h" />
+    <ClInclude Include="src\Items\ItemRegistry.h" />
     <ClInclude Include="src\Summons\Ignis.h" />
     <ClInclude Include="src\Summons\SummonAction.h" />
     <ClInclude Include="src\Summons\SummonDefinition.h" />
@@ -146,6 +155,11 @@
     <ClInclude Include="src\Vestiges\ToughnessBreakerVestige.h" />
     <ClInclude Include="src\Vestiges\VestigeFactory.h" />
     <ClInclude Include="src\Vestiges\VestigeOfTheUnbound.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="data\encounters.json" />
+    <None Include="data\enemies.json" />
+    <None Include="data\items.json" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -205,7 +219,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)src;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)src;$(ProjectDir)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -221,7 +235,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)src;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)src;$(ProjectDir)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -237,7 +251,7 @@
       <ConformanceMode>true</ConformanceMode>
       <TreatWarningAsError>true</TreatWarningAsError>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)src;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)src;$(ProjectDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -254,7 +268,7 @@
       <ConformanceMode>true</ConformanceMode>
       <TreatWarningAsError>true</TreatWarningAsError>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)src;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)src;$(ProjectDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

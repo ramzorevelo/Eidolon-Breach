@@ -1,0 +1,85 @@
+{
+  "heal_potion": {
+    "name": "Heal Potion",
+    "type": "Consumable",
+    "rarity": "Common",
+    "stackSize": 5,
+    "goldValue": 15,
+    "effects": [
+      {
+        "type": "ConsumableHeal",
+        "amount": 30
+      }
+    ]
+  },
+  "mega_potion": {
+    "name": "Mega Potion",
+    "type": "Consumable",
+    "rarity": "Rare",
+    "stackSize": 3,
+    "goldValue": 40,
+    "effects": [
+      {
+        "type": "ConsumableHeal",
+        "amount": 70
+      }
+    ]
+  },
+  "purification_vial": {
+    "name": "Purification Vial",
+    "type": "Consumable",
+    "rarity": "Common",
+    "stackSize": 3,
+    "goldValue": 20,
+    "effects": [
+      {
+        "type": "ModifyExposure",
+        "delta": -30
+      }
+    ]
+  },
+  "iron_sword": {
+    "name": "Iron Sword",
+    "type": "Equipment",
+    "equipSlot": "Weapon",
+    "rarity": "Common",
+    "stackSize": 1,
+    "goldValue": 50,
+    "effects": [
+      {
+        "type": "StatModifier",
+        "stat": "ATK",
+        "amount": 8
+      }
+    ]
+  },
+  "leather_armor": {
+    "name": "Leather Armor",
+    "type": "Equipment",
+    "equipSlot": "Armor",
+    "rarity": "Common",
+    "stackSize": 1,
+    "goldValue": 40,
+    "effects": [
+      {
+        "type": "StatModifier",
+        "stat": "DEF",
+        "amount": 6
+      }
+    ]
+  },
+  "resonance_band": {
+    "name": "Resonance Band",
+    "type": "Equipment",
+    "equipSlot": "Accessory",
+    "rarity": "Rare",
+    "stackSize": 1,
+    "goldValue": 60,
+    "effects": [
+      {
+        "type": "ResonanceModifier",
+        "amount": 5
+      }
+    ]
+  }
+}

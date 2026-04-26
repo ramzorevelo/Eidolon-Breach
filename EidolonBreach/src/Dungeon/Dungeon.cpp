@@ -9,6 +9,8 @@
 #include "Core/CombatConstants.h"
 #include "Core/MetaProgress.h"
 #include "Dungeon/BattleNode.h"
+#include "Dungeon/EncounterTable.h"
+#include "Entities/EnemyRegistry.h"
 #include "Core/BattleEvents.h"
 #include "Dungeon/BossNode.h"
 #include "Entities/PlayableCharacter.h"
@@ -28,57 +30,6 @@
 
 namespace
 {
-void populateSlimeParty(Party &p)
-{
-    p.addUnit(std::make_unique<Slime>("Slime Alpha", 80, 30));
-    p.addUnit(std::make_unique<Slime>("Slime Beta", 60, 25));
-}
-void populateGolemParty(Party &p)
-{
-    p.addUnit(std::make_unique<StoneGolem>("Stone Golem", 130, 60));
-}
-void populateBatParty(Party &p)
-{
-    p.addUnit(std::make_unique<VampireBat>("Vampire Bat", 100, 40));
-}
-void populateMixedParty(Party &p)
-{
-    p.addUnit(std::make_unique<Slime>("Slime", 70, 25));
-    p.addUnit(std::make_unique<VampireBat>("Vampire Bat", 90, 35));
-}
-void populateBossParty(Party &p)
-{
-    p.addUnit(std::make_unique<StoneGolem>("Breach Warden", 200, 90));
-    p.addUnit(std::make_unique<VampireBat>("Shard Wraith", 120, 50));
-}
-
-
-using EnemyFactory = std::function<void(Party &)>;
-
-EnemyFactory pickEnemyFactory(std::mt19937 &rng)
-{
-    std::uniform_int_distribution<int> dist{0, 2};
-    switch (dist(rng))
-    {
-    case 0:
-        return populateSlimeParty;
-    case 1:
-        return populateBatParty;
-    default:
-        return populateMixedParty;
-    }
-}
-
-EnemyFactory pickEliteFactory(std::mt19937 &rng)
-{
-    std::uniform_int_distribution<int> dist{0, 1};
-    return dist(rng) == 0 ? populateGolemParty : populateBatParty;
-}
-
-/**
- * @brief Elite weight table per difficulty.
- *        Weight is out of 10; remaining weight is split between battle and rest/treasure.
- */
 int eliteWeight(int layer, int numLayers, DungeonDifficulty difficulty)
 {
     const float depthRatio{static_cast<float>(layer) / static_cast<float>(numLayers)};
@@ -95,11 +46,9 @@ int eliteWeight(int layer, int numLayers, DungeonDifficulty difficulty)
         base = 5;
         break;
     }
-    // Weight grows with depth: deeper floors are more likely to have elites.
     return base + static_cast<int>(depthRatio * 3.0f);
 }
 } // namespace
-
 Dungeon::Dungeon() = default;
 Dungeon::~Dungeon() = default;
 
@@ -113,6 +62,8 @@ void Dungeon::generate(std::uint32_t seed,
     m_runContext.reset();
     m_achievements = std::make_unique<AchievementSystem>(m_eventBus);
     m_layers.clear();
+    m_enemyRegistry.loadFromJson("data/enemies.json");
+    m_encounterTable.loadFromJson("data/encounters.json", m_enemyRegistry);
     assignFloorAffinities(seed, numLayers);
     buildGraph(seed, numLayers, difficulty);
 }
@@ -155,9 +106,13 @@ std::unique_ptr<MapNode> Dungeon::makeNode(int layer,
     const int roll{dist(rng)};
 
     if (roll < eW)
-        return std::make_unique<EliteNode>(pickEliteFactory(rng), floorAffinity, m_summonRegistry);
+        return std::make_unique<EliteNode>(
+            m_encounterTable.getFactory(EncounterTable::Tier::Elite, rng),
+            floorAffinity, m_summonRegistry);
     if (roll < eW + battleW)
-        return std::make_unique<BattleNode>(pickEnemyFactory(rng), floorAffinity, 10, m_summonRegistry);
+        return std::make_unique<BattleNode>(
+            m_encounterTable.getFactory(EncounterTable::Tier::Standard, rng),
+            floorAffinity, 10, m_summonRegistry);
     if (roll < eW + battleW + restW)
         return std::make_unique<RestNode>();
     return std::make_unique<TreasureNode>(gold, rng());
@@ -187,7 +142,8 @@ void Dungeon::buildGraph(std::uint32_t seed,
         if (isBossFloor)
         {
             layerNodes.push_back({std::make_unique<BossNode>(
-                                      populateBossParty, floorAffinity, m_summonRegistry),
+                                      m_encounterTable.getFactory(EncounterTable::Tier::Boss, rng),
+                                      floorAffinity, m_summonRegistry),
                                   {}});
             prevLayerHadElite = false;
             prevLayerHadRest = false;
@@ -205,7 +161,8 @@ void Dungeon::buildGraph(std::uint32_t seed,
         else if (isEliteGateFloor)
         {
             layerNodes.push_back({std::make_unique<EliteNode>(
-                                      pickEliteFactory(rng), floorAffinity, m_summonRegistry),
+                                      m_encounterTable.getFactory(EncounterTable::Tier::Elite, rng),
+                                      floorAffinity, m_summonRegistry),
                                   {}});
             prevLayerHadElite = true;
             prevLayerHadRest = false;

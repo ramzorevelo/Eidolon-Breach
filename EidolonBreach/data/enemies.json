@@ -1,0 +1,38 @@
+{
+  "slime_alpha": {
+    "name": "Slime Alpha",
+    "enemyType": "slime",
+    "maxHp": 80,
+    "maxToughness": 30
+  },
+  "slime_beta": {
+    "name": "Slime Beta",
+    "enemyType": "slime",
+    "maxHp": 60,
+    "maxToughness": 25
+  },
+  "stone_golem": {
+    "name": "Stone Golem",
+    "enemyType": "stone_golem",
+    "maxHp": 130,
+    "maxToughness": 60
+  },
+  "vampire_bat": {
+    "name": "Vampire Bat",
+    "enemyType": "vampire_bat",
+    "maxHp": 100,
+    "maxToughness": 40
+  },
+  "breach_warden": {
+    "name": "Breach Warden",
+    "enemyType": "stone_golem",
+    "maxHp": 200,
+    "maxToughness": 90
+  },
+  "shard_wraith": {
+    "name": "Shard Wraith",
+    "enemyType": "vampire_bat",
+    "maxHp": 120,
+    "maxToughness": 50
+  }
+}
