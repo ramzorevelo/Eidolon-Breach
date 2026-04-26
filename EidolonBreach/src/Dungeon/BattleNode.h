@@ -37,6 +37,15 @@ class BattleNode : public MapNode
      */
     void applyFloorAffinityModifiers(Party &enemyParty) const;
 
+    /**
+     * @brief Run the battle without displaying an entry prompt.
+     *        Call this from subclasses that show their own prompt before combat.
+     */
+    void runBattle(Party &party,
+                   MetaProgress &meta,
+                   RunContext &runCtx,
+                   EventBus &eventBus);
+
     Affinity m_floorAffinity{Affinity::Aether};
     int m_xpReward{10};
 

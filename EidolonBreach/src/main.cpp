@@ -49,7 +49,9 @@ int main()
     MetaProgress meta{};
 
     Dungeon dungeon{};
-    dungeon.generate(12345u, 9, DungeonDifficulty::Normal, &summonRegistry);
+    const std::uint32_t seed{static_cast<std::uint32_t>(std::random_device{}())};
+    std::cout << "Run seed: " << seed << '\n'; // Reproduce a specific run
+    dungeon.generate(seed, 9, DungeonDifficulty::Normal, &summonRegistry);
 
     const bool won{dungeon.run(playerParty, meta)};
     std::cout << (won ? "\n=== RUN COMPLETE ===\n" : "\n=== DEFEATED ===\n");
