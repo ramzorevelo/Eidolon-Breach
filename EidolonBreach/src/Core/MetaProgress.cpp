@@ -19,7 +19,7 @@ MetaProgress MetaProgress::loadFromFile(const std::filesystem::path &path)
     MetaProgress meta{};
     std::ifstream file{path};
     if (!file.is_open())
-        return meta; 
+        return meta;
 
     nlohmann::json j{};
     try
@@ -28,7 +28,7 @@ MetaProgress MetaProgress::loadFromFile(const std::filesystem::path &path)
     }
     catch (const nlohmann::json::parse_error &)
     {
-        return meta; 
+        return meta;
     }
 
     meta.currency = j.value("currency", 0);
@@ -38,25 +38,33 @@ MetaProgress MetaProgress::loadFromFile(const std::filesystem::path &path)
     for (const auto &id : j.value("unlockedCharacterIds", nlohmann::json::array()))
         meta.unlockedCharacterIds.insert(id.get<std::string>());
 
-    for (const auto &[id, xp] : j.value("characterXP", nlohmann::json::object()).items())
+    // Store in named variables before calling .items() — j.value() returns a
+    // temporary whose lifetime does not extend through the range-for loop.
+    const nlohmann::json characterXP{j.value("characterXP", nlohmann::json::object())};
+    for (const auto &[id, xp] : characterXP.items())
     {
         meta.characterXP[id] = xp.get<int>();
         meta.characterLevels[id] = levelFromXP(xp.get<int>());
     }
 
-    for (const auto &[id, insight] : j.value("characterInsight", nlohmann::json::object()).items())
+    const nlohmann::json insightJson{j.value("characterInsight", nlohmann::json::object())};
+    for (const auto &[id, insight] : insightJson.items())
     {
         CharacterInsightData data{};
         data.echoCount = insight.value("echoCount", 0);
         data.bondTrialComplete = insight.value("bondTrialComplete", false);
-        for (const auto &aspect : insight.value("chosenAspects", nlohmann::json::array()))
+        const nlohmann::json aspects{insight.value("chosenAspects", nlohmann::json::array())};
+        for (const auto &aspect : aspects)
             data.chosenAspects.push_back(aspect.get<std::string>());
         meta.characterInsight[id] = std::move(data);
     }
 
-    for (const auto &[id, log] : j.value("masteryEventLog", nlohmann::json::object()).items())
+    const nlohmann::json masteryJson{j.value("masteryEventLog", nlohmann::json::object())};
+    for (const auto &[id, log] : masteryJson.items())
+    {
         for (const auto &entry : log)
             meta.masteryEventLog[id].push_back(entry.get<std::string>());
+    }
 
     return meta;
 }

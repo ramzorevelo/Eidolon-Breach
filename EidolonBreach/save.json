@@ -1,0 +1,30 @@
+{
+    "characterInsight": {
+        "conduit_1": {
+            "bondTrialComplete": false,
+            "chosenAspects": [],
+            "echoCount": 1
+        },
+        "striker_1": {
+            "bondTrialComplete": false,
+            "chosenAspects": [],
+            "echoCount": 1
+        }
+    },
+    "characterXP": {
+        "conduit_1": 150,
+        "striker_1": 110
+    },
+    "currency": 0,
+    "draftModeUnlocked": false,
+    "highestFloorReached": 9,
+    "masteryEventLog": {
+        "striker_1": [
+            "lyra_predator"
+        ]
+    },
+    "unlockedCharacterIds": [
+        "conduit_1",
+        "striker_1"
+    ]
+}
