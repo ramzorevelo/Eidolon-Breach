@@ -1,5 +1,6 @@
-{
-  "striker_1": {
+[
+  {
+    "id": "striker_1",
     "name": "Striker",
     "affinity": "Blaze",
     "maxHp": 80,
@@ -14,7 +15,8 @@
       "ultimate": "ultimate_default"
     }
   },
-  "conduit_1": {
+  {
+    "id": "conduit_1",
     "name": "Conduit",
     "affinity": "Terra",
     "maxHp": 110,
@@ -29,4 +31,4 @@
       "ultimate": "ultimate_default"
     }
   }
-}
+]

@@ -15,10 +15,11 @@ void CharacterRegistry::loadFromJson(const std::string &jsonPath,
 {
     m_abilityRegistry = &abilityRegistry;
     const nlohmann::json j{DataLoader::loadJson(jsonPath)};
-    for (auto it = j.begin(); it != j.end(); ++it)
+    for (const auto &entry : j) // array iteration preserves order
     {
-        m_blueprints[it.key()] = parseBlueprint(it.key(), it.value());
-        m_orderedIds.push_back(it.key());
+        const std::string id{entry.at("id").get<std::string>()};
+        m_blueprints[id] = parseBlueprint(id, entry);
+        m_orderedIds.push_back(id);
     }
 }
 
