@@ -27,7 +27,11 @@ class CharacterRegistry
 
     [[nodiscard]] const std::vector<std::string> &getIds() const;
     [[nodiscard]] bool contains(std::string_view characterId) const;
-
+    /**
+     * @brief Returns the archetype string for characterId, or empty string if not found.
+     *        Useful for UI display without creating a PlayableCharacter instance.
+     */
+    [[nodiscard]] std::string getArchetype(std::string_view characterId) const;
   private:
     struct CharacterBlueprint
     {
@@ -40,6 +44,7 @@ class CharacterRegistry
         int spd{};
         int resonanceContribution{};
         std::string passiveTrait{};
+        std::string archetype{};
         std::string basicId{};
         std::string archSkillId{};
         std::string ultimateId{};

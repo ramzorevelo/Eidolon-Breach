@@ -96,6 +96,7 @@
     <ClInclude Include="src\Characters\AbilityRegistry.h" />
     <ClInclude Include="src\Characters\CharacterRegistry.h" />
     <ClInclude Include="src\Characters\Lyra.h" />
+    <ClInclude Include="src\Characters\Vex.h" />
     <ClInclude Include="src\Core\AchievementSystem.h" />
     <ClInclude Include="src\Core\ActionData.h" />
     <ClInclude Include="src\Core\ActionResult.h" />

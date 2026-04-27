@@ -29,23 +29,22 @@ BattleState makeState()
 }
 } // namespace
 
-// ── resolveStanceId ─────────────────────────────────────────────────────────
 
 TEST_CASE("resolveStanceId: Lyra Aggressive → Predator")
 {
-    CHECK(StanceModifiers::resolveStanceId(LyraIds::kStriker,
+    CHECK(StanceModifiers::resolveStanceId(LyraIds::kId,
                                            BehaviorSignal::Aggressive) == LyraStances::kPredator);
 }
 
 TEST_CASE("resolveStanceId: Lyra Methodical → Conflagration")
 {
-    CHECK(StanceModifiers::resolveStanceId(LyraIds::kStriker,
+    CHECK(StanceModifiers::resolveStanceId(LyraIds::kId,
                                            BehaviorSignal::Methodical) == LyraStances::kConflagration);
 }
 
 TEST_CASE("resolveStanceId: Lyra Sacrificial → Ember")
 {
-    CHECK(StanceModifiers::resolveStanceId(LyraIds::kStriker,
+    CHECK(StanceModifiers::resolveStanceId(LyraIds::kId,
                                            BehaviorSignal::Sacrificial) == LyraStances::kEmber);
 }
 
@@ -56,7 +55,6 @@ TEST_CASE("resolveStanceId: unrecognised character returns empty string_view")
               .empty());
 }
 
-// ── applyResonanceModifier ─────────────────────────────────────────────────
 
 TEST_CASE("applyResonanceModifier: empty stanceId returns baseAmount unchanged")
 {

@@ -84,8 +84,10 @@ static void selectParty(Party &party,
                             : 1};
         const Stats &s{pc->getBaseStats()};
 
-        std::cout << "  [" << (i + 1) << "] " << pc->getName()
-                  << "  (Lv." << level << ")"
+        std::cout << "  [" << (i + 1) << "] "
+                  << pc->getName()
+                  << " [" << characterRegistry.getArchetype(available[i]) << "]"
+                  << "  Lv." << level
                   << "  HP:" << s.maxHp
                   << " ATK:" << s.atk
                   << " DEF:" << s.def

@@ -18,5 +18,5 @@ constexpr std::string_view kEmber = "lyra_ember";
 
 namespace LyraIds
 {
-constexpr std::string_view kStriker = "striker_1"; ///< Must match PlayableCharacter id in main.cpp.
+constexpr std::string_view kId = "lyra"; ///< Must match PlayableCharacter id in data/characters.json.
 } // namespace LyraIds

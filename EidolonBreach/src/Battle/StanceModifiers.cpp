@@ -7,6 +7,7 @@
 #include "Battle/StanceModifiers.h"
 #include "Battle/BattleState.h"
 #include "Characters/Lyra.h"
+#include "Characters/Vex.h"
 #include "Core/Affinity.h"
 #include "Entities/PlayableCharacter.h"
 #include <algorithm>
@@ -17,7 +18,7 @@ namespace StanceModifiers
 std::string_view resolveStanceId(std::string_view characterId,
                                  BehaviorSignal dominantSignal)
 {
-    if (characterId == LyraIds::kStriker)
+    if (characterId == LyraIds::kId)
     {
         if (dominantSignal == BehaviorSignal::Aggressive)
             return LyraStances::kPredator;
@@ -27,6 +28,16 @@ std::string_view resolveStanceId(std::string_view characterId,
             return LyraStances::kEmber;
         // Supportive and Reactive resolve to Predator as a fallback for Lyra.
         return LyraStances::kPredator;
+    }
+    if (characterId == VexIds::kId)
+    {
+        if (dominantSignal == BehaviorSignal::Methodical)
+            return VexStances::kBastion;
+        if (dominantSignal == BehaviorSignal::Supportive)
+            return VexStances::kResonance;
+        if (dominantSignal == BehaviorSignal::Sacrificial)
+            return VexStances::kFracture;
+        return VexStances::kBastion; // Aggressive / Reactive fallback
     }
     return {}; // Unrecognised character — no stance.
 }
@@ -72,6 +83,33 @@ int applyResonanceModifier(std::string_view stanceId,
         return std::max(0, baseAmount + kEmberBonus);
     }
 
+    // --- Vex: Bastion ---
+    // Terra actions contribute +2 extra — steady defensive energy.
+    if (stanceId == VexStances::kBastion)
+    {
+        constexpr int kTerraBonus{2};
+        if (actionAffinity == Affinity::Terra)
+            return baseAmount + kTerraBonus;
+        return baseAmount;
+    }
+
+    // --- Vex: Resonance ---
+    // SP-surplus play generates +3 extra on Terra actions.
+    if (stanceId == VexStances::kResonance)
+    {
+        constexpr int kTerraBonus{3};
+        if (actionAffinity == Affinity::Terra)
+            return baseAmount + kTerraBonus;
+        return baseAmount;
+    }
+
+    // --- Vex: Fracture ---
+    // High-Exposure commitment releases raw energy — any affinity gains +4.
+    if (stanceId == VexStances::kFracture)
+    {
+        constexpr int kFractureBonus{4};
+        return std::max(0, baseAmount + kFractureBonus);
+    }
     return baseAmount;
 }
 

@@ -20,9 +20,11 @@ struct EnemyBlueprint
 {
     std::string id{};
     std::string name{};
-    std::string enemyType{}; ///< "slime" | "stone_golem" | "vampire_bat"
+    std::string enemyType{};
     int maxHp{};
     int maxToughness{};
+    std::string faction{};
+    std::string category{};
 };
 
 class EnemyRegistry
@@ -45,4 +47,5 @@ class EnemyRegistry
     static EnemyBlueprint parseBlueprint(const std::string &id,
                                          const nlohmann::json &j);
     static std::unique_ptr<Enemy> instantiate(const EnemyBlueprint &bp);
+    
 };
