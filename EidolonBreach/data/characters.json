@@ -32,5 +32,22 @@
       "archSkill": "arch_skill_default",
       "ultimate": "ultimate_default"
     }
+  },
+  {
+    "id": "zara",
+    "name": "Zara",
+    "affinity": "Frost",
+    "archetype": "Weaver",
+    "maxHp": 90,
+    "atk": 14,
+    "def": 8,
+    "spd": 12,
+    "resonanceContribution": 12,
+    "passiveTrait": "Applying Slow to an enemy already affected by Slow deals 10 true damage.",
+    "abilities": {
+      "basic": "basic_strike",
+      "archSkill": "arch_skill_default",
+      "ultimate": "ultimate_default"
+    }
   }
 ]

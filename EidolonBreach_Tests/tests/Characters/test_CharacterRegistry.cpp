@@ -85,9 +85,10 @@ TEST_CASE("CharacterRegistry: getIds returns all registered ids in order")
     CharacterRegistry chars{};
     chars.loadFromJson("data/characters.json", abilities);
     const auto &ids{chars.getIds()};
-    REQUIRE(ids.size() == 2);
+    REQUIRE(ids.size() == 3);
     CHECK(ids[0] == "lyra");
     CHECK(ids[1] == "vex");
+    CHECK(ids[2] == "zara");
 }
 TEST_CASE("CharacterRegistry: getArchetype returns correct archetype string")
 {
@@ -98,4 +99,19 @@ TEST_CASE("CharacterRegistry: getArchetype returns correct archetype string")
     CHECK(chars.getArchetype("lyra") == "Striker");
     CHECK(chars.getArchetype("vex") == "Conduit");
     CHECK(chars.getArchetype("nobody") == "");
+}
+
+TEST_CASE("CharacterRegistry: create Zara has correct stats and archetype")
+{
+    AbilityRegistry abilities{makeAbilityRegistry()};
+    CharacterRegistry chars{};
+    chars.loadFromJson("data/characters.json", abilities);
+
+    auto pc{chars.create("zara")};
+    REQUIRE(pc != nullptr);
+    CHECK(pc->getName() == "Zara");
+    CHECK(pc->getBaseStats().maxHp == 90);
+    CHECK(pc->getBaseStats().spd == 12);
+    CHECK(pc->getBaseStats().atk == 14);
+    CHECK(chars.getArchetype("zara") == "Weaver");
 }

@@ -6,6 +6,8 @@
 #include "Battle/ResonanceField.h"
 #include "Battle/StanceModifiers.h"
 #include "Characters/Lyra.h"
+#include "Characters/Zara.h"
+#include "Characters/Vex.h"
 #include "Core/BehaviorSignal.h"
 #include "Core/EventBus.h"
 #include "Core/RunContext.h"
@@ -108,4 +110,35 @@ TEST_CASE("applyResonanceModifier: unrecognised stanceId returns baseAmount")
     int result{StanceModifiers::applyResonanceModifier(
         "invalid_stance", *hero, Affinity::Blaze, 10, state)};
     CHECK(result == 10);
+}
+// ── Zara stances ─────────────────────────────────────────────────────────
+
+TEST_CASE("resolveStanceId: Zara Methodical → Glacial")
+{
+    CHECK(StanceModifiers::resolveStanceId(ZaraIds::kId,
+                                           BehaviorSignal::Methodical) == ZaraStances::kGlacial);
+}
+
+TEST_CASE("resolveStanceId: Zara Aggressive → Shatter")
+{
+    CHECK(StanceModifiers::resolveStanceId(ZaraIds::kId,
+                                           BehaviorSignal::Aggressive) == ZaraStances::kShatter);
+}
+
+TEST_CASE("applyResonanceModifier: Glacial adds +3 to Frost actions")
+{
+    auto hero = makeHero();
+    BattleState state{makeState()};
+    int result{StanceModifiers::applyResonanceModifier(
+        ZaraStances::kGlacial, *hero, Affinity::Frost, 10, state)};
+    CHECK(result == 13);
+}
+
+TEST_CASE("applyResonanceModifier: Convergence adds +2 to any affinity")
+{
+    auto hero = makeHero();
+    BattleState state{makeState()};
+    int result{StanceModifiers::applyResonanceModifier(
+        ZaraStances::kConvergence, *hero, Affinity::Terra, 10, state)};
+    CHECK(result == 12);
 }
