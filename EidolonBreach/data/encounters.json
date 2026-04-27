@@ -11,6 +11,18 @@
     {
       "id": "mixed_1",
       "enemies": [ "slime_alpha", "vampire_bat" ]
+    },
+    {
+      "id": "frost_pair",
+      "enemies": [ "frost_wisp", "frost_wisp" ]
+    },
+    {
+      "id": "construct_patrol",
+      "enemies": [ "iron_sentinel" ]
+    },
+    {
+      "id": "mixed_2",
+      "enemies": [ "frost_wisp", "slime_beta" ]
     }
   ],
   "elite": [
@@ -21,6 +33,14 @@
     {
       "id": "bat_elite",
       "enemies": [ "vampire_bat" ]
+    },
+    {
+      "id": "construct_elite",
+      "enemies": [ "iron_sentinel", "stone_golem" ]
+    },
+    {
+      "id": "hollow_swarm",
+      "enemies": [ "vampire_bat", "shard_wraith" ]
     }
   ],
   "boss": [

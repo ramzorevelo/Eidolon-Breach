@@ -46,5 +46,21 @@
     "category": "Beast",
     "maxHp": 120,
     "maxToughness": 50
+  },
+  "frost_wisp": {
+    "name": "Frost Wisp",
+    "enemyType": "generic",
+    "faction": "Primordial",
+    "category": "Spirit",
+    "maxHp": 65,
+    "maxToughness": 28
+  },
+  "iron_sentinel": {
+    "name": "Iron Sentinel",
+    "enemyType": "generic",
+    "faction": "Construct",
+    "category": "Construct",
+    "maxHp": 110,
+    "maxToughness": 55
   }
 }
