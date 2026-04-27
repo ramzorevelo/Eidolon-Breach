@@ -58,9 +58,9 @@ TEST_CASE("CharacterRegistry: create returns PlayableCharacter with correct stat
     CharacterRegistry chars{};
     chars.loadFromJson("data/characters.json", abilities);
 
-    auto pc{chars.create("striker_1")};
+    auto pc{chars.create("lyra")};
     REQUIRE(pc != nullptr);
-    CHECK(pc->getName() == "Striker");
+    CHECK(pc->getName() == "Lyra");
     CHECK(pc->getBaseStats().maxHp == 80);
     CHECK(pc->getBaseStats().atk == 22);
     CHECK(pc->getBaseStats().spd == 14);
@@ -73,7 +73,7 @@ TEST_CASE("CharacterRegistry: created character has all three abilities register
     CharacterRegistry chars{};
     chars.loadFromJson("data/characters.json", abilities);
 
-    auto pc{chars.create("conduit_1")};
+    auto pc{chars.create("vex")};
     REQUIRE(pc != nullptr);
     // basic + archSkill + ultimate = 3
     CHECK(pc->getAbilities().size() == 3);
@@ -86,6 +86,16 @@ TEST_CASE("CharacterRegistry: getIds returns all registered ids in order")
     chars.loadFromJson("data/characters.json", abilities);
     const auto &ids{chars.getIds()};
     REQUIRE(ids.size() == 2);
-    CHECK(ids[0] == "striker_1");
-    CHECK(ids[1] == "conduit_1");
+    CHECK(ids[0] == "lyra");
+    CHECK(ids[1] == "vex");
+}
+TEST_CASE("CharacterRegistry: getArchetype returns correct archetype string")
+{
+    AbilityRegistry abilities{makeAbilityRegistry()};
+    CharacterRegistry chars{};
+    chars.loadFromJson("data/characters.json", abilities);
+
+    CHECK(chars.getArchetype("lyra") == "Striker");
+    CHECK(chars.getArchetype("vex") == "Conduit");
+    CHECK(chars.getArchetype("nobody") == "");
 }

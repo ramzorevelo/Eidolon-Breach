@@ -1,14 +1,15 @@
 [
   {
-    "id": "striker_1",
-    "name": "Striker",
+    "id": "lyra",
+    "name": "Lyra",
     "affinity": "Blaze",
+    "archetype": "Striker",
     "maxHp": 80,
     "atk": 22,
     "def": 5,
     "spd": 14,
     "resonanceContribution": 10,
-    "passiveTrait": "",
+    "passiveTrait": "Blaze actions on a Broken enemy restore 8 Energy.",
     "abilities": {
       "basic": "basic_strike",
       "archSkill": "arch_skill_default",
@@ -16,15 +17,16 @@
     }
   },
   {
-    "id": "conduit_1",
-    "name": "Conduit",
+    "id": "vex",
+    "name": "Vex",
     "affinity": "Terra",
+    "archetype": "Conduit",
     "maxHp": 110,
     "atk": 10,
     "def": 15,
     "spd": 9,
     "resonanceContribution": 8,
-    "passiveTrait": "",
+    "passiveTrait": "Each time an ally is shielded, Vex gains 5 Energy.",
     "abilities": {
       "basic": "basic_strike",
       "archSkill": "arch_skill_default",

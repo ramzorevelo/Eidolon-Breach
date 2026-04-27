@@ -46,6 +46,8 @@ EnemyBlueprint EnemyRegistry::parseBlueprint(const std::string &id,
     bp.enemyType = j.at("enemyType").get<std::string>();
     bp.maxHp = j.at("maxHp").get<int>();
     bp.maxToughness = j.at("maxToughness").get<int>();
+    bp.faction = j.value("faction", "");
+    bp.category = j.value("category", "");
     return bp;
 }
 

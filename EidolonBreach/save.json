@@ -13,18 +13,28 @@
     },
     "characterXP": {
         "conduit_1": 150,
-        "striker_1": 110
+        "lyra": 30,
+        "striker_1": 110,
+        "vex": 50
     },
     "currency": 0,
     "draftModeUnlocked": false,
     "highestFloorReached": 9,
     "masteryEventLog": {
+        "lyra": [
+            "lyra_predator"
+        ],
         "striker_1": [
             "lyra_predator"
+        ],
+        "vex": [
+            "vex_bastion"
         ]
     },
     "unlockedCharacterIds": [
         "conduit_1",
-        "striker_1"
+        "lyra",
+        "striker_1",
+        "vex"
     ]
 }

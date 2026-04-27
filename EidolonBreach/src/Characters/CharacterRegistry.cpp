@@ -60,6 +60,12 @@ bool CharacterRegistry::contains(std::string_view characterId) const
     return m_blueprints.count(std::string{characterId}) > 0;
 }
 
+std::string CharacterRegistry::getArchetype(std::string_view characterId) const
+{
+    auto it{m_blueprints.find(std::string{characterId})};
+    return (it != m_blueprints.end()) ? it->second.archetype : "";
+}
+
 CharacterRegistry::CharacterBlueprint
 CharacterRegistry::parseBlueprint(const std::string &id, const nlohmann::json &j)
 {
@@ -73,6 +79,7 @@ CharacterRegistry::parseBlueprint(const std::string &id, const nlohmann::json &j
     bp.spd = j.at("spd").get<int>();
     bp.resonanceContribution = j.value("resonanceContribution", 10);
     bp.passiveTrait = j.value("passiveTrait", "");
+    bp.archetype = j.value("archetype", "");
 
     const auto &abilities = j.at("abilities");
     bp.basicId = abilities.value("basic", "basic_strike");
