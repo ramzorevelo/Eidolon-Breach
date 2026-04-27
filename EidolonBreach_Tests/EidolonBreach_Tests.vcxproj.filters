@@ -294,6 +294,12 @@
     <ClCompile Include="..\EidolonBreach\src\Dungeon\EncounterTable.cpp">
       <Filter>Dungeon</Filter>
     </ClCompile>
+    <ClCompile Include="tests\Core\test_MetaProgress.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Core\MetaProgress.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="external\doctest.h">
