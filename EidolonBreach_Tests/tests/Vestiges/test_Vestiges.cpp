@@ -14,6 +14,9 @@
 #include "Vestiges/FlameResonanceVestige.h"
 #include "Vestiges/ToughnessBreakerVestige.h"
 #include "Vestiges/VestigeOfTheUnbound.h"
+#include "Vestiges/ResonantSurgeVestige.h"
+#include "Vestiges/SwiftStrikeVestige.h"
+#include "Vestiges/VoidHungerVestige.h"
 #include "UI/test_NullInputHandler.h"
 #include "UI/test_NullRenderer.h"
 #include "doctest.h"
@@ -406,4 +409,118 @@ TEST_CASE("Party::addVestige: returns false and does not add when at cap")
     bool ok{party.addVestige(std::make_unique<VestigeOfTheUnbound>())};
     CHECK(!ok);
     CHECK(party.getVestiges().size() == static_cast<std::size_t>(Party::kMaxVestiges));
+}
+
+// ── SwiftStrikeVestige ───────────────────────────────────────────────────────
+
+TEST_CASE("SwiftStrikeVestige: grants +5 Energy when HP is full")
+{
+    SwiftStrikeVestige vestige{};
+    auto hero = makeHero(); // 120/120 HP
+    BattleState state{makeState()};
+
+    REQUIRE(hero->getHp() == hero->getMaxHp());
+    const int energyBefore{hero->getEnergy()};
+    vestige.onTurnStart(*hero, state);
+    CHECK(hero->getEnergy() == energyBefore + 5);
+}
+
+TEST_CASE("SwiftStrikeVestige: no Energy gain when HP is below max")
+{
+    SwiftStrikeVestige vestige{};
+    auto hero = makeHero();
+    hero->takeTrueDamage(1); // HP now 119/120
+    BattleState state{makeState()};
+
+    const int energyBefore{hero->getEnergy()};
+    vestige.onTurnStart(*hero, state);
+    CHECK(hero->getEnergy() == energyBefore);
+}
+
+// ── ResonantSurgeVestige ─────────────────────────────────────────────────────
+
+TEST_CASE("ResonantSurgeVestige: grants +20 SP after Resonance Field trigger")
+{
+    ResonantSurgeVestige vestige{};
+    Party playerParty;
+    playerParty.gainSp(30);
+    BattleState state{makeState(&playerParty, nullptr)};
+
+    vestige.onBattleStart(*reinterpret_cast<Battle *>(nullptr), state);
+    state.eventBus.emit(ResonanceFieldTriggeredEvent{Affinity::Blaze, &state});
+
+    CHECK(playerParty.getSp() == 50); // 30 + 20
+}
+
+TEST_CASE("ResonantSurgeVestige: no SP gain before trigger fires")
+{
+    ResonantSurgeVestige vestige{};
+    Party playerParty;
+    playerParty.gainSp(30);
+    BattleState state{makeState(&playerParty, nullptr)};
+
+    vestige.onBattleStart(*reinterpret_cast<Battle *>(nullptr), state);
+    // No emit — SP unchanged.
+    CHECK(playerParty.getSp() == 30);
+}
+
+// ── VoidHungerVestige ────────────────────────────────────────────────────────
+
+TEST_CASE("VoidHungerVestige: adds kExposurePerTurn Exposure on turn start")
+{
+    VoidHungerVestige vestige{};
+    auto hero = makeHero();
+    BattleState state{makeState()};
+
+    REQUIRE(hero->getExposure() == 0);
+    vestige.onTurnStart(*hero, state);
+    CHECK(hero->getExposure() == 8);
+}
+
+TEST_CASE("VoidHungerVestige: heals all allies for 5% of damage dealt")
+{
+    VoidHungerVestige vestige{};
+    auto h1 = makeHero("h1"); // 120 HP
+    auto h2 = makeHero("h2"); // 120 HP
+    h1->takeTrueDamage(40);   // 80 HP
+    h2->takeTrueDamage(20);   // 100 HP
+
+    Party playerParty;
+    auto *p1{h1.get()};
+    auto *p2{h2.get()};
+    playerParty.addUnit(std::move(h1));
+    playerParty.addUnit(std::move(h2));
+
+    BattleState state{makeState(&playerParty, nullptr)};
+
+    auto hero = makeHero("actor");
+    ActionResult result{};
+    result.type = ActionResult::Type::Damage;
+    result.value = 40; // 5% of 40 = 2 HP heal per ally
+
+    vestige.onAction(*hero, result, state);
+
+    CHECK(p1->getHp() == 82);  // 80 + 2
+    CHECK(p2->getHp() == 102); // 100 + 2
+}
+
+TEST_CASE("VoidHungerVestige: no heal on non-damage actions")
+{
+    VoidHungerVestige vestige{};
+    auto h1 = makeHero("h1");
+    h1->takeTrueDamage(20); // 100 HP
+
+    Party playerParty;
+    auto *p1{h1.get()};
+    playerParty.addUnit(std::move(h1));
+
+    BattleState state{makeState(&playerParty, nullptr)};
+    auto hero = makeHero("actor");
+
+    ActionResult result{};
+    result.type = ActionResult::Type::Skip;
+    result.value = 0;
+
+    vestige.onAction(*hero, result, state);
+    CHECK(p1->getHp() == 100); // unchanged
 }

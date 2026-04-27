@@ -70,9 +70,12 @@
     <ClCompile Include="src\Vestiges\AttunistGambitVestige.cpp" />
     <ClCompile Include="src\Vestiges\EchoingStrikeVestige.cpp" />
     <ClCompile Include="src\Vestiges\FlameResonanceVestige.cpp" />
+    <ClCompile Include="src\Vestiges\ResonantSurgevestige.cpp" />
+    <ClCompile Include="src\Vestiges\SwiftStrikeVestige.cpp" />
     <ClCompile Include="src\Vestiges\ToughnessBreakerVestige.cpp" />
     <ClCompile Include="src\Vestiges\VestigeFactory.cpp" />
     <ClCompile Include="src\Vestiges\VestigeOfTheUnbound.cpp" />
+    <ClCompile Include="src\Vestiges\VoidHungerVestige.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="nlohmann\json.hpp" />
@@ -158,9 +161,12 @@
     <ClInclude Include="src\Vestiges\EchoingStrikeVestige.h" />
     <ClInclude Include="src\Vestiges\FlameResonanceVestige.h" />
     <ClInclude Include="src\Vestiges\IVestige.h" />
+    <ClInclude Include="src\Vestiges\ResonantSurgeVestige.h" />
+    <ClInclude Include="src\Vestiges\SwiftStrikeVestige.h" />
     <ClInclude Include="src\Vestiges\ToughnessBreakerVestige.h" />
     <ClInclude Include="src\Vestiges\VestigeFactory.h" />
     <ClInclude Include="src\Vestiges\VestigeOfTheUnbound.h" />
+    <ClInclude Include="src\Vestiges\VoidHungerVestige.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="data\characters.json" />

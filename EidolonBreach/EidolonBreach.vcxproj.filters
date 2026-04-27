@@ -216,6 +216,15 @@
     <ClCompile Include="src\Characters\CharacterRegistry.cpp">
       <Filter>Characters</Filter>
     </ClCompile>
+    <ClCompile Include="src\Vestiges\ResonantSurgevestige.cpp">
+      <Filter>Vestiges</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Vestiges\SwiftStrikeVestige.cpp">
+      <Filter>Vestiges</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Vestiges\VoidHungerVestige.cpp">
+      <Filter>Vestiges</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Actions\BasicStrikeAction.h">
@@ -475,6 +484,15 @@
     </ClInclude>
     <ClInclude Include="src\Characters\Zara.h">
       <Filter>Characters</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Vestiges\ResonantSurgeVestige.h">
+      <Filter>Vestiges</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Vestiges\SwiftStrikeVestige.h">
+      <Filter>Vestiges</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Vestiges\VoidHungerVestige.h">
+      <Filter>Vestiges</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

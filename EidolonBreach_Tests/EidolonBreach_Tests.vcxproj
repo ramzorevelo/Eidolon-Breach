@@ -60,9 +60,12 @@
     <ClCompile Include="..\EidolonBreach\src\Vestiges\AttunistGambitVestige.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Vestiges\EchoingStrikeVestige.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Vestiges\FlameResonanceVestige.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Vestiges\ResonantSurgevestige.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Vestiges\SwiftStrikeVestige.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Vestiges\ToughnessBreakerVestige.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Vestiges\VestigeFactory.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Vestiges\VestigeOfTheUnbound.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Vestiges\VoidHungerVestige.cpp" />
     <ClCompile Include="tests\Actions\testActionCategory.cpp" />
     <ClCompile Include="tests\Actions\test_BasicStrikeAction.cpp" />
     <ClCompile Include="tests\Actions\test_SkillAction.cpp" />

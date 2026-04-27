@@ -5,7 +5,17 @@
             "chosenAspects": [],
             "echoCount": 1
         },
+        "lyra": {
+            "bondTrialComplete": false,
+            "chosenAspects": [],
+            "echoCount": 1
+        },
         "striker_1": {
+            "bondTrialComplete": false,
+            "chosenAspects": [],
+            "echoCount": 1
+        },
+        "vex": {
             "bondTrialComplete": false,
             "chosenAspects": [],
             "echoCount": 1
@@ -13,9 +23,10 @@
     },
     "characterXP": {
         "conduit_1": 150,
-        "lyra": 30,
+        "lyra": 70,
         "striker_1": 110,
-        "vex": 50
+        "vex": 120,
+        "zara": 90
     },
     "currency": 0,
     "draftModeUnlocked": false,
@@ -29,12 +40,16 @@
         ],
         "vex": [
             "vex_bastion"
+        ],
+        "zara": [
+            "zara_shatter"
         ]
     },
     "unlockedCharacterIds": [
         "conduit_1",
         "lyra",
         "striker_1",
-        "vex"
+        "vex",
+        "zara"
     ]
 }
