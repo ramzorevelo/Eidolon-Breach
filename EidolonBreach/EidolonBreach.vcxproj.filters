@@ -473,6 +473,9 @@
     <ClInclude Include="src\Characters\Vex.h">
       <Filter>Characters</Filter>
     </ClInclude>
+    <ClInclude Include="src\Characters\Zara.h">
+      <Filter>Characters</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="data\items.json">

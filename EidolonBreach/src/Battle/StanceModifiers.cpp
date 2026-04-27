@@ -8,6 +8,7 @@
 #include "Battle/BattleState.h"
 #include "Characters/Lyra.h"
 #include "Characters/Vex.h"
+#include "Characters/Zara.h"
 #include "Core/Affinity.h"
 #include "Entities/PlayableCharacter.h"
 #include <algorithm>
@@ -39,6 +40,16 @@ std::string_view resolveStanceId(std::string_view characterId,
             return VexStances::kFracture;
         return VexStances::kBastion; // Aggressive / Reactive fallback
     }
+    if (characterId == ZaraIds::kId)
+{
+    if (dominantSignal == BehaviorSignal::Methodical)
+        return ZaraStances::kGlacial;
+    if (dominantSignal == BehaviorSignal::Aggressive)
+        return ZaraStances::kShatter;
+    if (dominantSignal == BehaviorSignal::Supportive)
+        return ZaraStances::kConvergence;
+    return ZaraStances::kGlacial; // Sacrificial / Reactive fallback
+}
     return {}; // Unrecognised character — no stance.
 }
 
@@ -110,6 +121,35 @@ int applyResonanceModifier(std::string_view stanceId,
         constexpr int kFractureBonus{4};
         return std::max(0, baseAmount + kFractureBonus);
     }
+
+    // --- Zara: Glacial ---
+    // Frost control chains deepen the field — +3 to Frost contributions.
+    if (stanceId == ZaraStances::kGlacial)
+    {
+        constexpr int kFrostBonus{3};
+        if (actionAffinity == Affinity::Frost)
+            return baseAmount + kFrostBonus;
+        return baseAmount;
+    }
+
+    // --- Zara: Shatter ---
+    // Break-hunting sharpens the edge — +2 to Frost, oriented toward toughness lanes.
+    if (stanceId == ZaraStances::kShatter)
+    {
+        constexpr int kFrostBonus{2};
+        if (actionAffinity == Affinity::Frost)
+            return baseAmount + kFrostBonus;
+        return baseAmount;
+    }
+
+    // --- Zara: Convergence ---
+    // SP surplus channels into the field — +2 to all affinities.
+    if (stanceId == ZaraStances::kConvergence)
+    {
+        constexpr int kConvergeBonus{2};
+        return std::max(0, baseAmount + kConvergeBonus);
+    }
+
     return baseAmount;
 }
 
