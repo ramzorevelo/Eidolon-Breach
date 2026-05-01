@@ -57,18 +57,26 @@ Dungeon::~Dungeon() = default;
 void Dungeon::generate(std::uint32_t seed,
                        int numLayers,
                        DungeonDifficulty difficulty,
-                       SummonRegistry *summonRegistry)
+                       SummonRegistry *summonRegistry,
+                       RunMode runMode)
 {
     m_summonRegistry = summonRegistry;
     m_difficulty = difficulty;
     m_runContext.reset();
+    m_runContext.runMode = runMode;
+
+    // Draft mode uses a separate seed pool so it never reproduces a Classic layout.
+    constexpr std::uint32_t kDraftSeedOffset{0xDEADBEEFu};
+    const std::uint32_t effectiveSeed{
+        runMode == RunMode::Draft ? seed ^ kDraftSeedOffset : seed};
+
     m_achievements = std::make_unique<AchievementSystem>(m_eventBus);
     m_layers.clear();
     m_enemyRegistry.loadFromJson("data/enemies.json");
     m_itemRegistry.loadFromJson("data/items.json");
     m_encounterTable.loadFromJson("data/encounters.json", m_enemyRegistry);
-    assignFloorAffinities(seed, numLayers);
-    buildGraph(seed, numLayers, difficulty);
+    assignFloorAffinities(effectiveSeed, numLayers);
+    buildGraph(effectiveSeed, numLayers, difficulty);
 }
 
 void Dungeon::assignFloorAffinities(std::uint32_t seed, int numLayers)

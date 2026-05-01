@@ -4,6 +4,7 @@
  */
 
 #include "Dungeon/BattleNode.h"
+#include "Core/RunContext.h"
 #include "Battle/Battle.h"
 #include "Core/Affinity.h"
 #include "Core/CombatConstants.h"
@@ -56,7 +57,7 @@ void BattleNode::runBattle(Party &party,
                   runCtx, eventBus, nullptr, m_summonRegistry};
     battle.run();
 
-    if (enemyParty.isAllDead())
+    if (enemyParty.isAllDead() && runCtx.runMode == RunMode::Classic)
     {
         for (std::size_t i{0}; i < party.size(); ++i)
         {
@@ -66,7 +67,6 @@ void BattleNode::runBattle(Party &party,
 
             const int newLevel{meta.gainXP(u->getId(), m_xpReward)};
 
-            // Apply slot unlocks if the character just crossed a threshold.
             auto *pc{dynamic_cast<PlayableCharacter *>(u)};
             if (!pc)
                 continue;

@@ -21,4 +21,6 @@ class RestNode : public MapNode
 
     /** @brief Reduce all party members' Exposure by kPurgeExposureReduction. */
     void applyPurge(Party &party) const;
+    /** @brief Draft Mode only: allow re-equip of slot skills for each party member. */
+    void applyAttune(Party &party) const;
 };

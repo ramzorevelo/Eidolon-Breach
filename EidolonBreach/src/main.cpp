@@ -4,6 +4,7 @@
  */
 
 #include "Actions/BasicStrikeAction.h"
+#include "Core/RunContext.h"
 #include "Actions/SkillAction.h"
 #include "Actions/UltimateAction.h"
 #include "Characters/AbilityRegistry.h"
@@ -161,8 +162,17 @@ int main()
     const std::uint32_t seed{static_cast<std::uint32_t>(std::random_device{}())};
     std::cout << "Run seed: " << seed << '\n';
 
+    std::cout << "Mode: [1] Classic  [2] Draft\nChoice: ";
+    int modeChoice{1};
+    std::cin >> modeChoice;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    const RunMode runMode{modeChoice == 2 ? RunMode::Draft : RunMode::Classic};
+
     Dungeon dungeon{};
-    dungeon.generate(seed, 9, DungeonDifficulty::Normal, &summonRegistry);
+    dungeon.generate(seed, 9, DungeonDifficulty::Normal, &summonRegistry, runMode);
+
+    if (runMode == RunMode::Draft)
+        std::cout << "Draft Mode: no XP earned. Attune available at Rest sites.\n";
 
     const bool won{dungeon.run(playerParty, meta)};
     std::cout << (won ? "\n=== RUN COMPLETE ===\n" : "\n=== DEFEATED ===\n");

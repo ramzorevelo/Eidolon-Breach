@@ -81,3 +81,24 @@ TEST_CASE("RunContext: getAffinityVoteTotal returns 0 for affinity with no votes
     RunContext ctx{};
     CHECK(ctx.getAffinityVoteTotal(Affinity::Terra) == doctest::Approx(0.0f));
 }
+
+TEST_CASE("RunContext: runMode defaults to Classic")
+{
+    RunContext ctx{};
+    CHECK(ctx.runMode == RunMode::Classic);
+}
+
+TEST_CASE("RunContext: runMode can be set to Draft")
+{
+    RunContext ctx{};
+    ctx.runMode = RunMode::Draft;
+    CHECK(ctx.runMode == RunMode::Draft);
+}
+
+TEST_CASE("RunContext: reset preserves runMode (mode set by Dungeon, not per-battle)")
+{
+    RunContext ctx{};
+    ctx.runMode = RunMode::Draft;
+    ctx.reset(); // resets signal counts and vote totals, not mode
+    CHECK(ctx.runMode == RunMode::Draft);
+}
