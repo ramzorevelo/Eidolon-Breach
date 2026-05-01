@@ -52,7 +52,8 @@ class Dungeon
      */
     void generate(std::uint32_t seed, int numLayers,
                   DungeonDifficulty difficulty = DungeonDifficulty::Normal,
-                  SummonRegistry *summonRegistry = nullptr);
+                  SummonRegistry *summonRegistry = nullptr,
+                  RunMode runMode = RunMode::Classic);
 
     /**
      * @brief Run the dungeon. Returns true if the player clears the boss.

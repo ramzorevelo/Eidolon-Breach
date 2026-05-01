@@ -13,6 +13,19 @@
 #include <string>
 #include <string_view>
 
+
+/**
+ * @brief Game mode for the current run.
+ *        Classic: earns character XP, pre-run loadout.
+ *        Draft: no XP, Attune at Rest, separate RNG seed pool.
+ */
+enum class RunMode
+{
+    Classic,
+    Draft,
+};
+
+
 /** Per-character run state used to track Stance crystallization progress. */
 struct RunCharacterState
 {
@@ -45,6 +58,9 @@ class RunContext
 
     /** @brief Clear all state. Call at run start and between runs. */
     void reset();
+
+    /** @brief Run mode for this run. Set by Dungeon::generate before any battles start. */
+    RunMode runMode{RunMode::Classic};
 
   private:
     std::map<std::string, RunCharacterState, std::less<>> m_states{};
