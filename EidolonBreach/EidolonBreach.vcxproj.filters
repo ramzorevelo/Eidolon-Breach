@@ -500,6 +500,9 @@
     <ClInclude Include="src\Dungeon\ShopNode.h">
       <Filter>Dungeon</Filter>
     </ClInclude>
+    <ClInclude Include="src\Core\FieldDiscovery.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="data\items.json">

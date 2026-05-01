@@ -2,7 +2,8 @@
  * @file Battle.cpp
  * @brief Battle orchestration implementation.
  */
-
+#include <set>
+#include "Core/FieldDiscovery.h"
 #include "Battle/Battle.h"
 #include "Battle/SpeedBasedTurnOrderCalculator.h"
 #include "Core/BattleEvents.h"
@@ -262,31 +263,58 @@ void Battle::applyResonanceContribution(Unit &unit,
 void Battle::applyResonanceTrigger(Affinity affinity, BattleState &state)
 {
     state.eventBus.emit(ResonanceFieldTriggeredEvent{affinity, &state});
+    const std::set<std::string> &discoveries{state.runContext.activeDiscoveries};
 
     switch (affinity)
     {
     case Affinity::Blaze:
         for (Unit *u : m_enemyParty.getAliveUnits())
             u->applyEffect(std::make_unique<BurnEffect>(10, 2));
+        // Molten Lattice: also shield all allies.
+        if (discoveries.count(std::string{FieldDiscoveryIds::kMoltenLattice}))
+        {
+            for (Unit *u : m_playerParty.getAliveUnits())
+                u->applyEffect(std::make_unique<ShieldEffect>(15, 1));
+            m_renderer.renderMessage(">> Molten Lattice: allies shielded! <<");
+        }
         break;
+
     case Affinity::Frost:
+    {
+        // Arctic Surge: apply Slow for 3 turns instead of 2.
+        const int slowDuration{
+            discoveries.count(std::string{FieldDiscoveryIds::kArcticSurge}) ? 3 : 2};
         for (Unit *u : m_enemyParty.getAliveUnits())
-            u->applyEffect(std::make_unique<SlowEffect>(0.30f, 2));
+            u->applyEffect(std::make_unique<SlowEffect>(0.30f, slowDuration));
+        if (slowDuration == 3)
+            m_renderer.renderMessage(">> Arctic Surge: extended Slow! <<");
         break;
+    }
+
     case Affinity::Tempest:
         for (Unit *u : m_playerParty.getAliveUnits())
             if (auto *pc = dynamic_cast<PlayableCharacter *>(u))
                 pc->gainEnergy(20);
         break;
+
     case Affinity::Terra:
         for (Unit *u : m_playerParty.getAliveUnits())
             u->applyEffect(std::make_unique<ShieldEffect>(30, 2));
         break;
+
     case Affinity::Aether:
         for (Unit *u : m_playerParty.getAliveUnits())
             u->removeEffectsByTag(EffectTags::kDebuff);
         for (Unit *u : m_enemyParty.getAliveUnits())
             u->removeEffectsByTag(EffectTags::kBuff);
+        // Lattice Attunement: add extra Aether votes to field.
+        if (discoveries.count(std::string{FieldDiscoveryIds::kLatticeAttunement}))
+        {
+            state.resonanceField.addContribution(Affinity::Aether,
+                                                 static_cast<int>(
+                                                     ResonanceField::kAetherVoteFraction * 10.0f));
+            m_renderer.renderMessage(">> Lattice Attunement: Aether echo! <<");
+        }
         break;
     }
 }

@@ -118,6 +118,7 @@
     <ClInclude Include="src\Core\Effects\ShieldEffect.h" />
     <ClInclude Include="src\Core\Effects\SlowEffect.h" />
     <ClInclude Include="src\Core\EventBus.h" />
+    <ClInclude Include="src\Core\FieldDiscovery.h" />
     <ClInclude Include="src\Core\IStatusEffect.h" />
     <ClInclude Include="src\Core\MetaProgress.h" />
     <ClInclude Include="src\Core\PartyResources.h" />

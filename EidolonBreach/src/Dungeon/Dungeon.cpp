@@ -5,6 +5,7 @@
 
 #include "Dungeon/Dungeon.h"
 #include "Core/AchievementSystem.h"
+#include "Core/FieldDiscovery.h"
 #include "Core/BattleEvents.h"
 #include "Core/CombatConstants.h"
 #include "Core/MetaProgress.h"
@@ -335,7 +336,10 @@ bool Dungeon::run(Party &party, MetaProgress &meta)
 
         ++floorsCleared;
         meta.highestFloorReached = std::max(meta.highestFloorReached, floorsCleared);
-        // Traverse only from the node the player actually entered.
+        const std::size_t discoveriesBefore{m_runContext.activeDiscoveries.size()};
+        m_runContext.checkAndActivateDiscoveries();
+        if (m_runContext.activeDiscoveries.size() > discoveriesBefore)
+            std::cout << "\n>> FIELD DISCOVERY ACTIVATED! <<\n";
         reachable = getReachableIndices(layer, std::vector<int>{chosen});
     }
 
