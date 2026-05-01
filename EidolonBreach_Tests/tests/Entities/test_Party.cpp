@@ -3,6 +3,7 @@
  * @brief Unit tests for Party container and shared resources.
  */
 #include "Actions/BasicStrikeAction.h"
+#include "Vestiges/FlameResonanceVestige.h"
 #include "Actions/SkillAction.h"
 #include "Actions/UltimateAction.h"
 #include "Entities/Party.h"
@@ -79,4 +80,22 @@ TEST_CASE("Party: SP defaults to 0, must be initialised externally")
     // The main game loop is responsible for setting starting SP (50 per spec)
     p.gainSp(50);
     CHECK(p.getSp() == 50);
+}
+
+TEST_CASE("Party::removeVestige: removes vestige at given index")
+{
+    Party p;
+    p.addVestige(std::make_unique<FlameResonanceVestige>());
+    p.addVestige(std::make_unique<FlameResonanceVestige>());
+    REQUIRE(p.getVestiges().size() == 2);
+    p.removeVestige(0);
+    CHECK(p.getVestiges().size() == 1);
+}
+
+TEST_CASE("Party::removeVestige: no-op on out-of-range index")
+{
+    Party p;
+    p.addVestige(std::make_unique<FlameResonanceVestige>());
+    p.removeVestige(5); // must not crash
+    CHECK(p.getVestiges().size() == 1);
 }

@@ -14,6 +14,7 @@
 #include "UI/test_NullInputHandler.h"
 #include "UI/test_NullRenderer.h"
 #include "doctest.h"
+#include <test_helpers.h>
 
 namespace
 {
@@ -166,4 +167,37 @@ TEST_CASE("Summon: turn order includes Summon via SpeedBasedTurnOrderCalculator"
     auto order{calc.calculate(playerParty, enemyParty)};
     REQUIRE(order.size() == 1);
     CHECK(order[0].unit->isSummon());
+}
+
+TEST_CASE("Summon: getSummonerAtk returns value passed at construction")
+{
+    SummonDefinition def{makeTestDef()};
+    Summon s{def, 10, 25};
+    CHECK(s.getSummonerAtk() == 25);
+}
+
+TEST_CASE("Summon: default summonerAtk is 0 when not specified")
+{
+    SummonDefinition def{makeTestDef()};
+    Summon s{def, 10};
+    CHECK(s.getSummonerAtk() == 0);
+}
+
+TEST_CASE("Party::removeUnit: removes unit by id")
+{
+    Party p;
+    p.addUnit(makeHero("hero_a"));
+    p.addUnit(makeHero("hero_b"));
+    REQUIRE(p.size() == 2);
+    p.removeUnit("hero_a");
+    CHECK(p.size() == 1);
+    CHECK(p.getUnitAt(0)->getId() == "hero_b");
+}
+
+TEST_CASE("Party::removeUnit: no-op for absent id")
+{
+    Party p;
+    p.addUnit(makeHero("hero_a"));
+    p.removeUnit("nobody"); // must not crash
+    CHECK(p.size() == 1);
 }

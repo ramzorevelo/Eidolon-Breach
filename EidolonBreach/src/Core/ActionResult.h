@@ -20,8 +20,9 @@
  */
 struct SummonEffect
 {
-    std::string summonId{};   ///< Key into SummonRegistry.
-    int preferredPosition{3}; ///< 0-indexed party slot; Battle clamps to first available.
+    std::string summonId{};
+    int preferredPosition{3};
+    int summonerAtk{0}; ///< Attacker ATK at spawn time, used by scaling actions
 };
 
 struct ActionResult
