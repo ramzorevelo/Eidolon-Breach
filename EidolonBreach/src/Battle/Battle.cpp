@@ -96,7 +96,20 @@ void Battle::runBattleLoop(BattleState &state)
                 processPlayerTurn(slot.unit, state);
             else
                 processEnemyTurn(slot.unit, state);
-
+            // Auto-remove expired summons at the end of their own turn.
+            if (slot.unit->isSummon())
+            {
+                auto *s{dynamic_cast<Summon *>(slot.unit)};
+                if (s)
+                {
+                    s->tickDuration();
+                    if (s->isExpired())
+                    {
+                        m_renderer.renderMessage(slot.unit->getName() + " fades away.");
+                        m_playerParty.removeUnit(slot.unit->getId());
+                    }
+                }
+            }
             if (checkAndHandleBattleEnd(state))
                 return;
         }
@@ -525,7 +538,7 @@ void Battle::processSummonEffect(const SummonEffect &effect,
         return;
     }
 
-    auto summon{std::make_unique<Summon>(*def, summonerContribution)};
+    auto summon{std::make_unique<Summon>(*def, summonerContribution, effect.summonerAtk)};
     state.renderer.renderMessage(def->displayName + " manifests!");
     m_playerParty.addUnit(std::move(summon));
 }

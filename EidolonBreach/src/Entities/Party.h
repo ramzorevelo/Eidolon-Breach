@@ -10,6 +10,7 @@
 #include "Items/Inventory.h"
 #include <vector>
 #include <memory>
+#include <optional>
 #include <cstddef>
 #include "Vestiges/IVestige.h"
 class IVestige;
@@ -25,6 +26,17 @@ public:
 	std::size_t        size() const;
 	bool               contains(const Unit* unit) const;
 	std::size_t        getIndex(const Unit* unit) const;
+    /**
+     * @brief Remove the unit with the given ID from the party.
+     *        No-op if the ID is not found. Ownership is released and destroyed.
+     */
+    void removeUnit(std::string_view unitId);
+    /**
+     * @brief Remove the vestige at the given index (0-based).
+     *        No-op when index is out of range.
+     * @return true if a vestige was removed.
+     */
+    bool removeVestige(std::size_t index);
 
 	// Shared SP pool management
 	int  getSp() const { return m_resources.sp; }
@@ -42,11 +54,11 @@ public:
     static constexpr int kMaxVestiges{5};
 
     /**
-     * @brief Add a vestige to the party's collection.
-     * @return true if added successfully; false if at kMaxVestiges capacity.
-     *         The caller is responsible for presenting the discard UI on false.
+     * @brief Attempt to add a vestige.
+     * @return nullopt if added successfully. Returns the vestige back if at kMaxVestiges
+     *         capacity so the caller can handle the overflow (e.g. offer discard).
      */
-    bool addVestige(std::unique_ptr<IVestige> vestige);
+    std::optional<std::unique_ptr<IVestige>> addVestige(std::unique_ptr<IVestige> vestige);
 
     /** @return Read-only view of all held vestiges. */
     [[nodiscard]] const std::vector<std::unique_ptr<IVestige>> &getVestiges() const;

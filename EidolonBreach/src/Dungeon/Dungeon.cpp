@@ -12,6 +12,8 @@
 #include "Dungeon/EncounterTable.h"
 #include "Entities/EnemyRegistry.h"
 #include "Core/BattleEvents.h"
+#include "Dungeon/ShopNode.h"
+#include "Items/ItemRegistry.h"
 #include "Dungeon/BossNode.h"
 #include "Entities/PlayableCharacter.h"
 #include "Dungeon/EliteNode.h"
@@ -63,6 +65,7 @@ void Dungeon::generate(std::uint32_t seed,
     m_achievements = std::make_unique<AchievementSystem>(m_eventBus);
     m_layers.clear();
     m_enemyRegistry.loadFromJson("data/enemies.json");
+    m_itemRegistry.loadFromJson("data/items.json");
     m_encounterTable.loadFromJson("data/encounters.json", m_enemyRegistry);
     assignFloorAffinities(seed, numLayers);
     buildGraph(seed, numLayers, difficulty);
@@ -84,7 +87,8 @@ std::unique_ptr<MapNode> Dungeon::makeNode(int layer,
                                            bool noElite,
                                            bool noRest,
                                            bool noTreasure,
-                                           bool noBattle) const
+                                           bool noBattle,
+                                           bool noShop) const
 {
     const Affinity floorAffinity{
         m_floorAffinities[static_cast<std::size_t>(layer)]};
@@ -94,13 +98,12 @@ std::unique_ptr<MapNode> Dungeon::makeNode(int layer,
     const int battleW{noBattle ? 0 : 3};
     int restW{noRest ? 0 : 4};
     const int treasureW{noTreasure ? 0 : 3};
+    const int shopW{noShop || layer < 2 ? 0 : 2}; // No shops on first two floors.
 
-    // Fallback: if all other weights are zero, always allow rest to prevent
-    // a dead-end where the only option would be an illegal empty distribution.
-    if (eW == 0 && battleW == 0 && treasureW == 0)
+    if (eW == 0 && battleW == 0 && treasureW == 0 && shopW == 0)
         restW = 4;
 
-    const int totalW{eW + battleW + restW + treasureW};
+    const int totalW{eW + battleW + restW + treasureW + shopW};
 
     std::uniform_int_distribution<int> dist{0, totalW - 1};
     const int roll{dist(rng)};
@@ -115,6 +118,14 @@ std::unique_ptr<MapNode> Dungeon::makeNode(int layer,
             floorAffinity, 10, m_summonRegistry);
     if (roll < eW + battleW + restW)
         return std::make_unique<RestNode>();
+    if (roll < eW + battleW + restW + shopW)
+    {
+        // Stock: one of each consumable, rotated by floor.
+        std::vector<std::string> stock{"heal_potion", "purification_vial"};
+        if (layer % 2 == 0)
+            stock.push_back("mega_potion");
+        return std::make_unique<ShopNode>(m_itemRegistry, std::move(stock), rng());
+    }
     return std::make_unique<TreasureNode>(gold, rng());
 }
 

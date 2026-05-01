@@ -8,6 +8,7 @@
 
 #include "Core/Affinity.h"
 #include "Core/EventBus.h"
+#include "Items/ItemRegistry.h"
 #include "Core/RunContext.h"
 #include "Dungeon/MapNode.h"
 #include "Dungeon/EncounterTable.h"
@@ -69,7 +70,8 @@ class Dungeon
                                                     bool noElite = false,
                                                     bool noRest = false,
                                                     bool noTreasure = false,
-                                                    bool noBattle = false) const;
+                                                    bool noBattle = false,
+                                                    bool noShop = false) const;
 
     void connectLayers(int layerIndex, std::mt19937 &rng);
 
@@ -92,4 +94,5 @@ class Dungeon
     SummonRegistry *m_summonRegistry{nullptr}; ///< Non-owning; owned by main().
     EnemyRegistry m_enemyRegistry{};
     EncounterTable m_encounterTable{};
+    ItemRegistry m_itemRegistry{};
 };

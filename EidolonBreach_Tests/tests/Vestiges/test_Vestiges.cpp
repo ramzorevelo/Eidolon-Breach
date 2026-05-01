@@ -394,8 +394,8 @@ TEST_CASE("Party::addVestige: accepts vestiges up to kMaxVestiges")
     Party party;
     for (int i{0}; i < Party::kMaxVestiges; ++i)
     {
-        bool ok{party.addVestige(std::make_unique<FlameResonanceVestige>())};
-        CHECK(ok);
+        auto overflow{party.addVestige(std::make_unique<FlameResonanceVestige>())};
+        CHECK(!overflow.has_value());
     }
     CHECK(party.getVestiges().size() == static_cast<std::size_t>(Party::kMaxVestiges));
 }
@@ -406,8 +406,8 @@ TEST_CASE("Party::addVestige: returns false and does not add when at cap")
     for (int i{0}; i < Party::kMaxVestiges; ++i)
         party.addVestige(std::make_unique<FlameResonanceVestige>());
 
-    bool ok{party.addVestige(std::make_unique<VestigeOfTheUnbound>())};
-    CHECK(!ok);
+    auto overflow{party.addVestige(std::make_unique<VestigeOfTheUnbound>())};
+    CHECK(overflow.has_value()); 
     CHECK(party.getVestiges().size() == static_cast<std::size_t>(Party::kMaxVestiges));
 }
 
