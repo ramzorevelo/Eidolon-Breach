@@ -7,6 +7,7 @@
 #include "Battle/BattleState.h"
 #include "Battle/ITurnOrderCalculator.h"
 #include "Battle/ResonanceField.h"
+#include "Core/FieldDiscovery.h"
 #include "Battle/TurnSlot.h"
 #include "Entities/Party.h"
 #include "UI/IInputHandler.h"

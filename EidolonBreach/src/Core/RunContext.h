@@ -9,6 +9,8 @@
 #include "Core/Affinity.h"
 #include "Core/BehaviorSignal.h"
 #include <map>
+#include <set>
+#include <string>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -61,6 +63,18 @@ class RunContext
 
     /** @brief Run mode for this run. Set by Dungeon::generate before any battles start. */
     RunMode runMode{RunMode::Classic};
+
+    /**
+     * @brief Active Field Discoveries for this run.
+     *        Populated by Dungeon after each battle. Read by Battle::applyResonanceTrigger.
+     */
+    std::set<std::string> activeDiscoveries{};
+
+    /**
+     * @brief Check cumulative field vote totals and activate any newly met discoveries.
+     *        Called by Dungeon::run after each battle completes.
+     */
+    void checkAndActivateDiscoveries();
 
   private:
     std::map<std::string, RunCharacterState, std::less<>> m_states{};
