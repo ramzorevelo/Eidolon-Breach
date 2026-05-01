@@ -15,11 +15,11 @@ class Summon : public Unit
 {
   public:
     /**
-     * @param def                  The summon's data. Not owned — SummonRegistry owns it.
+     * @param def                  The summon's data.
      * @param summonerContribution The summoner's resonanceContribution at spawn time.
-     *                             Stored as floor(contribution / 2) per GDD §3.3.
+     * @param summonerAtk          The summoner's ATK stat at spawn time.
      */
-    Summon(const SummonDefinition &def, int summonerContribution);
+    Summon(const SummonDefinition &def, int summonerContribution, int summonerAtk = 0);
 
     ActionResult takeTurn(Party &allies, Party &enemies, BattleState &state) override;
 
@@ -41,10 +41,13 @@ class Summon : public Unit
      *        Auto-removal on expiry is deferred to Phase 9.
      */
     void tickDuration();
+    /** @return The summoner's ATK stat recorded at spawn time. */
+    [[nodiscard]] int getSummonerAtk() const;
 
   private:
     const SummonDefinition *m_definition{nullptr};
     int m_resonanceContribution{};
     std::optional<int> m_remainingTurns{};
+    int m_summonerAtk{0};         ///< Summoner's ATK stat at spawn time for damage-scaling actions.
     std::size_t m_actionIndex{0}; ///< Round-robin index into the action pool.
 };

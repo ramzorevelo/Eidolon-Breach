@@ -43,7 +43,8 @@ ActionResult EmberCallAction::execute(PlayableCharacter &user,
     result.spCost = kSpCost;
     result.actionAffinity = Affinity::Blaze;
     result.flavorText = user.getName() + " calls forth Ignis!";
-    result.summonEffect = SummonEffect{std::string{Ignis::kId}, 3};
+    result.summonEffect = SummonEffect{std::string{Ignis::kId}, 3,
+                                       user.getFinalStats().atk};
     return result;
 }
 

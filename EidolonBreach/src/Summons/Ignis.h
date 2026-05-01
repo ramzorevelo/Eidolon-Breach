@@ -3,7 +3,8 @@
 #include "Entities/Unit.h"
 #include "Summons/SummonDefinition.h"
 #include "Summons/SummonRegistry.h"
-
+#include "Entities/Summon.h" 
+#include <algorithm>
 class Summon;
 struct BattleState;
 
@@ -21,17 +22,19 @@ inline void registerIgnis(SummonRegistry &registry)
 
     def.actions.push_back(SummonAction{
         "Ember Burst",
-        [](Summon & /*ignis*/ , Party & /*allies*/, Party &enemies, BattleState & /*state*/)
+        [](Summon &ignis, Party & /*allies*/, Party &enemies, BattleState & /*state*/)
         {
             const auto alive{enemies.getAliveUnits()};
             if (alive.empty())
                 return ActionResult{ActionResult::Type::Skip, 0};
 
             Unit *target{alive.front()};
-            constexpr int kIgnisBaseDamage{9};
-            target->takeTrueDamage(kIgnisBaseDamage);
+            // Damage = floor(summonerAtk * 0.6), minimum 1.
+            const int damage{std::max(1, static_cast<int>(
+                                             static_cast<float>(ignis.getSummonerAtk()) * 0.6f))};
+            target->takeTrueDamage(damage);
 
-            ActionResult result{ActionResult::Type::Damage, kIgnisBaseDamage};
+            ActionResult result{ActionResult::Type::Damage, damage};
             result.flavorText = ">> Ignis scorches the enemy! <<";
             result.actionAffinity = Affinity::Blaze;
             return result;

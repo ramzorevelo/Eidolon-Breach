@@ -8,11 +8,12 @@
 #include "Entities/Party.h"
 #include <algorithm>
 
-Summon::Summon(const SummonDefinition &def, int summonerContribution)
+Summon::Summon(const SummonDefinition &def, int summonerContribution, int summonerAtk)
     : Unit{def.id, def.displayName, def.baseStats, Affinity::Aether},
       m_definition{&def},
       m_resonanceContribution{summonerContribution / 2},
-      m_remainingTurns{def.duration}
+      m_remainingTurns{def.duration},
+      m_summonerAtk{summonerAtk}
 {
 }
 
@@ -42,4 +43,9 @@ void Summon::tickDuration()
 {
     if (m_remainingTurns.has_value())
         m_remainingTurns = std::max(0, *m_remainingTurns - 1);
+}
+
+int Summon::getSummonerAtk() const
+{
+    return m_summonerAtk;
 }
