@@ -39,6 +39,14 @@ std::size_t Party::getIndex(const Unit* unit) const {
 		if (m_units[i].get() == unit) return i;
 	return m_units.size();
 }
+void Party::removeUnit(std::string_view unitId)
+{
+    auto it{std::find_if(m_units.begin(), m_units.end(),
+                         [unitId](const std::unique_ptr<Unit> &u)
+                         { return u && u->getId() == unitId; })};
+    if (it != m_units.end())
+        m_units.erase(it);
+}
 
 void Party::gainSp(int amount) {
 	m_resources.sp = std::min(m_resources.maxSp, m_resources.sp + amount);
@@ -50,14 +58,21 @@ bool Party::useSp(int amount) {
 	return true;
 }
 
-bool Party::addVestige(std::unique_ptr<IVestige> vestige)
+std::optional<std::unique_ptr<IVestige>> Party::addVestige(std::unique_ptr<IVestige> vestige)
 {
     if (m_vestiges.size() >= static_cast<std::size_t>(kMaxVestiges))
-        return false;
+        return vestige; // return ownership back to caller
     m_vestiges.push_back(std::move(vestige));
-    return true;
+    return std::nullopt; // successfully stored
 }
 
+bool Party::removeVestige(std::size_t index)
+{
+    if (index >= m_vestiges.size())
+        return false;
+    m_vestiges.erase(m_vestiges.begin() + static_cast<std::ptrdiff_t>(index));
+    return true;
+}
 const std::vector<std::unique_ptr<IVestige>> &Party::getVestiges() const
 {
     return m_vestiges;

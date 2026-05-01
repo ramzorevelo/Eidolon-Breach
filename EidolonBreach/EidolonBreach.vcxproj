@@ -50,6 +50,7 @@
     <ClCompile Include="src\Dungeon\EncounterTable.cpp" />
     <ClCompile Include="src\Dungeon\EventNode.cpp" />
     <ClCompile Include="src\Dungeon\RestNode.cpp" />
+    <ClCompile Include="src\Dungeon\ShopNode.cpp" />
     <ClCompile Include="src\Dungeon\TreasureNode.cpp" />
     <ClCompile Include="src\Entities\Enemy.cpp" />
     <ClCompile Include="src\Entities\EnemyRegistry.cpp" />
@@ -135,6 +136,7 @@
     <ClInclude Include="src\Dungeon\EventNode.h" />
     <ClInclude Include="src\Dungeon\MapNode.h" />
     <ClInclude Include="src\Dungeon\RestNode.h" />
+    <ClInclude Include="src\Dungeon\ShopNode.h" />
     <ClInclude Include="src\Dungeon\TreasureNode.h" />
     <ClInclude Include="src\Entities\Enemy.h" />
     <ClInclude Include="src\Entities\EnemyRegistry.h" />
