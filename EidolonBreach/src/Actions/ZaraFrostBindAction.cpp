@@ -23,7 +23,7 @@ ZaraFrostbindAction::ZaraFrostbindAction()
 
 std::string ZaraFrostbindAction::label() const
 {
-    return "Frostbind (25 SP — Slow one enemy)";
+    return "Frostbind (25 SP - Slow one enemy)";
 }
 
 bool ZaraFrostbindAction::isAvailable(const PlayableCharacter &user,

@@ -187,11 +187,11 @@ int main()
     std::cout << "Run seed: " << seed << '\n';
 
     // --- Mode selection (Classic / Draft) ---
-    std::cout << "Mode: [1] Classic  [2] Draft\nChoice: ";
+    std::cout << "Mode: [1] Classic  [2] Eidolon Labyrinth\nChoice: ";
     int modeChoice{1};
     std::cin >> modeChoice;
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    const RunMode runMode{modeChoice == 2 ? RunMode::Draft : RunMode::Classic};
+    const RunMode runMode{modeChoice == 2 ? RunMode::EidolonLabyrinth : RunMode::Classic};
 
     Dungeon dungeon{};
     const DungeonDefinition *selectedDungeon{nullptr};
@@ -238,7 +238,7 @@ int main()
     {
         // Draft mode uses the first dungeon as a default template for now
         selectedDungeon = &DungeonTable::getClassicDungeons().front();
-        std::cout << "Draft Mode: no XP earned. Attune available at Rest sites.\n";
+        std::cout << "Eidolon Labyrinth: no XP earned. Attune available at Rest sites.\n";
     }
 
     dungeon.generate(seed, *selectedDungeon, &summonRegistry, runMode);

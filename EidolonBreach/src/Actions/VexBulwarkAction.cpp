@@ -24,7 +24,7 @@ VexBulwarkAction::VexBulwarkAction()
 
 std::string VexBulwarkAction::label() const
 {
-    return "Earthen Shield (25 SP — Shield one ally)";
+    return "Earthen Shield (25 SP - Shield one ally)";
 }
 
 bool VexBulwarkAction::isAvailable(const PlayableCharacter &user,

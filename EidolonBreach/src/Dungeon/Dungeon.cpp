@@ -71,7 +71,7 @@ void Dungeon::generate(std::uint32_t seed,
 
     constexpr std::uint32_t kDraftSeedOffset{0xDEADBEEFu};
     const std::uint32_t effectiveSeed{
-        runMode == RunMode::Draft ? seed ^ kDraftSeedOffset : seed};
+        runMode == RunMode::EidolonLabyrinth ? seed ^ kDraftSeedOffset : seed};
 
     m_achievements = std::make_unique<AchievementSystem>(m_eventBus);
     m_layers.clear();
@@ -147,6 +147,8 @@ void Dungeon::buildGraph(std::uint32_t seed,
     std::mt19937 rng{seed};
 
     bool prevLayerHadElite{false};
+    bool hasSeenCombat{false};
+    bool prevLayerHadShop{false};
     bool prevLayerHadRest{false};
     bool prevLayerHadTreasure{false};
     int consecutiveBattleFloors{0};
@@ -157,7 +159,7 @@ void Dungeon::buildGraph(std::uint32_t seed,
             m_floorAffinities[static_cast<std::size_t>(layer)]};
 
         std::vector<DungeonGraphNode> layerNodes{};
-        const bool isBossFloor{layer == numLayers - 1};
+        const bool isBossFloor{layer == numLayers - 1 && m_currentDungeon.hasBoss};
         const bool isPreBossFloor{layer == numLayers - 2};
         const bool isEliteGateFloor{layer == numLayers - 3};
 
@@ -203,11 +205,13 @@ void Dungeon::buildGraph(std::uint32_t seed,
             const bool noBattle{consecutiveBattleFloors >= 2};
             for (int i{0}; i < width; ++i)
             {
+                const bool noRest{prevLayerHadRest || !hasSeenCombat || layer == 0};
                 auto node{makeNode(layer, numLayers, difficulty, rng,
                                    layer < 2 || prevLayerHadElite || isPreEliteGate,
-                                   prevLayerHadRest,
+                                   noRest,
                                    prevLayerHadTreasure,
-                                   noBattle)};
+                                   noBattle,
+                                   prevLayerHadShop)};
                 if (dynamic_cast<EliteNode *>(node.get()))
                     thisLayerHadElite = true;
                 if (dynamic_cast<RestNode *>(node.get()))
@@ -219,6 +223,29 @@ void Dungeon::buildGraph(std::uint32_t seed,
             prevLayerHadElite = thisLayerHadElite;
             prevLayerHadRest = thisLayerHadRest;
             prevLayerHadTreasure = thisLayerHadTreasure;
+
+                        // Track whether this layer contains a ShopNode.
+            bool thisLayerHadShop{false};
+            for (const auto &node : layerNodes)
+            {
+                if (dynamic_cast<ShopNode *>(node.content.get()))
+                {
+                    thisLayerHadShop = true;
+                    break;
+                }
+            }
+            prevLayerHadShop = thisLayerHadShop;
+
+            // Mark that the party has seen combat once any battle node appears.
+            for (const auto &n : layerNodes)
+            {
+                if (dynamic_cast<BattleNode *>(n.content.get()))
+                {
+                    hasSeenCombat = true;
+                    break;
+                }
+            }
+
             const bool allBattleThisLayer{
                 !thisLayerHadElite && !thisLayerHadRest && !thisLayerHadTreasure};
             consecutiveBattleFloors = allBattleThisLayer ? consecutiveBattleFloors + 1 : 0;

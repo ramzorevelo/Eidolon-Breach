@@ -24,7 +24,8 @@
 enum class RunMode
 {
     Classic,
-    Draft,
+    EidolonLabyrinth,
+    Training,
 };
 
 
