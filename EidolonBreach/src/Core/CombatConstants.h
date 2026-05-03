@@ -16,7 +16,7 @@ constexpr int kArchSkillCooldownTurns{2};
 
 // Slot unlock levels
 constexpr int kSlot1UnlockLevel{20};
-constexpr int kSlot2UnlockLevel{40};
+inline constexpr int kSlot2UnlockLevel{40}; 
 
 // Consumable cooldown
 constexpr int kConsumableCooldownTurns{1};
@@ -42,10 +42,17 @@ constexpr int kMaxFormationSlots{5};
 constexpr int kMaxActiveSummons{2};
 
 // Character leveling (Classic mode)
-constexpr int kXpPerLevel{50};       ///< Flat XP cost per level. Level N needs (N-1)*50 total XP.
-constexpr int kXpStandardBattle{10}; ///< XP awarded per standard battle victory.
-constexpr int kXpBossBattle{50};     ///< XP awarded for boss victory.
 constexpr int kMaxEchoes{5};         ///< Maximum Resonance Echoes per character.
 
 constexpr int kMaxPlayerCharacters{3}; ///< Maximum Synchrons in a player party.
+
+// Character XP — non-linear formula: xpToLevel(n) = floor(kXpLevelBase * n^kXpLevelExponent)
+inline constexpr float kXpLevelBase{50.0f};
+inline constexpr float kXpLevelExponent{1.5f};
+
+// Player (account) XP
+inline constexpr int kPlayerXpDungeonBase{30};       ///< Base player XP per dungeon completion.
+inline constexpr int kPlayerXpFirstClearBonus{100};  ///< One-time bonus on first clear of a dungeon.
+inline constexpr float kPlayerXpLevelBase{100.0f};   ///< kXpLevelBase equivalent for player level.
+inline constexpr float kPlayerXpLevelExponent{1.8f}; ///< Steeper curve than character XP.
 } // namespace CombatConstants

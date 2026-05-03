@@ -59,13 +59,28 @@ class MetaProgress
      *        Level = 1 + totalXP / kXpPerLevel (integer division, minimum 1).
      */
     [[nodiscard]] static int levelFromXP(int totalXP);
+    /**
+     * @brief Award player (account) XP and update playerLevel.
+     * @param amount Raw XP to add before level recomputation.
+     * @return New player level.
+     */
+    int gainPlayerXp(int amount);
+
+    /**
+     * @brief Compute account level from total player XP.
+     *        Uses a steeper curve than character XP (kPlayerXpLevelExponent = 1.8).
+     */
+    [[nodiscard]] static int playerLevelFromXp(int totalXp);
 
     int currency{0};
     int highestFloorReached{0};
     bool draftModeUnlocked{false};
     std::set<std::string> unlockedCharacterIds{};
-    std::map<std::string, int> characterLevels{};                      ///< id → current level
-    std::map<std::string, int> characterXP{};                          ///< id → total XP
-    std::map<std::string, CharacterInsightData> characterInsight{};    ///< id → insight data
-    std::map<std::string, std::vector<std::string>> masteryEventLog{}; ///< id → stance IDs logged
+    std::map<std::string, int> characterLevels{};                     
+    std::map<std::string, int> characterXP{};                          
+    std::map<std::string, CharacterInsightData> characterInsight{};    
+    std::map<std::string, std::vector<std::string>> masteryEventLog{}; 
+    int playerXp{0};                                                   
+    int playerLevel{1};                                                
+    std::set<std::string> clearedDungeonIds{};                         
 };
