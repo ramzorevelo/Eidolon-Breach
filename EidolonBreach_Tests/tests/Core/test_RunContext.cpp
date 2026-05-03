@@ -91,14 +91,21 @@ TEST_CASE("RunContext: runMode defaults to Classic")
 TEST_CASE("RunContext: runMode can be set to Draft")
 {
     RunContext ctx{};
-    ctx.runMode = RunMode::Draft;
-    CHECK(ctx.runMode == RunMode::Draft);
+    ctx.runMode = RunMode::EidolonLabyrinth;
+    CHECK(ctx.runMode == RunMode::EidolonLabyrinth);
 }
 
 TEST_CASE("RunContext: reset preserves runMode (mode set by Dungeon, not per-battle)")
 {
     RunContext ctx{};
-    ctx.runMode = RunMode::Draft;
+    ctx.runMode = RunMode::EidolonLabyrinth;
     ctx.reset(); // resets signal counts and vote totals, not mode
-    CHECK(ctx.runMode == RunMode::Draft);
+    CHECK(ctx.runMode == RunMode::EidolonLabyrinth);
+}
+
+TEST_CASE("RunContext: Training mode can be set")
+{
+    RunContext ctx{};
+    ctx.runMode = RunMode::Training;
+    CHECK(ctx.runMode == RunMode::Training);
 }

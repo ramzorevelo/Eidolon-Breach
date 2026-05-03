@@ -23,7 +23,7 @@ EmberCallAction::EmberCallAction()
 
 std::string EmberCallAction::label() const
 {
-    return "Ember Call (25 SP — Summon Ignis)";
+    return "Ember Call (25 SP - Summon Ignis)";
 }
 
 bool EmberCallAction::isAvailable(const PlayableCharacter &user,

@@ -8,7 +8,7 @@
         "lyra": {
             "bondTrialComplete": false,
             "chosenAspects": [],
-            "echoCount": 4
+            "echoCount": 5
         },
         "striker_1": {
             "bondTrialComplete": false,
@@ -18,23 +18,25 @@
         "vex": {
             "bondTrialComplete": false,
             "chosenAspects": [],
-            "echoCount": 4
+            "echoCount": 5
         },
         "zara": {
             "bondTrialComplete": false,
             "chosenAspects": [],
-            "echoCount": 3
+            "echoCount": 5
         }
     },
     "characterXP": {
         "conduit_1": 150,
-        "lyra": 200,
+        "ignis": 48,
+        "lyra": 208,
         "striker_1": 110,
-        "vex": 270,
-        "zara": 240
+        "vex": 286,
+        "zara": 256
     },
     "clearedDungeonIds": [
-        "dungeon_01"
+        "dungeon_01",
+        "dungeon_02"
     ],
     "currency": 0,
     "draftModeUnlocked": false,
@@ -54,7 +56,7 @@
         ]
     },
     "playerLevel": 2,
-    "playerXp": 130,
+    "playerXp": 287,
     "unlockedCharacterIds": [
         "conduit_1",
         "lyra",

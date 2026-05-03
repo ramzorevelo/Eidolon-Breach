@@ -17,7 +17,7 @@ void RestNode::enter(Party &party,
                      RunContext &runCtx,
                      EventBus & /*eventBus*/)
 {
-    const bool isDraft{runCtx.runMode == RunMode::Draft};
+    const bool isDraft{runCtx.runMode == RunMode::EidolonLabyrinth};
     std::cout << "\n=== REST SITE ===\n"
               << "  [1] Heal - restore partial HP to all allies\n"
               << "  [2] Purge - reduce all Exposure by "

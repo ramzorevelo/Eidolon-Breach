@@ -155,5 +155,5 @@ TEST_CASE("CharacterRegistry: Vex Slot 1 pre-unlocked with EarthenShield")
     CHECK(pc->getEquippedSkills().slots[0].unlocked);
     CHECK(pc->getEquippedSkills().slots[0].equippedSkill != nullptr);
     CHECK(pc->getEquippedSkills().slots[0].equippedSkill->label() ==
-          "Earthen Shield (25 SP — Shield one ally)");
+          "Earthen Shield (25 SP - Shield one ally)");
 }
