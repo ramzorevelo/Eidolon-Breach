@@ -86,7 +86,8 @@ std::size_t PlayableCharacter::selectActionIndex(const Party &allies,
 }
 
 std::optional<TargetInfo> PlayableCharacter::selectTarget(const Party &enemies,
-                                                          IInputHandler &input)
+                                                          IInputHandler &input,
+                                                          IRenderer &renderer)
 {
     std::vector<std::pair<std::size_t, const Unit *>> targets{};
     for (std::size_t i{0}; i < enemies.size(); ++i)
@@ -101,8 +102,41 @@ std::optional<TargetInfo> PlayableCharacter::selectTarget(const Party &enemies,
     if (targets.size() == 1)
         return TargetInfo{TargetInfo::Type::Enemy, targets[0].first};
 
-    std::size_t choice{input.getTargetChoice(targets.size())};
+    std::vector<std::string> names{};
+    names.reserve(targets.size());
+    for (const auto &[idx, unit] : targets)
+        names.push_back(unit->getName());
+    renderer.renderTargetList(names);
+
+    const std::size_t choice{input.getTargetChoice(targets.size())};
     return TargetInfo{TargetInfo::Type::Enemy, targets[choice].first};
+}
+
+std::optional<TargetInfo> PlayableCharacter::selectAllyTarget(const Party &allies,
+                                                              IInputHandler &input,
+                                                              IRenderer &renderer)
+{
+    std::vector<std::pair<std::size_t, const Unit *>> targets{};
+    for (std::size_t i{0}; i < allies.size(); ++i)
+    {
+        const Unit *u{allies.getUnitAt(i)};
+        if (u && u->isAlive())
+            targets.emplace_back(i, u);
+    }
+
+    if (targets.empty())
+        return std::nullopt;
+    if (targets.size() == 1)
+        return TargetInfo{TargetInfo::Type::Ally, targets[0].first};
+
+    std::vector<std::string> names{};
+    names.reserve(targets.size());
+    for (const auto &[idx, unit] : targets)
+        names.push_back(unit->getName());
+    renderer.renderTargetList(names);
+
+    const std::size_t choice{input.getTargetChoice(targets.size())};
+    return TargetInfo{TargetInfo::Type::Ally, targets[choice].first};
 }
 
 void PlayableCharacter::displayActionMenu(const Party &party, IRenderer &renderer) const
@@ -115,8 +149,25 @@ ActionResult PlayableCharacter::takeTurn(Party &allies,
                                          BattleState &state)
 {
     displayActionMenu(allies, state.renderer);
-    std::size_t actionIdx{selectActionIndex(allies, state.inputHandler)};
-    std::optional<TargetInfo> target{selectTarget(enemies, state.inputHandler)};
+    const std::size_t actionIdx{selectActionIndex(allies, state.inputHandler)};
+
+    const TargetMode mode{m_abilities[actionIdx]->getActionData().targetMode};
+    std::optional<TargetInfo> target{};
+    switch (mode)
+    {
+    case TargetMode::Self:
+    case TargetMode::AllEnemies:
+    case TargetMode::AllAllies:
+        // No user selection — action resolves its own targets internally.
+        break;
+    case TargetMode::SingleAlly:
+    case TargetMode::SplashAlly:
+        target = selectAllyTarget(allies, state.inputHandler, state.renderer);
+        break;
+    default:
+        target = selectTarget(enemies, state.inputHandler, state.renderer);
+        break;
+    }
 
     const Affinity actionAffinity{m_abilities[actionIdx]->getAffinity()};
     ActionResult result{m_abilities[actionIdx]->execute(*this, allies, enemies, target)};

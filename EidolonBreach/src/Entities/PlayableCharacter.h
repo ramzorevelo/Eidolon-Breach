@@ -198,7 +198,22 @@ class PlayableCharacter : public Unit
 
     void displayActionMenu(const Party &party, IRenderer &renderer) const;
     std::size_t selectActionIndex(const Party &allies, IInputHandler &input);
-    std::optional<TargetInfo> selectTarget(const Party &enemies, IInputHandler &input);
+
+    /**
+     * @brief Build a numbered enemy list, display it, prompt for choice.
+     * @return TargetInfo with Type::Enemy, or nullopt if no enemies alive.
+     */
+    std::optional<TargetInfo> selectTarget(const Party &enemies,
+                                           IInputHandler &input,
+                                           IRenderer &renderer);
+
+    /**
+     * @brief Build a numbered ally list, display it, prompt for choice.
+     * @return TargetInfo with Type::Ally, or nullopt if no allies alive.
+     */
+    std::optional<TargetInfo> selectAllyTarget(const Party &allies,
+                                               IInputHandler &input,
+                                               IRenderer &renderer);
     int m_archSkillCooldown{0};
     bool m_archSkillUnlocked{false};
     int m_consumableCooldown{0};

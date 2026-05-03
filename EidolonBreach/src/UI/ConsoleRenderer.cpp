@@ -176,3 +176,9 @@ void ConsoleRenderer::renderActionMenu(const PlayableCharacter &character,
         std::cout << '\n';
     }
 }
+
+void ConsoleRenderer::renderTargetList(const std::vector<std::string> &names)
+{
+    for (std::size_t i{0}; i < names.size(); ++i)
+        std::cout << "  [" << (i + 1) << "] " << names[i] << '\n';
+}

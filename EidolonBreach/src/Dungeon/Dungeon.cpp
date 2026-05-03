@@ -159,7 +159,7 @@ void Dungeon::buildGraph(std::uint32_t seed,
             m_floorAffinities[static_cast<std::size_t>(layer)]};
 
         std::vector<DungeonGraphNode> layerNodes{};
-        const bool isBossFloor{layer == numLayers - 1 && m_currentDungeon.hasBoss};
+        const bool isBossFloor{layer == numLayers - 1};
         const bool isPreBossFloor{layer == numLayers - 2};
         const bool isEliteGateFloor{layer == numLayers - 3};
 

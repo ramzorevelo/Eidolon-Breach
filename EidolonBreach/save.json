@@ -28,11 +28,11 @@
     },
     "characterXP": {
         "conduit_1": 150,
-        "ignis": 48,
-        "lyra": 208,
+        "ignis": 53,
+        "lyra": 211,
         "striker_1": 110,
-        "vex": 286,
-        "zara": 256
+        "vex": 289,
+        "zara": 259
     },
     "clearedDungeonIds": [
         "dungeon_01",
@@ -56,7 +56,7 @@
         ]
     },
     "playerLevel": 2,
-    "playerXp": 287,
+    "playerXp": 314,
     "unlockedCharacterIds": [
         "conduit_1",
         "lyra",
