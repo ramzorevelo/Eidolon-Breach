@@ -219,10 +219,13 @@ int main()
         {
             const auto &def{*available[i]};
             const bool cleared{meta.clearedDungeonIds.count(def.id) > 0};
+            const int displayFloors{def.fixedLayout.empty()
+                                        ? def.numFloors
+                                        : static_cast<int>(def.fixedLayout.size())};
             std::cout << "  [" << (i + 1) << "] " << def.name
                       << "  (Rec. Lv." << def.recommendedPlayerLevel
                       << " | Enemy Lv." << def.enemyLevel
-                      << " | " << def.numFloors << " floors"
+                      << " | " << displayFloors << " floors"
                       << (cleared ? " | CLEARED" : "") << ")\n"
                       << "      " << def.description << "\n";
         }

@@ -74,6 +74,7 @@
     <ClCompile Include="tests\Actions\test_UltimateAction.cpp" />
     <ClCompile Include="tests\Actions\test_UseConsumableAction.cpp" />
     <ClCompile Include="tests\Actions\test_VentActions.cpp" />
+    <ClCompile Include="tests\Battle\test_FixedDungeon.cpp" />
     <ClCompile Include="tests\Battle\test_FormationManager.cpp" />
     <ClCompile Include="tests\Battle\test_ResonanceField.cpp" />
     <ClCompile Include="tests\Battle\test_SpeedBasedTurnOrderCalculator.cpp" />
