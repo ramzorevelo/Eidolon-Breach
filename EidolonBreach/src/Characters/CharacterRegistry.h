@@ -44,6 +44,7 @@ class CharacterRegistry
         int spd{};
         int resonanceContribution{};
         std::string passiveTrait{};
+        std::vector<std::string> slotSkillIds{};
         std::string archetype{};
         std::string basicId{};
         std::string archSkillId{};

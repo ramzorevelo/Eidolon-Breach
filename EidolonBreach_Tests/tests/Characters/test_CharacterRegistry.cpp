@@ -1,3 +1,4 @@
+
 /**
  * @file test_CharacterRegistry.cpp
  * @brief Tests for CharacterRegistry and AbilityRegistry.
@@ -5,6 +6,9 @@
 #include "Actions/BasicStrikeAction.h"
 #include "Actions/SkillAction.h"
 #include "Actions/UltimateAction.h"
+#include "Actions/EmberCallAction.h"
+#include "Actions/VexBulwarkAction.h"
+#include "Actions/ZaraFrostbindAction.h"
 #include "Entities/PlayableCharacter.h"
 #include "Characters/AbilityRegistry.h"
 #include "Characters/CharacterRegistry.h"
@@ -24,6 +28,16 @@ AbilityRegistry makeAbilityRegistry()
     reg.registerAbility("ultimate_default",
                         []
                         { return std::make_unique<UltimateAction>(); });
+    // Slot skills (required for pre‑unlock tests)
+    reg.registerAbility("lyra_ember_call",
+                        []
+                        { return std::make_unique<EmberCallAction>(); });
+    reg.registerAbility("vex_bulwark",
+                        []
+                        { return std::make_unique<VexBulwarkAction>(); });
+    reg.registerAbility("zara_frostbind",
+                        []
+                        { return std::make_unique<ZaraFrostbindAction>(); });
     return reg;
 }
 } // namespace
@@ -76,7 +90,7 @@ TEST_CASE("CharacterRegistry: created character has all three abilities register
     auto pc{chars.create("vex")};
     REQUIRE(pc != nullptr);
     // basic + archSkill + ultimate = 3
-    CHECK(pc->getAbilities().size() == 3);
+    CHECK(pc->getAbilities().size() == 4);
 }
 
 TEST_CASE("CharacterRegistry: getIds returns all registered ids in order")
@@ -114,4 +128,32 @@ TEST_CASE("CharacterRegistry: create Zara has correct stats and archetype")
     CHECK(pc->getBaseStats().spd == 12);
     CHECK(pc->getBaseStats().atk == 14);
     CHECK(chars.getArchetype("zara") == "Weaver");
+}
+
+TEST_CASE("CharacterRegistry: Lyra has Slot 1 pre-unlocked and equipped")
+{
+    AbilityRegistry abilities{makeAbilityRegistry()};
+    CharacterRegistry chars{};
+    chars.loadFromJson("data/characters.json", abilities);
+
+    auto pc{chars.create("lyra")};
+    REQUIRE(pc != nullptr);
+    const auto &slots{pc->getEquippedSkills()};
+    CHECK(slots.slots[0].unlocked);
+    CHECK(slots.slots[0].equippedSkill != nullptr);
+    CHECK(!slots.slots[1].unlocked);
+}
+
+TEST_CASE("CharacterRegistry: Vex Slot 1 pre-unlocked with EarthenShield")
+{
+    AbilityRegistry abilities{makeAbilityRegistry()};
+    CharacterRegistry chars{};
+    chars.loadFromJson("data/characters.json", abilities);
+
+    auto pc{chars.create("vex")};
+    REQUIRE(pc != nullptr);
+    CHECK(pc->getEquippedSkills().slots[0].unlocked);
+    CHECK(pc->getEquippedSkills().slots[0].equippedSkill != nullptr);
+    CHECK(pc->getEquippedSkills().slots[0].equippedSkill->label() ==
+          "Earthen Shield (25 SP — Shield one ally)");
 }

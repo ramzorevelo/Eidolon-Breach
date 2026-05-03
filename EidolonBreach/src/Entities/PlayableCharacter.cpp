@@ -136,6 +136,13 @@ void PlayableCharacter::tryUnlockSlot(int slotIndex)
     m_equipped.slots[static_cast<std::size_t>(slotIndex)].unlocked = true;
 }
 
+void PlayableCharacter::equipSkillToSlot(int slotIndex, IAction *skill)
+{
+    if (slotIndex < 0 || slotIndex >= EquippedSkillSet::kEquipSlots)
+        return;
+    m_equipped.slots[static_cast<std::size_t>(slotIndex)].equippedSkill = skill;
+}
+
 void PlayableCharacter::consumeArchSkill()
 {
     m_archSkillCooldown = CombatConstants::kArchSkillCooldownTurns;
