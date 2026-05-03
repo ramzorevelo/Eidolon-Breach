@@ -503,6 +503,12 @@
     <ClInclude Include="src\Core\FieldDiscovery.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="src\Dungeon\DungeonDefinition.h">
+      <Filter>Dungeon</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Dungeon\DungeonTable.h">
+      <Filter>Dungeon</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="data\items.json">
