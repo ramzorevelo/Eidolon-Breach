@@ -84,10 +84,7 @@ void BattleNode::runBattle(Party &party,
             if (!pc)
                 continue;
 
-            if (newLevel >= CombatConstants::kSlot1UnlockLevel)
-                pc->tryUnlockSlot(0);
-            if (newLevel >= CombatConstants::kSlot2UnlockLevel)
-                pc->tryUnlockSlot(1);
+            pc->applyUnlocks(newLevel);
         }
     }
 }

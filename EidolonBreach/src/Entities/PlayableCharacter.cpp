@@ -181,6 +181,14 @@ void PlayableCharacter::resetArchSkillCooldown()
     m_archSkillCooldown = 0;
 }
 
+void PlayableCharacter::applyUnlocks(int level)
+{
+    if (level >= CombatConstants::kArchSkillUnlockLevel)
+        m_archSkillUnlocked = true;
+    if (level >= CombatConstants::kSlot2UnlockLevel)
+        tryUnlockSlot(1);
+}
+
 std::optional<Item> PlayableCharacter::equip(const Item &item)
 {
     if (item.type != ItemType::Equipment || !item.equipSlot.has_value())

@@ -25,7 +25,7 @@ void CharacterRegistry::loadFromJson(const std::string &jsonPath,
 }
 
 std::unique_ptr<PlayableCharacter>
-CharacterRegistry::create(std::string_view characterId) const
+CharacterRegistry::create(std::string_view characterId, int characterLevel) const
 {
     auto it = m_blueprints.find(std::string{characterId});
     if (it == m_blueprints.end())
@@ -63,6 +63,8 @@ CharacterRegistry::create(std::string_view characterId) const
         pc->tryUnlockSlot(static_cast<int>(i));
         pc->equipSkillToSlot(static_cast<int>(i), rawPtr);
     }
+
+    pc->applyUnlocks(characterLevel);
 
     return pc;
 }
@@ -102,8 +104,8 @@ CharacterRegistry::parseBlueprint(const std::string &id, const nlohmann::json &j
     bp.basicId = abilities.value("basic", "basic_strike");
     bp.archSkillId = abilities.value("archSkill", "arch_skill_default");
     bp.ultimateId = abilities.value("ultimate", "ultimate_default");
-    for (const auto &id : abilities.value("slotSkills", nlohmann::json::array()))
-        bp.slotSkillIds.push_back(id.get<std::string>());
+    for (const auto &skillId : abilities.value("slotSkills", nlohmann::json::array()))
+        bp.slotSkillIds.push_back(skillId.get<std::string>());
     return bp;
 }
 
