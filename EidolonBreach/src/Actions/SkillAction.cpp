@@ -30,7 +30,7 @@ std::string SkillAction::label() const
 
 bool SkillAction::isAvailable(const PlayableCharacter &user, const Party & /*party*/) const
 {
-    return user.isArchSkillReady();
+    return user.isArchSkillUnlocked() && user.isArchSkillReady();
 }
 
 ActionResult SkillAction::execute(PlayableCharacter &user,

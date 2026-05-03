@@ -78,7 +78,10 @@ static void selectParty(Party &party,
     {
         for (const std::string &id : available)
         {
-            auto pc{characterRegistry.create(id)};
+            const int level{meta.characterLevels.count(id) > 0
+                                ? meta.characterLevels.at(id)
+                                : 1};
+            auto pc{characterRegistry.create(id, level)};
             if (pc)
                 party.addUnit(std::move(pc));
         }
@@ -133,9 +136,13 @@ static void selectParty(Party &party,
     if (chosen.empty())
         chosen.push_back(1);
 
-    for (std::size_t idx : chosen)
+        for (std::size_t idx : chosen)
     {
-        auto pc{characterRegistry.create(available[idx - 1])};
+        const std::string &id{available[idx - 1]};
+        const int level{meta.characterLevels.count(id) > 0
+                            ? meta.characterLevels.at(id)
+                            : 1};
+        auto pc{characterRegistry.create(id, level)};
         if (pc)
             party.addUnit(std::move(pc));
     }

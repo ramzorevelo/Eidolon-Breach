@@ -157,3 +157,37 @@ TEST_CASE("PlayableCharacter: multi-turn consumable locks for entire battle")
     hero->tickConsumableCooldown();      // cooldown reaches 0
     CHECK(!hero->canUseConsumable());    // still locked by m_consumableUsedThisBattle
 }
+
+TEST_CASE("PlayableCharacter: archSkill locked at creation (level 1)")
+{
+    auto hero = makeHero();
+    CHECK(!hero->isArchSkillUnlocked());
+}
+
+TEST_CASE("PlayableCharacter: applyUnlocks at 20 unlocks archSkill")
+{
+    auto hero = makeHero();
+    hero->applyUnlocks(20);
+    CHECK(hero->isArchSkillUnlocked());
+}
+
+TEST_CASE("PlayableCharacter: applyUnlocks at 19 does not unlock archSkill")
+{
+    auto hero = makeHero();
+    hero->applyUnlocks(19);
+    CHECK(!hero->isArchSkillUnlocked());
+}
+
+TEST_CASE("PlayableCharacter: applyUnlocks at 40 unlocks Slot 2")
+{
+    auto hero = makeHero();
+    hero->applyUnlocks(40);
+    CHECK(hero->getEquippedSkills().slots[1].unlocked);
+}
+
+TEST_CASE("PlayableCharacter: applyUnlocks at 39 does not unlock Slot 2")
+{
+    auto hero = makeHero();
+    hero->applyUnlocks(39);
+    CHECK(!hero->getEquippedSkills().slots[1].unlocked);
+}

@@ -72,6 +72,20 @@ class PlayableCharacter : public Unit
     {
         return m_archSkillCooldown == 0;
     }
+
+    [[nodiscard]] bool isArchSkillUnlocked() const
+    {
+        return m_archSkillUnlocked;
+    }
+
+    /**
+     * @brief Apply all level-based unlocks for this character.
+     *        Call at creation (with stored level) and after each level-up.
+     * @param level The character's current level.
+     */
+    void applyUnlocks(int level);
+
+
     /** @return Remaining cooldown turns for UI display. */
     [[nodiscard]] int getArchSkillCooldown() const
     {
@@ -186,6 +200,7 @@ class PlayableCharacter : public Unit
     std::size_t selectActionIndex(const Party &allies, IInputHandler &input);
     std::optional<TargetInfo> selectTarget(const Party &enemies, IInputHandler &input);
     int m_archSkillCooldown{0};
+    bool m_archSkillUnlocked{false};
     int m_consumableCooldown{0};
     bool m_consumableUsedThisBattle{false};
     CharacterEquipment m_equipment{};

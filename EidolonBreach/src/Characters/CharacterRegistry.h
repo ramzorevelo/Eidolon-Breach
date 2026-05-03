@@ -23,7 +23,7 @@ class CharacterRegistry
                       const AbilityRegistry &abilityRegistry);
 
     [[nodiscard]] std::unique_ptr<PlayableCharacter>
-    create(std::string_view characterId) const;
+    create(std::string_view characterId, int characterLevel = 1) const;
 
     [[nodiscard]] const std::vector<std::string> &getIds() const;
     [[nodiscard]] bool contains(std::string_view characterId) const;
