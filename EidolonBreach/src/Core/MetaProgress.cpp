@@ -6,13 +6,44 @@
 #include "Core/MetaProgress.h"
 #include <algorithm>
 #include <fstream>
+#include <cmath>
 
 
 int MetaProgress::levelFromXP(int totalXP)
 {
-    return 1 + totalXP / CombatConstants::kXpPerLevel;
+    if (totalXP <= 0)
+        return 1;
+    int level{1};
+    int cumulative{0};
+    while (true)
+    {
+        const int threshold{static_cast<int>(
+            CombatConstants::kXpLevelBase *
+            std::pow(static_cast<float>(level), CombatConstants::kXpLevelExponent))};
+        if (cumulative + threshold > totalXP)
+            return level;
+        cumulative += threshold;
+        ++level;
+    }
 }
 
+int MetaProgress::playerLevelFromXp(int totalXp)
+{
+    if (totalXp <= 0)
+        return 1;
+    int level{1};
+    int cumulative{0};
+    while (true)
+    {
+        const int threshold{static_cast<int>(
+            CombatConstants::kPlayerXpLevelBase *
+            std::pow(static_cast<float>(level), CombatConstants::kPlayerXpLevelExponent))};
+        if (cumulative + threshold > totalXp)
+            return level;
+        cumulative += threshold;
+        ++level;
+    }
+}
 
 MetaProgress MetaProgress::loadFromFile(const std::filesystem::path &path)
 {
@@ -46,6 +77,11 @@ MetaProgress MetaProgress::loadFromFile(const std::filesystem::path &path)
         meta.characterXP[id] = xp.get<int>();
         meta.characterLevels[id] = levelFromXP(xp.get<int>());
     }
+
+    meta.playerXp = j.value("playerXp", 0);
+    meta.playerLevel = j.value("playerLevel", 1);
+    for (const auto &id : j.value("clearedDungeonIds", nlohmann::json::array()))
+        meta.clearedDungeonIds.insert(id.get<std::string>());
 
     const nlohmann::json insightJson{j.value("characterInsight", nlohmann::json::object())};
     for (const auto &[id, insight] : insightJson.items())
@@ -83,6 +119,12 @@ void MetaProgress::saveToFile(const std::filesystem::path &path) const
     j["characterXP"] = nlohmann::json::object();
     for (const auto &[id, xp] : characterXP)
         j["characterXP"][id] = xp;
+
+    j["playerXp"] = playerXp;
+    j["playerLevel"] = playerLevel;
+    j["clearedDungeonIds"] = nlohmann::json::array();
+    for (const auto &id : clearedDungeonIds)
+        j["clearedDungeonIds"].push_back(id);
 
     j["characterInsight"] = nlohmann::json::object();
     for (const auto &[id, data] : characterInsight)
@@ -128,4 +170,11 @@ int MetaProgress::gainXP(std::string_view characterId, int amount)
     characterXP[id] += amount;
     characterLevels[id] = levelFromXP(characterXP[id]);
     return characterLevels[id];
+}
+
+int MetaProgress::gainPlayerXp(int amount)
+{
+    playerXp += amount;
+    playerLevel = playerLevelFromXp(playerXp);
+    return playerLevel;
 }
