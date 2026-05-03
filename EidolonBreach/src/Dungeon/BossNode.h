@@ -11,6 +11,7 @@ class BossNode : public EliteNode
   public:
     explicit BossNode(std::function<void(Party &)> populateEnemies,
                       Affinity floorAffinity = Affinity::Aether,
+                      int dungeonEnemyLevel = 1,
                       const SummonRegistry *summonRegistry = nullptr);
 
     void enter(Party &party, MetaProgress &meta,

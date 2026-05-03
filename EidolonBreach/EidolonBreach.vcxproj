@@ -132,6 +132,8 @@
     <ClInclude Include="src\Dungeon\BattleNode.h" />
     <ClInclude Include="src\Dungeon\BossNode.h" />
     <ClInclude Include="src\Dungeon\Dungeon.h" />
+    <ClInclude Include="src\Dungeon\DungeonDefinition.h" />
+    <ClInclude Include="src\Dungeon\DungeonTable.h" />
     <ClInclude Include="src\Dungeon\EliteNode.h" />
     <ClInclude Include="src\Dungeon\EncounterTable.h" />
     <ClInclude Include="src\Dungeon\EventNode.h" />

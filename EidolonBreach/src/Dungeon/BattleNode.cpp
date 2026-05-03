@@ -19,15 +19,16 @@
 #include "UI/ConsoleRenderer.h"
 #include <iostream>
 #include "Summons/SummonRegistry.h"
+#include <cmath>
 #include <limits>
 
 BattleNode::BattleNode(std::function<void(Party &)> populateEnemies,
                        Affinity floorAffinity,
-                       int xpReward,
+                       int dungeonEnemyLevel,
                        const SummonRegistry *summonRegistry)
     : m_populateEnemies{std::move(populateEnemies)},
       m_floorAffinity{floorAffinity},
-      m_xpReward{xpReward},
+      m_dungeonEnemyLevel{dungeonEnemyLevel},
       m_summonRegistry{summonRegistry}
 {
 }
@@ -65,7 +66,19 @@ void BattleNode::runBattle(Party &party,
             if (!u || !u->isAlive())
                 continue;
 
-            const int newLevel{meta.gainXP(u->getId(), m_xpReward)};
+            const int charLevel{
+                meta.characterLevels.count(u->getId()) > 0
+                    ? meta.characterLevels.at(u->getId())
+                    : 1};
+            const float gap{static_cast<float>(m_dungeonEnemyLevel - charLevel)};
+            const float scale{std::clamp(
+                1.0f + gap * CombatConstants::kCharBattleXpLevelScale,
+                0.1f, 2.0f)};
+            const int xp{static_cast<int>(
+                static_cast<float>(m_dungeonEnemyLevel) *
+                CombatConstants::kCharBattleXpMultiplier * scale)};
+
+            const int newLevel{meta.gainXP(u->getId(), xp)};
 
             auto *pc{dynamic_cast<PlayableCharacter *>(u)};
             if (!pc)

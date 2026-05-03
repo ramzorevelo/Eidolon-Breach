@@ -22,7 +22,7 @@ class BattleNode : public MapNode
      */
     explicit BattleNode(std::function<void(Party &)> populateEnemies,
                         Affinity floorAffinity = Affinity::Aether,
-                        int xpReward = 10,
+                        int dungeonEnemyLevel = 1,
                         const SummonRegistry *summonRegistry = nullptr);
 
     void enter(Party &party, MetaProgress &meta,
@@ -46,10 +46,10 @@ class BattleNode : public MapNode
                    RunContext &runCtx,
                    EventBus &eventBus);
 
-    Affinity m_floorAffinity{Affinity::Aether};
-    int m_xpReward{10};
 
   private:
     std::function<void(Party &)> m_populateEnemies;
     const SummonRegistry *m_summonRegistry{nullptr};
+    Affinity m_floorAffinity{Affinity::Aether};
+    int m_dungeonEnemyLevel{1};
 };

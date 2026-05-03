@@ -2,7 +2,9 @@
  * @file main.cpp
  * @brief Entry point. Loads registries from data/ and runs a dungeon.
  */
-
+#include "Dungeon/DungeonTable.h"
+#include "Dungeon/DungeonDefinition.h"
+#include <limits>
 #include "Actions/BasicStrikeAction.h"
 #include "Core/RunContext.h"
 #include "Actions/SkillAction.h"
@@ -158,10 +160,11 @@ int main()
 
     std::cout << "\nStarting run with " << playerParty.size() << " character(s).\n";
 
-    // --- Run ---
+        // --- Run ---
     const std::uint32_t seed{static_cast<std::uint32_t>(std::random_device{}())};
     std::cout << "Run seed: " << seed << '\n';
 
+    // --- Mode selection (Classic / Draft) ---
     std::cout << "Mode: [1] Classic  [2] Draft\nChoice: ";
     int modeChoice{1};
     std::cin >> modeChoice;
@@ -169,16 +172,58 @@ int main()
     const RunMode runMode{modeChoice == 2 ? RunMode::Draft : RunMode::Classic};
 
     Dungeon dungeon{};
-    dungeon.generate(seed, 9, DungeonDifficulty::Normal, &summonRegistry, runMode);
+    const DungeonDefinition *selectedDungeon{nullptr};
 
-    if (runMode == RunMode::Draft)
+    if (runMode == RunMode::Classic)
+    {
+        // --- Classic dungeon selection ---
+        const auto &classicDungeons{DungeonTable::getClassicDungeons()};
+
+        std::vector<const DungeonDefinition *> available{};
+        bool previousCleared{true};
+        for (const auto &def : classicDungeons)
+        {
+            const bool levelMet{meta.playerLevel >= def.unlockPlayerLevel};
+            if (levelMet && previousCleared)
+                available.push_back(&def);
+            previousCleared = meta.clearedDungeonIds.count(def.id) > 0;
+        }
+        if (available.empty())
+            available.push_back(&classicDungeons.front());
+
+        std::cout << "\n=== DUNGEON SELECT ===\n"
+                  << "  Player Level: " << meta.playerLevel << "\n\n";
+        for (std::size_t i{0}; i < available.size(); ++i)
+        {
+            const auto &def{*available[i]};
+            const bool cleared{meta.clearedDungeonIds.count(def.id) > 0};
+            std::cout << "  [" << (i + 1) << "] " << def.name
+                      << "  (Rec. Lv." << def.recommendedPlayerLevel
+                      << " | Enemy Lv." << def.enemyLevel
+                      << " | " << def.numFloors << " floors"
+                      << (cleared ? " | CLEARED" : "") << ")\n"
+                      << "      " << def.description << "\n";
+        }
+        std::cout << "Select dungeon: ";
+        int dungeonChoice{1};
+        std::cin >> dungeonChoice;
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        if (dungeonChoice < 1 || dungeonChoice > static_cast<int>(available.size()))
+            dungeonChoice = 1;
+        selectedDungeon = available[static_cast<std::size_t>(dungeonChoice - 1)];
+    }
+    else
+    {
+        // Draft mode uses the first dungeon as a default template for now
+        selectedDungeon = &DungeonTable::getClassicDungeons().front();
         std::cout << "Draft Mode: no XP earned. Attune available at Rest sites.\n";
+    }
 
+    dungeon.generate(seed, *selectedDungeon, &summonRegistry, runMode);
     const bool won{dungeon.run(playerParty, meta)};
     std::cout << (won ? "\n=== RUN COMPLETE ===\n" : "\n=== DEFEATED ===\n");
 
-    meta.highestFloorReached = std::max(meta.highestFloorReached,
-                                        static_cast<int>(won ? 9 : 0));
+   
     meta.saveToFile("save.json");
     std::cout << "Progress saved. Highest floor reached: "
               << meta.highestFloorReached << '\n';

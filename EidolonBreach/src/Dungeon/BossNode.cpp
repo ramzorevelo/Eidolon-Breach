@@ -12,11 +12,12 @@
 
 BossNode::BossNode(std::function<void(Party &)> populateEnemies,
                    Affinity floorAffinity,
+                   int dungeonEnemyLevel,
                    const SummonRegistry *summonRegistry)
-    : EliteNode{std::move(populateEnemies), floorAffinity, summonRegistry}
+    : EliteNode{
+          std::move(populateEnemies), floorAffinity, dungeonEnemyLevel, summonRegistry}
 {
 }
-
 void BossNode::enter(Party &party,
                      MetaProgress &meta,
                      RunContext &runCtx,

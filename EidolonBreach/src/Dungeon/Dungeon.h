@@ -13,6 +13,7 @@
 #include "Dungeon/MapNode.h"
 #include "Dungeon/EncounterTable.h"
 #include "Entities/EnemyRegistry.h"
+#include "Dungeon/DungeonDefinition.h"
 #include <cstdint>
 #include <memory>
 #include <random>
@@ -31,14 +32,6 @@ struct DungeonGraphNode
     std::vector<int> nextIndices{}; ///< Indices into the next layer's nodes.
 };
 
-/** Difficulty preset controlling elite frequency and gold rewards. */
-enum class DungeonDifficulty
-{
-    Normal,
-    Hard,
-    Nightmare
-};
-
 class Dungeon
 {
   public:
@@ -50,8 +43,8 @@ class Dungeon
      * @param numLayers  Total floor count including boss floor.
      * @param difficulty Controls elite spawn weight and reward scaling.
      */
-    void generate(std::uint32_t seed, int numLayers,
-                  DungeonDifficulty difficulty = DungeonDifficulty::Normal,
+    void generate(std::uint32_t seed,
+                  const DungeonDefinition &dungeonDef,
                   SummonRegistry *summonRegistry = nullptr,
                   RunMode runMode = RunMode::Classic);
 
@@ -59,6 +52,11 @@ class Dungeon
      * @brief Run the dungeon. Returns true if the player clears the boss.
      */
     bool run(Party &party, MetaProgress &meta);
+
+    [[nodiscard]] const DungeonDefinition &getCurrentDungeon() const
+    {
+        return m_currentDungeon;
+    }
 
   private:
     void assignFloorAffinities(std::uint32_t seed, int numLayers);
@@ -96,4 +94,5 @@ class Dungeon
     EnemyRegistry m_enemyRegistry{};
     EncounterTable m_encounterTable{};
     ItemRegistry m_itemRegistry{};
+    DungeonDefinition m_currentDungeon{};
 };

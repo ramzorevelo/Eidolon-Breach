@@ -47,8 +47,10 @@ void offerVestigeDiscard(Party &party, std::unique_ptr<IVestige> incoming)
 
 EliteNode::EliteNode(std::function<void(Party &)> populateEnemies,
                      Affinity floorAffinity,
+                     int dungeonEnemyLevel,
                      const SummonRegistry *summonRegistry)
-    : BattleNode{std::move(populateEnemies), floorAffinity, 20, summonRegistry}
+    : BattleNode{
+          std::move(populateEnemies), floorAffinity, dungeonEnemyLevel, summonRegistry}
 {
 }
 

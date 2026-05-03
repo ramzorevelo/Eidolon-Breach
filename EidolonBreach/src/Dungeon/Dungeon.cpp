@@ -22,6 +22,9 @@
 #include "Dungeon/RestNode.h"
 #include "Dungeon/TreasureNode.h"
 #include "Entities/Party.h"
+#include "Dungeon/DungeonDefinition.h"
+#include "Dungeon/DungeonTable.h"
+#include <cmath>
 #include "Entities/Slime.h"
 #include "Entities/StoneGolem.h"
 #include "Entities/VampireBat.h"
@@ -56,17 +59,16 @@ Dungeon::Dungeon() = default;
 Dungeon::~Dungeon() = default;
 
 void Dungeon::generate(std::uint32_t seed,
-                       int numLayers,
-                       DungeonDifficulty difficulty,
+                       const DungeonDefinition &dungeonDef,
                        SummonRegistry *summonRegistry,
                        RunMode runMode)
 {
+    m_currentDungeon = dungeonDef;
     m_summonRegistry = summonRegistry;
-    m_difficulty = difficulty;
+    m_difficulty = dungeonDef.difficulty;
     m_runContext.reset();
     m_runContext.runMode = runMode;
 
-    // Draft mode uses a separate seed pool so it never reproduces a Classic layout.
     constexpr std::uint32_t kDraftSeedOffset{0xDEADBEEFu};
     const std::uint32_t effectiveSeed{
         runMode == RunMode::Draft ? seed ^ kDraftSeedOffset : seed};
@@ -76,8 +78,8 @@ void Dungeon::generate(std::uint32_t seed,
     m_enemyRegistry.loadFromJson("data/enemies.json");
     m_itemRegistry.loadFromJson("data/items.json");
     m_encounterTable.loadFromJson("data/encounters.json", m_enemyRegistry);
-    assignFloorAffinities(effectiveSeed, numLayers);
-    buildGraph(effectiveSeed, numLayers, difficulty);
+    assignFloorAffinities(effectiveSeed, dungeonDef.numFloors);
+    buildGraph(effectiveSeed, dungeonDef.numFloors, dungeonDef.difficulty);
 }
 
 void Dungeon::assignFloorAffinities(std::uint32_t seed, int numLayers)
@@ -120,11 +122,11 @@ std::unique_ptr<MapNode> Dungeon::makeNode(int layer,
     if (roll < eW)
         return std::make_unique<EliteNode>(
             m_encounterTable.getFactory(EncounterTable::Tier::Elite, rng),
-            floorAffinity, m_summonRegistry);
+            floorAffinity, m_currentDungeon.enemyLevel, m_summonRegistry);
     if (roll < eW + battleW)
         return std::make_unique<BattleNode>(
             m_encounterTable.getFactory(EncounterTable::Tier::Standard, rng),
-            floorAffinity, 10, m_summonRegistry);
+            floorAffinity, m_currentDungeon.enemyLevel, m_summonRegistry);
     if (roll < eW + battleW + restW)
         return std::make_unique<RestNode>();
     if (roll < eW + battleW + restW + shopW)
@@ -163,7 +165,7 @@ void Dungeon::buildGraph(std::uint32_t seed,
         {
             layerNodes.push_back({std::make_unique<BossNode>(
                                       m_encounterTable.getFactory(EncounterTable::Tier::Boss, rng),
-                                      floorAffinity, m_summonRegistry),
+                                      floorAffinity, m_currentDungeon.enemyLevel, m_summonRegistry),
                                   {}});
             prevLayerHadElite = false;
             prevLayerHadRest = false;
@@ -182,7 +184,7 @@ void Dungeon::buildGraph(std::uint32_t seed,
         {
             layerNodes.push_back({std::make_unique<EliteNode>(
                                       m_encounterTable.getFactory(EncounterTable::Tier::Elite, rng),
-                                      floorAffinity, m_summonRegistry),
+                                      floorAffinity, m_currentDungeon.enemyLevel, m_summonRegistry),
                                   {}});
             prevLayerHadElite = true;
             prevLayerHadRest = false;
@@ -345,6 +347,25 @@ bool Dungeon::run(Party &party, MetaProgress &meta)
 
     const bool playerWon{!party.isAllDead() &&
                          floorsCleared == static_cast<int>(m_layers.size())};
+    if (playerWon)
+    {
+        const bool isFirstClear{meta.clearedDungeonIds.count(m_currentDungeon.id) == 0};
+        if (isFirstClear)
+            meta.clearedDungeonIds.insert(m_currentDungeon.id);
+
+        const float gap{static_cast<float>(
+            m_currentDungeon.enemyLevel - meta.playerLevel)};
+        const float scale{std::clamp(
+            1.0f + gap * CombatConstants::kPlayerXpLevelScale, 0.1f, 2.0f)};
+        int xpAwarded{static_cast<int>(
+            static_cast<float>(CombatConstants::kPlayerXpDungeonBase) * scale)};
+        if (isFirstClear)
+            xpAwarded += CombatConstants::kPlayerXpFirstClearBonus;
+
+        const int newPlayerLevel{meta.gainPlayerXp(xpAwarded)};
+        std::cout << "Player XP gained: " << xpAwarded
+                  << "  (Player Level: " << newPlayerLevel << ")\n";
+    }
 
     m_eventBus.emit(RunCompletedEvent{playerWon, floorsCleared});
     m_eventBus.clearRunScope();
