@@ -40,6 +40,13 @@ class PlayableCharacter : public Unit
      */
     void tryUnlockSlot(int slotIndex);
 
+    /**
+     * @brief Set the raw IAction* observer for a slot.
+     *        The pointer must point into m_abilities (owned there).
+     */
+    void equipSkillToSlot(int slotIndex, IAction *skill);
+
+
     /** @return Read-only view of the equipped skill set. */
     const EquippedSkillSet &getEquippedSkills() const
     {

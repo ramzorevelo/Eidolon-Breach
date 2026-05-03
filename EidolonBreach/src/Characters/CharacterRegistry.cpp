@@ -7,6 +7,7 @@
 #include "Characters/AbilityRegistry.h"
 #include "Core/Affinity.h"
 #include "Core/DataLoader.h"
+
 #include "Entities/PlayableCharacter.h"
 #include <stdexcept>
 
@@ -47,6 +48,22 @@ CharacterRegistry::create(std::string_view characterId) const
         if (auto ult{m_abilityRegistry->create(bp.ultimateId)})
             pc->addAbility(std::move(ult));
     }
+
+    for (std::size_t i{0}; i < bp.slotSkillIds.size(); ++i)
+    {
+        if (i >= static_cast<std::size_t>(EquippedSkillSet::kEquipSlots))
+            break;
+        if (!m_abilityRegistry)
+            break;
+        auto skill{m_abilityRegistry->create(bp.slotSkillIds[i])};
+        if (!skill)
+            continue;
+        IAction *rawPtr{skill.get()};
+        pc->addAbility(std::move(skill));
+        pc->tryUnlockSlot(static_cast<int>(i));
+        pc->equipSkillToSlot(static_cast<int>(i), rawPtr);
+    }
+
     return pc;
 }
 
@@ -85,6 +102,8 @@ CharacterRegistry::parseBlueprint(const std::string &id, const nlohmann::json &j
     bp.basicId = abilities.value("basic", "basic_strike");
     bp.archSkillId = abilities.value("archSkill", "arch_skill_default");
     bp.ultimateId = abilities.value("ultimate", "ultimate_default");
+    for (const auto &id : abilities.value("slotSkills", nlohmann::json::array()))
+        bp.slotSkillIds.push_back(id.get<std::string>());
     return bp;
 }
 

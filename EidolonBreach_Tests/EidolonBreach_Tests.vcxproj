@@ -25,6 +25,8 @@
     <ClCompile Include="..\EidolonBreach\src\Actions\UltimateAction.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Actions\UseConsumableAction.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Actions\VentAction.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Actions\VexBulwarkAction.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Actions\ZaraFrostBindAction.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Battle\Battle.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Battle\FormationManager.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Battle\ResonanceField.cpp" />

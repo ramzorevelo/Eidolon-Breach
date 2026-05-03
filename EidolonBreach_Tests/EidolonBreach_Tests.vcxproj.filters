@@ -309,6 +309,12 @@
     <ClCompile Include="..\EidolonBreach\src\Vestiges\VoidHungerVestige.cpp">
       <Filter>Vestiges</Filter>
     </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Actions\ZaraFrostBindAction.cpp">
+      <Filter>Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Actions\VexBulwarkAction.cpp">
+      <Filter>Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="external\doctest.h">

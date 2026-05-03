@@ -18,6 +18,9 @@
 #include "Entities/PlayableCharacter.h"
 #include "Summons/Ignis.h"
 #include "Summons/SummonRegistry.h"
+#include "Actions/EmberCallAction.h"
+#include "Actions/VexBulwarkAction.h"
+#include "Actions/ZaraFrostbindAction.h"
 #include <algorithm>
 #include <iostream>
 #include <memory>
@@ -36,6 +39,18 @@ static AbilityRegistry buildAbilityRegistry()
     reg.registerAbility("ultimate_default",
                         []
                         { return std::make_unique<UltimateAction>(); });
+    // Lyra's Ember Call 
+    reg.registerAbility("lyra_ember_call",
+                        []
+                        { return std::make_unique<EmberCallAction>(); });
+    // Vex's Bulwark
+    reg.registerAbility("vex_bulwark",
+                        []
+                        { return std::make_unique<VexBulwarkAction>(); });
+    // Zara's Frostbind
+    reg.registerAbility("zara_frostbind",
+                        []
+                        { return std::make_unique<ZaraFrostbindAction>(); });
     return reg;
 }
 

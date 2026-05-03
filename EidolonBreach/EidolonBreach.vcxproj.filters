@@ -228,6 +228,12 @@
     <ClCompile Include="src\Dungeon\ShopNode.cpp">
       <Filter>Dungeon</Filter>
     </ClCompile>
+    <ClCompile Include="src\Actions\VexBulwarkAction.cpp">
+      <Filter>Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Actions\ZaraFrostBindAction.cpp">
+      <Filter>Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Actions\BasicStrikeAction.h">
@@ -508,6 +514,12 @@
     </ClInclude>
     <ClInclude Include="src\Dungeon\DungeonTable.h">
       <Filter>Dungeon</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Actions\VexBulwarkAction.h">
+      <Filter>Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Actions\ZaraFrostBindAction.h">
+      <Filter>Actions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
