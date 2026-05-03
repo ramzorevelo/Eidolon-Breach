@@ -10,6 +10,7 @@
 #include "Core/ActionResult.h"
 #include "Core/Drop.h"
 #include <optional>
+#include <vector>
 #include <string>
 
 class Party;
@@ -59,4 +60,9 @@ class IRenderer
      */
     virtual void renderActionMenu(const PlayableCharacter &character,
                                   const Party &party) = 0;
+    /**
+     * @brief Render the numbered list of valid targets before the input prompt.
+     * @param names Display name of each selectable target, in selection order.
+     */
+    virtual void renderTargetList(const std::vector<std::string> &names) = 0;
 };

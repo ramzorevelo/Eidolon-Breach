@@ -30,7 +30,7 @@ class ConsoleRenderer : public IRenderer
     void renderActionMenu(const PlayableCharacter &character,
                           const Party &party) override;
 
-
+    void renderTargetList(const std::vector<std::string> &names) override;
   private:
     static void printBar(int current, int maximum, int width = 20);
     static void renderParty(const Party &party,
