@@ -61,6 +61,13 @@ class Dungeon
   private:
     void assignFloorAffinities(std::uint32_t seed, int numLayers);
     void buildGraph(std::uint32_t seed, int numLayers, DungeonDifficulty difficulty);
+    /**
+     * @brief Build a single-path (no branches) dungeon from an ordered node list.
+     *        Called by generate() when dungeonDef.fixedLayout is non-empty.
+     */
+    void buildFixedGraph(std::uint32_t seed,
+                         const std::vector<std::string> &layout,
+                         DungeonDifficulty difficulty);
 
     [[nodiscard]] std::unique_ptr<MapNode> makeNode(int layer,
                                                     int numLayers,

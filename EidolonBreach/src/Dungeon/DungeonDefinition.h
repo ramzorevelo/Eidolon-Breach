@@ -4,6 +4,7 @@
  * @brief Difficulty preset and data descriptor for a named dungeon tier.
  */
 #include <string>
+#include <vector>   
 
 enum class DungeonDifficulty
 {
@@ -22,4 +23,10 @@ struct DungeonDefinition
     int unlockPlayerLevel{1};
     int numFloors{5};
     DungeonDifficulty difficulty{DungeonDifficulty::Normal};
+    /**
+     * @brief Ordered list of node type strings for a fixed Classic dungeon.
+     *        Valid strings: "battle", "elite", "boss", "rest", "treasure", "event".
+     *        When empty the dungeon uses the procedural generator (EidolonLabyrinth).
+     */
+    std::vector<std::string> fixedLayout{};
 };

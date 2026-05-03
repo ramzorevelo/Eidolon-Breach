@@ -315,6 +315,9 @@
     <ClCompile Include="..\EidolonBreach\src\Actions\VexBulwarkAction.cpp">
       <Filter>Actions</Filter>
     </ClCompile>
+    <ClCompile Include="tests\Battle\test_FixedDungeon.cpp">
+      <Filter>Battle</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="external\doctest.h">

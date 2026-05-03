@@ -78,8 +78,15 @@ void Dungeon::generate(std::uint32_t seed,
     m_enemyRegistry.loadFromJson("data/enemies.json");
     m_itemRegistry.loadFromJson("data/items.json");
     m_encounterTable.loadFromJson("data/encounters.json", m_enemyRegistry);
-    assignFloorAffinities(effectiveSeed, dungeonDef.numFloors);
-    buildGraph(effectiveSeed, dungeonDef.numFloors, dungeonDef.difficulty);
+    const int floors{dungeonDef.fixedLayout.empty()
+                         ? dungeonDef.numFloors
+                         : static_cast<int>(dungeonDef.fixedLayout.size())};
+    assignFloorAffinities(effectiveSeed, floors);
+
+    if (!dungeonDef.fixedLayout.empty())
+        buildFixedGraph(effectiveSeed, dungeonDef.fixedLayout, dungeonDef.difficulty);
+    else
+        buildGraph(effectiveSeed, floors, dungeonDef.difficulty);
 }
 
 void Dungeon::assignFloorAffinities(std::uint32_t seed, int numLayers)
@@ -321,7 +328,65 @@ std::vector<int> Dungeon::getReachableIndices(
     }
     return reachable;
 }
+void Dungeon::buildFixedGraph(std::uint32_t seed,
+                              const std::vector<std::string> &layout,
+                              DungeonDifficulty difficulty)
+{
+    (void)difficulty; // reserved for future per-node difficulty scaling
+    std::mt19937 rng{seed};
+    m_layers.clear();
 
+    for (std::size_t i{0}; i < layout.size(); ++i)
+    {
+        const Affinity floorAffinity{
+            i < m_floorAffinities.size()
+                ? m_floorAffinities[i]
+                : Affinity::Aether};
+        const std::string &nodeType{layout[i]};
+
+        std::unique_ptr<MapNode> node{};
+        if (nodeType == "battle")
+        {
+            node = std::make_unique<BattleNode>(
+                m_encounterTable.getFactory(EncounterTable::Tier::Standard, rng),
+                floorAffinity, m_currentDungeon.enemyLevel, m_summonRegistry);
+        }
+        else if (nodeType == "elite")
+        {
+            node = std::make_unique<EliteNode>(
+                m_encounterTable.getFactory(EncounterTable::Tier::Elite, rng),
+                floorAffinity, m_currentDungeon.enemyLevel, m_summonRegistry);
+        }
+        else if (nodeType == "boss")
+        {
+            node = std::make_unique<BossNode>(
+                m_encounterTable.getFactory(EncounterTable::Tier::Boss, rng),
+                floorAffinity, m_currentDungeon.enemyLevel, m_summonRegistry);
+        }
+        else if (nodeType == "rest")
+        {
+            node = std::make_unique<RestNode>();
+        }
+        else if (nodeType == "treasure")
+        {
+            node = std::make_unique<TreasureNode>(
+                20 + static_cast<int>(i) * 5, rng());
+        }
+        else
+        {
+            // "event" and any unknown type fall back to EventNode
+            node = std::make_unique<EventNode>();
+        }
+
+        std::vector<DungeonGraphNode> layer{};
+        layer.push_back({std::move(node), {}});
+        m_layers.push_back(std::move(layer));
+    }
+
+    // Connect each layer to the next (linear, no branching).
+    for (std::size_t i{0}; i + 1 < m_layers.size(); ++i)
+        m_layers[i][0].nextIndices.push_back(0);
+}
 bool Dungeon::run(Party &party, MetaProgress &meta)
 {
     int floorsCleared{0};
