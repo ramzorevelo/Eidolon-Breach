@@ -6,11 +6,29 @@
 #include "Entities/EnemyRegistry.h"
 #include "Core/DataLoader.h"
 #include "Entities/Enemy.h"
+#include "Core/Affinity.h"
 #include "Entities/IAIStrategy.h"
 #include "Entities/Slime.h"
 #include "Entities/StoneGolem.h"
 #include "Entities/VampireBat.h"
 #include <stdexcept>
+
+
+namespace
+{
+Affinity parseAffinityStr(const std::string &s)
+{
+    if (s == "Blaze")
+        return Affinity::Blaze;
+    if (s == "Frost")
+        return Affinity::Frost;
+    if (s == "Tempest")
+        return Affinity::Tempest;
+    if (s == "Terra")
+        return Affinity::Terra;
+    return Affinity::Aether;
+}
+} // namespace
 
 void EnemyRegistry::loadFromJson(const std::string &jsonPath)
 {
@@ -48,6 +66,7 @@ EnemyBlueprint EnemyRegistry::parseBlueprint(const std::string &id,
     bp.maxToughness = j.at("maxToughness").get<int>();
     bp.faction = j.value("faction", "");
     bp.category = j.value("category", "");
+    bp.affinity = j.value("affinity", "Aether");
     return bp;
 }
 
@@ -65,7 +84,7 @@ std::unique_ptr<Enemy> EnemyRegistry::instantiate(const EnemyBlueprint &bp)
     return std::make_unique<Enemy>(
         bp.id, bp.name,
         Stats{bp.maxHp, bp.maxHp, 10, 0, 5},
-        Affinity::Aether,
+        parseAffinityStr(bp.affinity),
         bp.maxToughness,
         std::make_unique<BasicAIStrategy>());
 }
