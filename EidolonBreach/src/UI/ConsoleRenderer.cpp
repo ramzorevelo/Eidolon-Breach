@@ -186,13 +186,16 @@ void ConsoleRenderer::renderTargetList(const std::vector<std::string> &names)
 void ConsoleRenderer::renderTurnOrder(const std::vector<TurnSlot> &order)
 {
     std::cout << "  Turn: ";
-    for (std::size_t i{0}; i < order.size() && i < 15; ++i)
+    bool first{true};
+    for (std::size_t i{0}; i < order.size() && i < 9; ++i)
     {
-        if (i != 0)
-            std::cout << " -> ";
         const Unit *u{order[i].unit};
-        if (u)
-            std::cout << (order[i].isPlayer ? "" : "[E]") << u->getName();
+        if (!u)
+            continue;
+        if (!first)
+            std::cout << " -> ";
+        first = false;
+        std::cout << (order[i].isPlayer ? "" : "[E]") << u->getName();
     }
     std::cout << '\n';
 }

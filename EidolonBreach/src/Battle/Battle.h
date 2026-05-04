@@ -74,7 +74,13 @@ class Battle
                                     Affinity actionAffinity,
                                     BattleState &state);
     void applyResonanceTrigger(Affinity affinity, BattleState &state);
-
+    /**
+     * @brief Apply the Exposure threshold 50 "Resonating" one-time bonus effect.
+     *        Called from processPlayerTurn when the proc is armed and fires.
+     */
+    void applyResonatingProc(PlayableCharacter &pc,
+                             const ActionResult &result,
+                             BattleState &state);
     void processActionResult(PlayableCharacter &actor,
                              Party &allies,
                              const ActionResult &result,

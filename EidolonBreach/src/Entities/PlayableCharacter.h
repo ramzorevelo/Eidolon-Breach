@@ -122,6 +122,19 @@ class PlayableCharacter : public Unit
     }
     void modifyExposure(int delta);
     bool canVent() const; // 0 < exposure < 100
+    
+    [[nodiscard]] bool isResonatingProcArmed() const
+    {
+        return m_resonatingProcArmed;
+    }
+    void armResonatingProc()
+    {
+        m_resonatingProcArmed = true;
+    }
+    void consumeResonatingProc()
+    {
+        m_resonatingProcArmed = false;
+    }
 
     // Consumable cooldown
     /** @return true when a consumable may be used this turn. */
@@ -218,5 +231,6 @@ class PlayableCharacter : public Unit
     bool m_archSkillUnlocked{false};
     int m_consumableCooldown{0};
     bool m_consumableUsedThisBattle{false};
+    bool m_resonatingProcArmed{false};
     CharacterEquipment m_equipment{};
 };

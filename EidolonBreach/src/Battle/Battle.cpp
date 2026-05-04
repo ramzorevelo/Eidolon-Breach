@@ -50,7 +50,16 @@ void Battle::run()
                       m_renderer, m_runContext, m_eventBus};
     state.playerParty = &m_playerParty;
     state.enemyParty = &m_enemyParty;
-
+    m_eventBus.subscribe<ExposureThresholdEvent>(
+        [this, &state](const ExposureThresholdEvent &e)
+        {
+            if (e.threshold != CombatConstants::kExposureThreshold50 || !e.character)
+                return;
+            e.character->armResonatingProc();
+            state.renderer.renderMessage(
+                e.character->getName() + " begins Resonating! (proc armed)");
+        },
+        EventScope::Battle);
     m_eventBus.emit(BattleStartedEvent{&state});
     callVestigeOnBattleStart(state);
     m_renderer.renderMessage("\n=== BATTLE START ===");
@@ -188,6 +197,12 @@ void Battle::processPlayerTurn(Unit *unit, BattleState &state)
     if (pc)
     {
         processActionResult(*pc, m_playerParty, result, state);
+        if (pc->isResonatingProcArmed() &&
+            result.actionAffinity == pc->getAffinity())
+        {
+            pc->consumeResonatingProc();
+            applyResonatingProc(*pc, result, state);
+        }
         if (result.summonEffect.has_value())
         {
             processSummonEffect(*result.summonEffect, pc->getResonanceContribution(), state);
@@ -218,6 +233,11 @@ void Battle::processPlayerTurn(Unit *unit, BattleState &state)
 void Battle::processEnemyTurn(Unit *unit, BattleState &state)
 {
     auto playerAliveBefore{snapshotAliveStates(m_playerParty)};
+
+    const std::string intent{unit->getIntentLabel()};
+    if (!intent.empty())
+        m_renderer.renderMessage(">> " + unit->getName() + " intends: " + intent + " <<");
+
     const ActionResult result{unit->takeTurn(m_enemyParty, m_playerParty, state)};
 
     if (result.type == ActionResult::Type::Skip)
@@ -596,4 +616,54 @@ int Battle::countActiveSummons() const
             ++count;
     }
     return count;
+}
+
+void Battle::applyResonatingProc(PlayableCharacter &pc,
+                                 const ActionResult &result,
+                                 BattleState &state)
+{
+    switch (pc.getAffinity())
+    {
+    case Affinity::Blaze:
+        if (result.targetEnemyIndex >= 0 && state.enemyParty != nullptr)
+        {
+            Unit *t{state.enemyParty->getUnitAt(
+                static_cast<std::size_t>(result.targetEnemyIndex))};
+            if (t && t->isAlive())
+                t->applyEffect(std::make_unique<BurnEffect>(5, 2));
+        }
+        break;
+
+    case Affinity::Frost:
+        if (result.targetEnemyIndex >= 0 && state.enemyParty != nullptr)
+        {
+            Unit *t{state.enemyParty->getUnitAt(
+                static_cast<std::size_t>(result.targetEnemyIndex))};
+            if (t && t->isAlive())
+                t->applyEffect(std::make_unique<SlowEffect>(0.20f, 2));
+        }
+        break;
+
+    case Affinity::Tempest:
+        pc.gainEnergy(15);
+        break;
+
+    case Affinity::Terra:
+    {
+        const int shield{
+            std::max(1, static_cast<int>(
+                            static_cast<float>(pc.getFinalStats().maxHp) * 0.10f))};
+        pc.applyEffect(std::make_unique<ShieldEffect>(shield, 2));
+        break;
+    }
+
+    case Affinity::Aether:
+        state.resonanceField.addContribution(
+            Affinity::Aether,
+            std::max(1, pc.getResonanceContribution() / 2));
+        break;
+    }
+
+    state.renderer.renderMessage(
+        pc.getName() + " — Resonating proc fires!");
 }

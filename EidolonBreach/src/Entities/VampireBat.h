@@ -22,6 +22,8 @@ class VampireBat : public Enemy
     /** @brief Zeroes HP damage output for kBloodlessDuration turns. */
     void onBreakCallback() override;
 
+    [[nodiscard]] std::string getIntentLabel() const override;
+
   private:
     int m_turnCount{0};
     bool m_bloodlessActive{false};

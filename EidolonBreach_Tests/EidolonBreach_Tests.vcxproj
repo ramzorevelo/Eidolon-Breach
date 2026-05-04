@@ -103,6 +103,7 @@
     <ClCompile Include="tests\Entities\test_Exposure.cpp" />
     <ClCompile Include="tests\Entities\test_Party.cpp" />
     <ClCompile Include="tests\Entities\test_PlayableCharacter.cpp" />
+    <ClCompile Include="tests\Entities\test_ResonatingProc.cpp" />
     <ClCompile Include="tests\Entities\test_Summon.cpp" />
     <ClCompile Include="tests\Entities\test_Unit.cpp" />
     <ClCompile Include="tests\Entities\test_UnitEffects.cpp" />

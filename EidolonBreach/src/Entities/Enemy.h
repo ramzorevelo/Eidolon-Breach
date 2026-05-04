@@ -102,6 +102,8 @@ class Enemy : public Unit
      */
     virtual void onBreakCallback() {}
 
+    [[nodiscard]] std::string getIntentLabel() const override;
+
   protected:
     virtual ActionResult performAttack();
 

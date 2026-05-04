@@ -73,3 +73,14 @@ ActionResult VampireBat::performAttack()
     }
     return ActionResult{ActionResult::Type::Damage, kBatBaseDamage};
 }
+
+std::string VampireBat::getIntentLabel() const
+{
+    if (isBroken())
+        return "Stunned (skip)";
+    if (m_bloodlessActive)
+        return "Bloodless (skip)";
+    if ((m_turnCount + 1) % kBatLifedrainInterval == 0)
+        return "Lifedrain!";
+    return "Attacks";
+}
