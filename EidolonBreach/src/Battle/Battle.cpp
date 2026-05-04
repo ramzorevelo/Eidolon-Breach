@@ -67,6 +67,13 @@ void Battle::run()
                 state.renderer.renderMessage(
                     e.character->getName() + " is Surging! (next action boosted)");
             }
+            else if (e.threshold == CombatConstants::kExposureThreshold100)
+            {
+                e.character->activateBreachborn();
+                applyBreachbornEffect(*e.character, state);
+                state.renderer.renderMessage(
+                    e.character->getName() + " enters BREACHBORN!");
+            }
         },
         EventScope::Battle);
 
@@ -177,7 +184,24 @@ void Battle::processPlayerTurn(Unit *unit, BattleState &state)
     {
         pc->tickArchSkillCooldown();
         pc->tickConsumableCooldown();
-        // onTurnStart fires before the character chooses an action.
+
+        // Fracture start-of-turn effect (permanent after Breachborn ends).
+        if (pc->isFractured())
+            applyFractureStartOfTurn(*pc, state);
+
+        // Breachborn turn counter.
+        if (pc->isBreachbornActive())
+        {
+            m_renderer.renderMessage(pc->getName() +
+                                     " — BREACHBORN (" +
+                                     std::to_string(pc->getBreachbornTurnsRemaining()) +
+                                     " turns remaining)");
+            const bool fractureActivated{pc->tickBreachborn()};
+            if (fractureActivated)
+                m_renderer.renderMessage(pc->getName() +
+                                         " — Breachborn ends. FRACTURE activated!");
+        }
+
         for (auto &v : m_playerParty.getVestiges())
             v->onTurnStart(*pc, state);
     }
@@ -219,6 +243,9 @@ void Battle::processPlayerTurn(Unit *unit, BattleState &state)
             pc->consumeSurgingProc();
             applySurgingProc(*pc, result, state);
         }
+
+        if (pc && pc->isBreachbornActive())
+            applyBreachbornActionBonus(*pc, result, state);
 
         if (result.summonEffect.has_value())
         {
@@ -737,5 +764,96 @@ void Battle::applySurgingProc(PlayableCharacter &pc,
     else
     {
         state.renderer.renderMessage(pc.getName() + " — Surging!");
+    }
+}
+
+void Battle::applyBreachbornEffect(PlayableCharacter &pc, BattleState &state)
+{
+    switch (pc.getAffinity())
+    {
+    case Affinity::Blaze:
+        if (state.enemyParty != nullptr)
+            for (Unit *u : state.enemyParty->getAliveUnits())
+                u->applyEffect(std::make_unique<BurnEffect>(10, 3));
+        state.renderer.renderMessage(
+            pc.getName() + " — Breachborn: Burn descends on all enemies!");
+        break;
+
+    case Affinity::Frost:
+        if (state.enemyParty != nullptr)
+            for (Unit *u : state.enemyParty->getAliveUnits())
+                u->applyEffect(std::make_unique<SlowEffect>(0.50f, 3));
+        state.renderer.renderMessage(
+            pc.getName() + " — Breachborn: Arctic storm slows all enemies!");
+        break;
+
+    case Affinity::Tempest:
+        if (state.playerParty != nullptr)
+            for (Unit *u : state.playerParty->getAliveUnits())
+                if (auto *ally = dynamic_cast<PlayableCharacter *>(u))
+                    ally->gainEnergy(20);
+        state.renderer.renderMessage(
+            pc.getName() + " — Breachborn: Tempest surges through the party (+20 Energy)!");
+        break;
+
+    case Affinity::Terra:
+        if (state.playerParty != nullptr)
+            for (Unit *u : state.playerParty->getAliveUnits())
+                u->applyEffect(std::make_unique<ShieldEffect>(25, 3));
+        state.renderer.renderMessage(
+            pc.getName() + " — Breachborn: Terra fortress shields the party!");
+        break;
+
+    case Affinity::Aether:
+        state.resonanceField.addContribution(Affinity::Aether, 30);
+        state.renderer.renderMessage(
+            pc.getName() + " — Breachborn: Aether floods the Resonance Field!");
+        break;
+    }
+}
+
+void Battle::applyFractureStartOfTurn(PlayableCharacter &pc, BattleState &state)
+{
+    if (pc.getAffinity() == Affinity::Blaze)
+    {
+        // Lyra Fracture: 5% maxHP self-DoT per her turn.
+        const int selfDamage{
+            std::max(1, static_cast<int>(
+                            static_cast<float>(pc.getFinalStats().maxHp) * 0.05f))};
+        pc.takeTrueDamage(selfDamage);
+        state.renderer.renderMessage(
+            pc.getName() + " — Fracture: -" + std::to_string(selfDamage) +
+            " HP (self-DoT)");
+    }
+    else
+    {
+        // Other Fracture effects deferred to IPassiveTrait (v0.9.x).
+        state.renderer.renderMessage(pc.getName() + " — [Fractured]");
+    }
+}
+
+void Battle::applyBreachbornActionBonus(PlayableCharacter &pc,
+                                        const ActionResult &result,
+                                        BattleState &state)
+{
+    if (pc.getAffinity() != Affinity::Blaze)
+        return; // Placeholder: only Blaze has per-action Breachborn bonus for now.
+
+    // +50% bonus damage as true damage to primary target.
+    if (result.value > 0 && result.targetEnemyIndex >= 0 &&
+        state.enemyParty != nullptr)
+    {
+        Unit *t{state.enemyParty->getUnitAt(
+            static_cast<std::size_t>(result.targetEnemyIndex))};
+        if (t && t->isAlive())
+        {
+            const int bonus{result.value / 2};
+            t->takeTrueDamage(bonus);
+            // Also re-apply Burn on every Breachborn action.
+            t->applyEffect(std::make_unique<BurnEffect>(5, 1));
+            state.renderer.renderMessage(
+                pc.getName() + " — Breachborn Blaze: +" +
+                std::to_string(bonus) + " bonus damage + Burn!");
+        }
     }
 }
