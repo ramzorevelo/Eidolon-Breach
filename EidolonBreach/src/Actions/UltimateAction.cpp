@@ -25,7 +25,7 @@ UltimateAction::UltimateAction()
 
 std::string UltimateAction::label() const
 {
-    return "Ultimate (full Momentum -> 0 | +5 Momentum)";
+    return "Ultimate (full Energy -> 0 | +5 Energy)";
 }
 
 bool UltimateAction::isAvailable(const PlayableCharacter &user,

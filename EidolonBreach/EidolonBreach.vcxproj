@@ -21,12 +21,15 @@
   <ItemGroup>
     <ClCompile Include="src\Actions\BasicStrikeAction.cpp" />
     <ClCompile Include="src\Actions\EmberCallAction.cpp" />
+    <ClCompile Include="src\Actions\LyraUltimateAction.cpp" />
     <ClCompile Include="src\Actions\SkillAction.cpp" />
     <ClCompile Include="src\Actions\UltimateAction.cpp" />
     <ClCompile Include="src\Actions\UseConsumableAction.cpp" />
     <ClCompile Include="src\Actions\VentAction.cpp" />
     <ClCompile Include="src\Actions\VexBulwarkAction.cpp" />
+    <ClCompile Include="src\Actions\VexUltimateAction.cpp" />
     <ClCompile Include="src\Actions\ZaraFrostBindAction.cpp" />
+    <ClCompile Include="src\Actions\ZaraUltimateAction.cpp" />
     <ClCompile Include="src\Battle\Battle.cpp" />
     <ClCompile Include="src\Battle\FormationManager.cpp" />
     <ClCompile Include="src\Battle\ResonanceField.cpp" />
@@ -85,13 +88,16 @@
     <ClInclude Include="src\Actions\BasicStrikeAction.h" />
     <ClInclude Include="src\Actions\EmberCallAction.h" />
     <ClInclude Include="src\Actions\IAction.h" />
+    <ClInclude Include="src\Actions\LyraUltimateAction.h" />
     <ClInclude Include="src\Actions\SkillAction.h" />
     <ClInclude Include="src\Actions\SlotState.h" />
     <ClInclude Include="src\Actions\UltimateAction.h" />
     <ClInclude Include="src\Actions\UseConsumableAction.h" />
     <ClInclude Include="src\Actions\VentAction.h" />
     <ClInclude Include="src\Actions\VexBulwarkAction.h" />
+    <ClInclude Include="src\Actions\VexUltimateAction.h" />
     <ClInclude Include="src\Actions\ZaraFrostBindAction.h" />
+    <ClInclude Include="src\Actions\ZaraUltimateAction.h" />
     <ClInclude Include="src\Battle\Battle.h" />
     <ClInclude Include="src\Battle\BattleState.h" />
     <ClInclude Include="src\Battle\FormationManager.h" />

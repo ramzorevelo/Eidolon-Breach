@@ -3,6 +3,9 @@
  * @file test_CharacterRegistry.cpp
  * @brief Tests for CharacterRegistry and AbilityRegistry.
  */
+#include "Actions/LyraUltimateAction.h"
+#include "Actions/VexUltimateAction.h"
+#include "Actions/ZaraUltimateAction.h"
 #include "Actions/BasicStrikeAction.h"
 #include "Actions/SkillAction.h"
 #include "Actions/UltimateAction.h"
@@ -28,6 +31,15 @@ AbilityRegistry makeAbilityRegistry()
     reg.registerAbility("ultimate_default",
                         []
                         { return std::make_unique<UltimateAction>(); });
+    reg.registerAbility("lyra_ultimate",
+                        []
+                        { return std::make_unique<LyraUltimateAction>(); });
+    reg.registerAbility("vex_ultimate",
+                        []
+                        { return std::make_unique<VexUltimateAction>(); });
+    reg.registerAbility("zara_ultimate",
+                        []
+                        { return std::make_unique<ZaraUltimateAction>(); });
     // Slot skills (required for pre‑unlock tests)
     reg.registerAbility("lyra_ember_call",
                         []

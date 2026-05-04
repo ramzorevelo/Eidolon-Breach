@@ -61,5 +61,5 @@ TEST_CASE("UltimateAction: does not consume SP")
 TEST_CASE("UltimateAction: label is correct")
 {
     UltimateAction ult;
-    CHECK(ult.label() == "Ultimate (full Momentum -> 0 | +5 Momentum)");
+    CHECK(ult.label() == "Ultimate (full Energy -> 0 | +5 Energy)");
 }
