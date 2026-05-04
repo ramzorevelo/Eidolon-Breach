@@ -81,6 +81,14 @@ class Battle
     void applyResonatingProc(PlayableCharacter &pc,
                              const ActionResult &result,
                              BattleState &state);
+    /**
+     * @brief Apply the Exposure threshold 75 "Surging" one-time archetype bonus.
+     *        Called from processPlayerTurn when the proc is armed and fires.
+     */
+    void applySurgingProc(PlayableCharacter &pc,
+                          const ActionResult &result,
+                          BattleState &state);
+
     void processActionResult(PlayableCharacter &actor,
                              Party &allies,
                              const ActionResult &result,

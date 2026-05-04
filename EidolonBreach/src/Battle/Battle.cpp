@@ -53,13 +53,23 @@ void Battle::run()
     m_eventBus.subscribe<ExposureThresholdEvent>(
         [this, &state](const ExposureThresholdEvent &e)
         {
-            if (e.threshold != CombatConstants::kExposureThreshold50 || !e.character)
+            if (!e.character)
                 return;
-            e.character->armResonatingProc();
-            state.renderer.renderMessage(
-                e.character->getName() + " begins Resonating! (proc armed)");
+            if (e.threshold == CombatConstants::kExposureThreshold50)
+            {
+                e.character->armResonatingProc();
+                state.renderer.renderMessage(
+                    e.character->getName() + " begins Resonating! (proc armed)");
+            }
+            else if (e.threshold == CombatConstants::kExposureThreshold75)
+            {
+                e.character->armSurgingProc();
+                state.renderer.renderMessage(
+                    e.character->getName() + " is Surging! (next action boosted)");
+            }
         },
         EventScope::Battle);
+
     m_eventBus.emit(BattleStartedEvent{&state});
     callVestigeOnBattleStart(state);
     m_renderer.renderMessage("\n=== BATTLE START ===");
@@ -203,6 +213,13 @@ void Battle::processPlayerTurn(Unit *unit, BattleState &state)
             pc->consumeResonatingProc();
             applyResonatingProc(*pc, result, state);
         }
+
+        if (pc->isSurgingProcArmed())
+        {
+            pc->consumeSurgingProc();
+            applySurgingProc(*pc, result, state);
+        }
+
         if (result.summonEffect.has_value())
         {
             processSummonEffect(*result.summonEffect, pc->getResonanceContribution(), state);
@@ -666,4 +683,59 @@ void Battle::applyResonatingProc(PlayableCharacter &pc,
 
     state.renderer.renderMessage(
         pc.getName() + " — Resonating proc fires!");
+}
+
+void Battle::applySurgingProc(PlayableCharacter &pc,
+                              const ActionResult &result,
+                              BattleState &state)
+{
+    const std::string &arch{pc.getArchetype()};
+
+    if (arch == "Striker")
+    {
+        // +25% of the damage dealt as bonus true damage to the primary target.
+        if (result.value > 0 && result.targetEnemyIndex >= 0 &&
+            state.enemyParty != nullptr)
+        {
+            Unit *t{state.enemyParty->getUnitAt(
+                static_cast<std::size_t>(result.targetEnemyIndex))};
+            if (t && t->isAlive())
+            {
+                const int bonus{std::max(1, result.value / 4)};
+                t->takeTrueDamage(bonus);
+                state.renderer.renderMessage(
+                    pc.getName() + " — Surging: +" + std::to_string(bonus) +
+                    " true damage!");
+            }
+        }
+    }
+    else if (arch == "Conduit")
+    {
+        if (state.playerParty != nullptr)
+            state.playerParty->gainSp(20);
+        state.renderer.renderMessage(pc.getName() + " — Surging: +20 SP!");
+    }
+    else if (arch == "Weaver")
+    {
+        if (state.enemyParty != nullptr)
+        {
+            for (Unit *u : state.enemyParty->getAliveUnits())
+                u->extendEffectsByTag(EffectTags::kDebuff, 1);
+        }
+        state.renderer.renderMessage(
+            pc.getName() + " — Surging: enemy debuffs extended by 1 turn!");
+    }
+    else if (arch == "Anchor")
+    {
+        const int shield{
+            std::max(1, static_cast<int>(
+                            static_cast<float>(pc.getFinalStats().maxHp) * 0.15f))};
+        pc.applyEffect(std::make_unique<ShieldEffect>(shield, 2));
+        state.renderer.renderMessage(
+            pc.getName() + " — Surging: shield +" + std::to_string(shield) + "!");
+    }
+    else
+    {
+        state.renderer.renderMessage(pc.getName() + " — Surging!");
+    }
 }

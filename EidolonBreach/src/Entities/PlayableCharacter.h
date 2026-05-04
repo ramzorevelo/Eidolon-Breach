@@ -148,6 +148,19 @@ class PlayableCharacter : public Unit
         m_resonatingProcArmed = false;
     }
 
+    [[nodiscard]] bool isSurgingProcArmed() const
+    {
+        return m_surgingProcArmed;
+    }
+    void armSurgingProc()
+    {
+        m_surgingProcArmed = true;
+    }
+    void consumeSurgingProc()
+    {
+        m_surgingProcArmed = false;
+    }
+
     // Consumable cooldown
     /** @return true when a consumable may be used this turn. */
     [[nodiscard]] bool canUseConsumable() const;
@@ -245,5 +258,6 @@ class PlayableCharacter : public Unit
     int m_consumableCooldown{0};
     bool m_consumableUsedThisBattle{false};
     bool m_resonatingProcArmed{false};
+    bool m_surgingProcArmed{false};
     CharacterEquipment m_equipment{};
 };

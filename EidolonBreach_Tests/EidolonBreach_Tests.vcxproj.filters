@@ -330,6 +330,9 @@
     <ClCompile Include="..\EidolonBreach\src\Actions\ZaraUltimateAction.cpp">
       <Filter>Actions</Filter>
     </ClCompile>
+    <ClCompile Include="tests\Entities\test_SurgingProc.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="external\doctest.h">
