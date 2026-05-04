@@ -121,6 +121,15 @@ public:
     }
 
     /**
+     * @return A short label describing what this unit intends to do on its
+     *         next turn (e.g. "Attacks", "Regenerates"). Empty string = no intent shown.
+     */
+    [[nodiscard]] virtual std::string getIntentLabel() const
+    {
+        return {};
+    }
+
+    /**
      * @return The unit's Resonance Field contribution value.
      *         Base implementation returns 0 (enemies never contribute).
      *         Overridden by PlayableCharacter and Summon.

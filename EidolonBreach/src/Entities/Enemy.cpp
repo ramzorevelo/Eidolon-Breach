@@ -160,3 +160,10 @@ ActionResult Enemy::performAttack()
 {
     return ActionResult{ActionResult::Type::Damage, 20};
 }
+
+std::string Enemy::getIntentLabel() const
+{
+    if (m_isBroken)
+        return "Stunned (skip)";
+    return "Attacks";
+}

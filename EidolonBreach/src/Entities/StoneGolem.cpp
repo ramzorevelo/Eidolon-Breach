@@ -51,3 +51,13 @@ ActionResult StoneGolem::performAttack()
     }
     return ActionResult{ActionResult::Type::Damage, kGolemBaseDamage};
 }
+
+
+std::string StoneGolem::getIntentLabel() const
+{
+    if (isBroken())
+        return "Stunned (skip)";
+    if ((m_turnCount + 1) % kGolemHeavySlamInterval == 0)
+        return "Heavy Slam!";
+    return "Attacks";
+}

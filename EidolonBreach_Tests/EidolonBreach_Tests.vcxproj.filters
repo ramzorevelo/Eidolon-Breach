@@ -318,6 +318,9 @@
     <ClCompile Include="tests\Battle\test_FixedDungeon.cpp">
       <Filter>Battle</Filter>
     </ClCompile>
+    <ClCompile Include="tests\Entities\test_ResonatingProc.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="external\doctest.h">
