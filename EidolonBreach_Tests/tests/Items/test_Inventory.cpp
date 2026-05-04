@@ -109,3 +109,41 @@ TEST_CASE("Inventory: gold is a plain member, independently modifiable")
     inv.gold += 50;
     CHECK(inv.gold == 50);
 }
+
+TEST_CASE("Inventory: removeEquipmentAt removes the correct entry")
+{
+    Inventory inv{};
+    Item sw{};
+    sw.id = "sword";
+    sw.name = "Sword";
+    sw.type = ItemType::Equipment;
+    sw.equipSlot = EquipSlot::Weapon;
+    sw.stackSize = 1;
+
+    Item ar{};
+    ar.id = "armor";
+    ar.name = "Armor";
+    ar.type = ItemType::Equipment;
+    ar.equipSlot = EquipSlot::Armor;
+    ar.stackSize = 1;
+
+    inv.addItem(sw);
+    inv.addItem(ar);
+    REQUIRE(inv.getEquipment().size() == 2);
+
+    inv.removeEquipmentAt(0); // remove sword
+    REQUIRE(inv.getEquipment().size() == 1);
+    CHECK(inv.getEquipment()[0].id == "armor");
+}
+
+TEST_CASE("Inventory: removeEquipmentAt out-of-range is a no-op")
+{
+    Inventory inv{};
+    Item sw{};
+    sw.id = "sword";
+    sw.type = ItemType::Equipment;
+    sw.stackSize = 1;
+    inv.addItem(sw);
+    inv.removeEquipmentAt(5); // must not crash
+    CHECK(inv.getEquipment().size() == 1);
+}

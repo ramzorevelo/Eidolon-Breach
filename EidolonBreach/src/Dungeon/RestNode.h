@@ -23,4 +23,6 @@ class RestNode : public MapNode
     void applyPurge(Party &party) const;
     /** @brief Draft Mode only: allow re-equip of slot skills for each party member. */
     void applyAttune(Party &party) const;
+    /** @brief Let each PC equip one item from the party's equipment inventory. */
+    void applyEquip(Party &party) const;
 };
