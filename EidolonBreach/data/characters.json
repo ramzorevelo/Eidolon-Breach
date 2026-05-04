@@ -13,7 +13,7 @@
     "abilities": {
       "basic": "basic_strike",
       "archSkill": "arch_skill_default",
-      "ultimate": "ultimate_default",
+      "ultimate": "lyra_ultimate",
       "slotSkills": [ "lyra_ember_call" ]
     }
   },
@@ -31,7 +31,7 @@
     "abilities": {
       "basic": "basic_strike",
       "archSkill": "arch_skill_default",
-      "ultimate": "ultimate_default",
+      "ultimate": "vex_ultimate",
       "slotSkills": [ "vex_bulwark" ]
     }
   },
@@ -49,7 +49,7 @@
     "abilities": {
       "basic": "basic_strike",
       "archSkill": "arch_skill_default",
-      "ultimate": "ultimate_default",
+      "ultimate": "zara_ultimate",
       "slotSkills": [ "zara_frostbind" ]
     }
   }

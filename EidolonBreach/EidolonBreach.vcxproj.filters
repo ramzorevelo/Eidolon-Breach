@@ -234,6 +234,15 @@
     <ClCompile Include="src\Actions\ZaraFrostBindAction.cpp">
       <Filter>Actions</Filter>
     </ClCompile>
+    <ClCompile Include="src\Actions\ZaraUltimateAction.cpp">
+      <Filter>Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Actions\VexUltimateAction.cpp">
+      <Filter>Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Actions\LyraUltimateAction.cpp">
+      <Filter>Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Actions\BasicStrikeAction.h">
@@ -519,6 +528,15 @@
       <Filter>Actions</Filter>
     </ClInclude>
     <ClInclude Include="src\Actions\ZaraFrostBindAction.h">
+      <Filter>Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Actions\ZaraUltimateAction.h">
+      <Filter>Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Actions\VexUltimateAction.h">
+      <Filter>Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Actions\LyraUltimateAction.h">
       <Filter>Actions</Filter>
     </ClInclude>
   </ItemGroup>

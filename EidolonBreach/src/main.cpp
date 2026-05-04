@@ -8,6 +8,9 @@
 #include "Actions/BasicStrikeAction.h"
 #include "Core/RunContext.h"
 #include "Actions/SkillAction.h"
+#include "Actions/LyraUltimateAction.h"
+#include "Actions/VexUltimateAction.h"
+#include "Actions/ZaraUltimateAction.h"
 #include "Actions/UltimateAction.h"
 #include "Characters/AbilityRegistry.h"
 #include "Characters/CharacterRegistry.h"
@@ -39,6 +42,15 @@ static AbilityRegistry buildAbilityRegistry()
     reg.registerAbility("ultimate_default",
                         []
                         { return std::make_unique<UltimateAction>(); });
+    reg.registerAbility("lyra_ultimate",
+                        []
+                        { return std::make_unique<LyraUltimateAction>(); });
+    reg.registerAbility("vex_ultimate",
+                        []
+                        { return std::make_unique<VexUltimateAction>(); });
+    reg.registerAbility("zara_ultimate",
+                        []
+                        { return std::make_unique<ZaraUltimateAction>(); });
     // Lyra's Ember Call 
     reg.registerAbility("lyra_ember_call",
                         []

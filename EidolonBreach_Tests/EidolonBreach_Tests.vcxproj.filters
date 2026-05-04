@@ -321,6 +321,15 @@
     <ClCompile Include="tests\Entities\test_ResonatingProc.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Actions\LyraUltimateAction.cpp">
+      <Filter>Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Actions\VexUltimateAction.cpp">
+      <Filter>Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Actions\ZaraUltimateAction.cpp">
+      <Filter>Actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="external\doctest.h">
