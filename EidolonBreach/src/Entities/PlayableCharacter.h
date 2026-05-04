@@ -31,6 +31,13 @@ class PlayableCharacter : public Unit
     ~PlayableCharacter() override;
 
     void addAbility(std::unique_ptr<IAction> action);
+    /**
+     * @brief Set the character's archetype string. Called once by CharacterRegistry::create.
+     */
+    void setArchetype(std::string_view arch)
+    {
+        m_archetype = std::string{arch};
+    }
     const std::vector<std::unique_ptr<IAction>> &getAbilities() const;
 
     /**
@@ -110,6 +117,11 @@ class PlayableCharacter : public Unit
     const std::string &getPassiveTrait() const
     {
         return m_passiveTrait;
+    }
+
+    [[nodiscard]] const std::string &getArchetype() const
+    {
+        return m_archetype;
     }
 
     // Exposure gauge
@@ -205,6 +217,7 @@ class PlayableCharacter : public Unit
 
     int m_resonanceContribution{};
     std::string m_passiveTrait{};
+    std::string m_archetype{};
     int m_exposure{0};
 
     EquippedSkillSet m_equipped{};

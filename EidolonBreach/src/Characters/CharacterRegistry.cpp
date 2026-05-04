@@ -37,6 +37,8 @@ CharacterRegistry::create(std::string_view characterId, int characterLevel) cons
         bp.id, bp.name, stats, parseAffinity(bp.affinity),
         bp.resonanceContribution, bp.passiveTrait)};
 
+    pc->setArchetype(bp.archetype);
+
     // Resolve abilities; log warning for unregistered IDs but do not throw,
     // so partial configurations can still be tested.
     if (m_abilityRegistry)

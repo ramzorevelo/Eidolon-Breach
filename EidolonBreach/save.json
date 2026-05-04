@@ -3,24 +3,24 @@
         "lyra": {
             "bondTrialComplete": false,
             "chosenAspects": [],
-            "echoCount": 2
+            "echoCount": 3
         },
         "vex": {
             "bondTrialComplete": false,
             "chosenAspects": [],
-            "echoCount": 2
+            "echoCount": 3
         },
         "zara": {
             "bondTrialComplete": false,
             "chosenAspects": [],
-            "echoCount": 2
+            "echoCount": 3
         }
     },
     "characterXP": {
-        "ignis": 30,
-        "lyra": 15,
-        "vex": 15,
-        "zara": 15
+        "ignis": 35,
+        "lyra": 20,
+        "vex": 20,
+        "zara": 20
     },
     "clearedDungeonIds": [
         "dungeon_01"
@@ -30,7 +30,7 @@
     "highestFloorReached": 1,
     "masteryEventLog": {},
     "playerLevel": 2,
-    "playerXp": 184,
+    "playerXp": 211,
     "unlockedCharacterIds": [
         "lyra",
         "vex",

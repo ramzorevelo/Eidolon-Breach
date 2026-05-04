@@ -127,6 +127,25 @@ TEST_CASE("CharacterRegistry: getArchetype returns correct archetype string")
     CHECK(chars.getArchetype("nobody") == "");
 }
 
+TEST_CASE("CharacterRegistry: created character has archetype set correctly")
+{
+    AbilityRegistry abilities{makeAbilityRegistry()};
+    CharacterRegistry chars{};
+    chars.loadFromJson("data/characters.json", abilities);
+
+    auto lyra{chars.create("lyra")};
+    REQUIRE(lyra != nullptr);
+    CHECK(lyra->getArchetype() == "Striker");
+
+    auto vex{chars.create("vex")};
+    REQUIRE(vex != nullptr);
+    CHECK(vex->getArchetype() == "Conduit");
+
+    auto zara{chars.create("zara")};
+    REQUIRE(zara != nullptr);
+    CHECK(zara->getArchetype() == "Weaver");
+}
+
 TEST_CASE("CharacterRegistry: create Zara has correct stats and archetype")
 {
     AbilityRegistry abilities{makeAbilityRegistry()};
