@@ -57,3 +57,11 @@ const std::vector<Item> &Inventory::getEquipment() const
 {
     return m_equipment;
 }
+
+void Inventory::removeEquipmentAt(std::size_t index)
+{
+    if (index >= m_equipment.size())
+        return;
+    m_equipment.erase(m_equipment.begin() +
+                      static_cast<std::ptrdiff_t>(index));
+}

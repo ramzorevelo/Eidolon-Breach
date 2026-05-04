@@ -372,6 +372,13 @@ void Dungeon::buildFixedGraph(std::uint32_t seed,
             node = std::make_unique<TreasureNode>(
                 20 + static_cast<int>(i) * 5, rng());
         }
+        else if (nodeType == "shop")
+        {
+            std::vector<std::string> stock{"heal_potion", "purification_vial"};
+            if (static_cast<int>(i) % 2 == 0)
+                stock.push_back("mega_potion");
+            node = std::make_unique<ShopNode>(m_itemRegistry, std::move(stock), rng());
+        }
         else
         {
             // "event" and any unknown type fall back to EventNode

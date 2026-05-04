@@ -2,7 +2,9 @@
  * @file RestNode.cpp
  * @brief RestNode implementation.
  */
-
+#include "Entities/PlayableCharacter.h"
+#include "Items/Item.h"
+#include <limits>
 #include "Dungeon/RestNode.h"
 #include "Core/CombatConstants.h"
 #include "Entities/Party.h"
@@ -21,9 +23,10 @@ void RestNode::enter(Party &party,
     std::cout << "\n=== REST SITE ===\n"
               << "  [1] Heal - restore partial HP to all allies\n"
               << "  [2] Purge - reduce all Exposure by "
-              << CombatConstants::kPurgeExposureReduction << "\n";
+              << CombatConstants::kPurgeExposureReduction << "\n"
+              << "  [3] Equip - equip items from party inventory\n";
     if (isDraft)
-        std::cout << "  [3] Attune - re-equip slot skills\n";
+        std::cout << "  [4] Attune - re-equip slot skills\n";
     std::cout << "  [0] Continue\n"
               << "Choose: ";
 
@@ -40,6 +43,9 @@ void RestNode::enter(Party &party,
         applyPurge(party);
         break;
     case 3:
+        applyEquip(party);
+        break;
+    case 4:
         if (isDraft)
             applyAttune(party);
         break;
@@ -105,4 +111,87 @@ void RestNode::applyAttune(Party &party) const
     }
     if (!attuneAvailable)
         std::cout << "  No unlocked slots available to attune.\n";
+}
+
+void RestNode::applyEquip(Party &party) const
+{
+    const auto &equipment{party.getInventory().getEquipment()};
+    if (equipment.empty())
+    {
+        std::cout << "  No equipment in inventory.\n";
+        return;
+    }
+
+    std::cout << "\n  Equipment available:\n";
+    for (std::size_t i{0}; i < equipment.size(); ++i)
+    {
+        const Item &item{equipment[i]};
+        const std::string slotStr{
+            item.equipSlot.has_value()
+                ? (*item.equipSlot == EquipSlot::Weapon
+                       ? "Weapon"
+                   : *item.equipSlot == EquipSlot::Armor ? "Armor"
+                                                         : "Accessory")
+                : "Unknown"};
+        std::cout << "  [" << (i + 1) << "] " << item.name
+                  << " (" << slotStr << ", " << item.goldValue << " gold)\n";
+    }
+    std::cout << "  [0] Cancel\n"
+              << "  Item: ";
+
+    int itemChoice{0};
+    std::cin >> itemChoice;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+    if (itemChoice < 1 || itemChoice > static_cast<int>(equipment.size()))
+    {
+        std::cout << "  Cancelled.\n";
+        return;
+    }
+
+    const Item selectedItem{equipment[static_cast<std::size_t>(itemChoice - 1)]};
+
+    // Collect alive player characters only.
+    std::vector<PlayableCharacter *> pcs{};
+    for (std::size_t i{0}; i < party.size(); ++i)
+        if (auto *pc = dynamic_cast<PlayableCharacter *>(party.getUnitAt(i)))
+            if (pc->isAlive())
+                pcs.push_back(pc);
+
+    if (pcs.empty())
+    {
+        std::cout << "  No alive characters to equip.\n";
+        return;
+    }
+
+    std::cout << "  Equip to:\n";
+    for (std::size_t i{0}; i < pcs.size(); ++i)
+        std::cout << "  [" << (i + 1) << "] " << pcs[i]->getName() << '\n';
+    std::cout << "  [0] Cancel\n"
+              << "  Character: ";
+
+    int charChoice{0};
+    std::cin >> charChoice;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+    if (charChoice < 1 || charChoice > static_cast<int>(pcs.size()))
+    {
+        std::cout << "  Cancelled.\n";
+        return;
+    }
+
+    PlayableCharacter *target{pcs[static_cast<std::size_t>(charChoice - 1)]};
+    auto displaced{target->equip(selectedItem)};
+
+    party.getInventory().removeEquipmentAt(
+        static_cast<std::size_t>(itemChoice - 1));
+
+    std::cout << "  " << target->getName() << " equipped " << selectedItem.name << "!\n";
+
+    // Return displaced item (if any) to inventory.
+    if (displaced.has_value())
+    {
+        party.getInventory().addItem(*displaced, 1);
+        std::cout << "  " << displaced->name << " returned to inventory.\n";
+    }
 }

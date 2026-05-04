@@ -38,7 +38,11 @@ class Inventory
      *         Equipment removal is not supported via this method.
      */
     bool removeItem(std::string_view itemId, int quantity = 1);
-
+    /**
+     * @brief Remove the equipment entry at the given 0-based index.
+     *        No-op if index is out of range.
+     */
+    void removeEquipmentAt(std::size_t index);
     /**
      * @brief Returns the stack count for consumable itemId, or 0 if not present.
      *        Always returns 0 for equipment ids.
