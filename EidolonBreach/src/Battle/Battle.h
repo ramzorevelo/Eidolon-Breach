@@ -89,6 +89,25 @@ class Battle
                           const ActionResult &result,
                           BattleState &state);
 
+    /**
+     * @brief Apply the immediate affinity burst when a character enters Breachborn.
+     */
+    void applyBreachbornEffect(PlayableCharacter &pc, BattleState &state);
+
+    /**
+     * @brief Apply Fracture-state per-turn effects at the start of a character's turn.
+     *        Currently only implements Lyra's (Blaze) 5% self-DoT.
+     */
+    void applyFractureStartOfTurn(PlayableCharacter &pc, BattleState &state);
+
+    /**
+     * @brief Apply Breachborn active per-action bonus (Blaze: +50% damage + Burn).
+     *        Called from processPlayerTurn when pc.isBreachbornActive() is true.
+     */
+    void applyBreachbornActionBonus(PlayableCharacter &pc,
+                                    const ActionResult &result,
+                                    BattleState &state);
+
     void processActionResult(PlayableCharacter &actor,
                              Party &allies,
                              const ActionResult &result,

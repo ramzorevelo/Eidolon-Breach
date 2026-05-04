@@ -100,6 +100,7 @@
     <ClCompile Include="tests\Core\test_Stats.cpp" />
     <ClCompile Include="tests\Core\test_StatusEffectBase.cpp" />
     <ClCompile Include="tests\EidolonBreach_Tests.cpp" />
+    <ClCompile Include="tests\Entities\test_BreachbornFracture.cpp" />
     <ClCompile Include="tests\Entities\test_Enemy.cpp" />
     <ClCompile Include="tests\Entities\test_EnemyBreakMechanics.cpp" />
     <ClCompile Include="tests\Entities\test_EnemyRegistry.cpp" />

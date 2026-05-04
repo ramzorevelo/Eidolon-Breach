@@ -134,6 +134,50 @@ class PlayableCharacter : public Unit
     }
     void modifyExposure(int delta);
     bool canVent() const; // 0 < exposure < 100
+
+    [[nodiscard]] bool isBreachbornActive() const
+    {
+        return m_breachbornActive;
+    }
+    [[nodiscard]] bool isFractured() const
+    {
+        return m_fractured;
+    }
+
+    /**
+     * @brief Activates Breachborn for 3 turns. Safe to call while Fractured
+     *        (refreshes the counter without changing Fracture status).
+     */
+    void activateBreachborn()
+    {
+        m_breachbornActive = true;
+        m_breachbornTurnsRemaining = 3;
+    }
+
+    /**
+     * @brief Decrements the Breachborn counter by one turn.
+     *        When the counter reaches 0 Breachborn ends and Fracture activates.
+     * @return true if Breachborn just ended and Fracture is now active.
+     */
+    bool tickBreachborn()
+    {
+        if (!m_breachbornActive)
+            return false;
+        --m_breachbornTurnsRemaining;
+        if (m_breachbornTurnsRemaining <= 0)
+        {
+            m_breachbornActive = false;
+            m_fractured = true;
+            return true;
+        }
+        return false;
+    }
+
+    [[nodiscard]] int getBreachbornTurnsRemaining() const
+    {
+        return m_breachbornTurnsRemaining;
+    }
+
     
     [[nodiscard]] bool isResonatingProcArmed() const
     {
@@ -259,5 +303,8 @@ class PlayableCharacter : public Unit
     bool m_consumableUsedThisBattle{false};
     bool m_resonatingProcArmed{false};
     bool m_surgingProcArmed{false};
+    bool m_breachbornActive{false};
+    int m_breachbornTurnsRemaining{0};
+    bool m_fractured{false};
     CharacterEquipment m_equipment{};
 };
