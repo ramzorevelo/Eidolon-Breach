@@ -25,6 +25,7 @@ struct EnemyBlueprint
     int maxToughness{};
     std::string faction{};
     std::string category{};
+    std::string affinity{"Aether"};
 };
 
 class EnemyRegistry

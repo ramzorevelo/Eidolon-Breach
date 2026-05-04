@@ -5,6 +5,7 @@
  */
 
 #include "UI/IRenderer.h"
+#include "Battle/TurnSlot.h"
 
 class NullRenderer : public IRenderer
 {
@@ -19,4 +20,5 @@ class NullRenderer : public IRenderer
     void renderResonanceField(const ResonanceField &) override {}
     void renderActionMenu(const PlayableCharacter &, const Party &) override {}
     void renderTargetList(const std::vector<std::string> &) override {}
+    void renderTurnOrder(const std::vector<TurnSlot> &) override {}
 };

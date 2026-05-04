@@ -7,6 +7,7 @@
  * They never instantiate a concrete renderer.
  */
 #include "Entities/PlayableCharacter.h" 
+#include "Battle/TurnSlot.h"
 #include "Core/ActionResult.h"
 #include "Core/Drop.h"
 #include <optional>
@@ -65,4 +66,9 @@ class IRenderer
      * @param names Display name of each selectable target, in selection order.
      */
     virtual void renderTargetList(const std::vector<std::string> &names) = 0;
+    /**
+     * @brief Render the upcoming turn order at the start of each round.
+     * @param order Slots in the order units will act this round.
+     */
+    virtual void renderTurnOrder(const std::vector<TurnSlot> &order) = 0;
 };

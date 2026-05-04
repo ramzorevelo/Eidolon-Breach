@@ -52,6 +52,7 @@
     "enemyType": "generic",
     "faction": "Primordial",
     "category": "Spirit",
+    "affinity": "Frost",
     "maxHp": 65,
     "maxToughness": 28
   },
@@ -60,6 +61,7 @@
     "enemyType": "generic",
     "faction": "Construct",
     "category": "Construct",
+    "affinity": "Terra",
     "maxHp": 110,
     "maxToughness": 55
   }

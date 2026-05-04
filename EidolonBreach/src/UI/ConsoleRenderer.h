@@ -6,6 +6,7 @@
 
 #include "UI/IRenderer.h"
 #include <optional>
+#include "Battle/TurnSlot.h"
 #include <string>
 
 class Party;
@@ -31,6 +32,7 @@ class ConsoleRenderer : public IRenderer
                           const Party &party) override;
 
     void renderTargetList(const std::vector<std::string> &names) override;
+    void renderTurnOrder(const std::vector<TurnSlot> &order) override;
   private:
     static void printBar(int current, int maximum, int width = 20);
     static void renderParty(const Party &party,

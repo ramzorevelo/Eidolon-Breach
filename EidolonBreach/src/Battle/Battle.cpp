@@ -69,7 +69,7 @@ void Battle::runBattleLoop(BattleState &state)
     while (!isBattleOver())
     {
         auto turnOrder{m_turnOrderCalc->calculate(m_playerParty, m_enemyParty)};
-
+        m_renderer.renderTurnOrder(turnOrder);
         for (const auto &slot : turnOrder)
         {
             if (!slot.unit->isAlive() || isBattleOver())
