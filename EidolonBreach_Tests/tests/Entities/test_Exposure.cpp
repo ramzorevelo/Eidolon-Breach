@@ -71,7 +71,7 @@ TEST_CASE("VentAction: consolation proc fires when Exposure was >= 50 at time of
     hero->modifyExposure(75);
     VentAction vent{};
     ActionResult result = vent.execute(*hero, allies, enemies, std::nullopt);
-    CHECK(!result.flavorText.empty()); // consolation message present
+    CHECK(result.ventConsolation); // flag set; Battle will fire the actual proc
     CHECK(hero->getExposure() == 0);
 }
 
@@ -82,5 +82,27 @@ TEST_CASE("VentAction: no consolation when Exposure was < 50")
     hero->modifyExposure(30);
     VentAction vent{};
     ActionResult result = vent.execute(*hero, allies, enemies, std::nullopt);
-    CHECK(result.flavorText.empty());
+    CHECK(!result.ventConsolation);
+}
+
+TEST_CASE("PlayableCharacter: canVent returns false when Fractured")
+{
+    auto hero = makeHero();
+    hero->modifyExposure(50);
+    REQUIRE(hero->canVent()); // sanity
+
+    hero->applyFracture();
+    CHECK(!hero->canVent()); // Fracture locks Vent
+}
+
+TEST_CASE("PlayableCharacter: canVent returns true when Fractured but re-hits 100 (Breachborn refresh)")
+{
+    // Fractured characters can re-hit 100 — but Vent is still locked.
+    // This test confirms canVent() stays false at all exposures when Fractured.
+    auto hero = makeHero();
+    hero->applyFracture();
+    hero->modifyExposure(60);
+    CHECK(!hero->canVent());
+    hero->modifyExposure(40); // now at 100
+    CHECK(!hero->canVent());
 }

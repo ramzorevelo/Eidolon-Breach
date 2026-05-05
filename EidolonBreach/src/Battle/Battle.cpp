@@ -244,6 +244,14 @@ void Battle::processPlayerTurn(Unit *unit, BattleState &state)
             applySurgingProc(*pc, result, state);
         }
 
+        if (result.ventConsolation && pc->isResonatingProcArmed())
+        {
+            state.renderer.renderMessage(
+                pc->getName() + " vents — Resonating discharge fires as consolation!");
+            pc->consumeResonatingProc();
+            applyResonatingProc(*pc, result, state);
+        }
+
         if (pc && pc->isBreachbornActive())
             applyBreachbornActionBonus(*pc, result, state);
 

@@ -15,12 +15,62 @@ TEST_CASE("VentAction: label is correct")
     CHECK(vent.label() == "Vent (Exposure -> 0, ends turn)");
 }
 
-TEST_CASE("VentAction: isAvailable returns false until Exposure is wired (Commit 10)")
+TEST_CASE("VentAction: isAvailable false when Fractured even with valid Exposure")
 {
     Party allies{};
     auto hero = makeHero();
+    hero->modifyExposure(50);
+    REQUIRE(hero->canVent());
+
+    hero->applyFracture();
     VentAction vent{};
     CHECK(!vent.isAvailable(*hero, allies));
+}
+
+TEST_CASE("VentAction: execute sets ventConsolation true when Exposure >= 50")
+{
+    Party allies{}, enemies{};
+    auto hero = makeHero();
+    hero->modifyExposure(75);
+    VentAction vent{};
+    ActionResult result{vent.execute(*hero, allies, enemies, std::nullopt)};
+    CHECK(result.ventConsolation);
+    CHECK(hero->getExposure() == 0);
+}
+
+TEST_CASE("VentAction: execute sets ventConsolation false when Exposure < 50")
+{
+    Party allies{}, enemies{};
+    auto hero = makeHero();
+    hero->modifyExposure(30);
+    VentAction vent{};
+    ActionResult result{vent.execute(*hero, allies, enemies, std::nullopt)};
+    CHECK(!result.ventConsolation);
+}
+
+TEST_CASE("VentAction: execute cancels armed Surging proc")
+{
+    Party allies{}, enemies{};
+    auto hero = makeHero();
+    hero->modifyExposure(75);
+    hero->armSurgingProc();
+    REQUIRE(hero->isSurgingProcArmed());
+
+    VentAction vent{};
+    vent.execute(*hero, allies, enemies, std::nullopt);
+    CHECK(!hero->isSurgingProcArmed()); // cancelled on vent
+}
+
+TEST_CASE("VentAction: execute does not cancel Surging proc when Exposure < 50")
+{
+    Party allies{}, enemies{};
+    auto hero = makeHero();
+    hero->modifyExposure(30);
+    hero->armSurgingProc();
+
+    VentAction vent{};
+    vent.execute(*hero, allies, enemies, std::nullopt);
+    CHECK(hero->isSurgingProcArmed()); // not cancelled — below consolation threshold
 }
 
 TEST_CASE("VentAction: execute returns Skip result")

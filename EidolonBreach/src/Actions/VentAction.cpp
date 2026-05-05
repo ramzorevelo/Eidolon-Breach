@@ -34,13 +34,18 @@ ActionResult VentAction::execute(PlayableCharacter &user,
                                  Party & /*enemies*/,
                                  std::optional<TargetInfo> /*target*/)
 {
-    // Consolation proc: if Exposure was >= 50 when venting, fire the 50-threshold proc.
-    bool consolation{user.getExposure() >= PlayableCharacter::kVentThreshold50};
-    user.modifyExposure(-user.getExposure()); // reduce to 0
+    // Capture state before clearing. Consolation requires Exposure >= 50.
+    const bool consolation{user.getExposure() >= PlayableCharacter::kVentThreshold50};
+
+    // Surging proc is cancelled when venting at 50–99.
+    // (isSurgingProcArmed is false if Exposure never crossed 75, safe to call unconditionally.)
+    if (consolation && user.isSurgingProcArmed())
+        user.consumeSurgingProc();
+
+    user.modifyExposure(-user.getExposure()); // clamp to 0
 
     ActionResult result{ActionResult::Type::Skip, 0};
-    if (consolation)
-        result.flavorText = "Resonating discharge — Exposure cleared with a bonus proc!";
+    result.ventConsolation = consolation;
     return result;
 }
 

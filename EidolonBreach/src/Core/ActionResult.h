@@ -39,6 +39,7 @@ struct ActionResult
     std::string flavorText{};
     int spGained{0};
     int exposureDelta{0};
+    bool ventConsolation{false};
     Affinity actionAffinity{Affinity::Aether};
     /**
      * @brief Base toughness damage dealt by this action (before affinity scaling).
