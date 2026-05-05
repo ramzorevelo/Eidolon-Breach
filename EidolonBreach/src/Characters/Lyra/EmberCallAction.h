@@ -8,7 +8,7 @@
  */
 
 #include "Actions/IAction.h"
-#include "Summons/Ignis.h"
+#include "Characters/Lyra/Ignis.h"
 
 class EmberCallAction : public IAction
 {

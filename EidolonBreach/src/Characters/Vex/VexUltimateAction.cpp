@@ -3,7 +3,7 @@
  * @brief VexUltimateAction implementation.
  */
 
-#include "Actions/VexUltimateAction.h"
+#include "Characters/Vex/VexUltimateAction.h"
 #include "Core/Effects/ShieldEffect.h"
 #include "Entities/Party.h"
 #include "Entities/PlayableCharacter.h"

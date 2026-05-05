@@ -3,15 +3,15 @@
  * @file test_CharacterRegistry.cpp
  * @brief Tests for CharacterRegistry and AbilityRegistry.
  */
-#include "Actions/LyraUltimateAction.h"
-#include "Actions/VexUltimateAction.h"
-#include "Actions/ZaraUltimateAction.h"
+#include "Characters/Lyra/LyraUltimateAction.h"
+#include "Characters/Vex/VexUltimateAction.h"
+#include "Characters/Zara/ZaraUltimateAction.h"
 #include "Actions/BasicStrikeAction.h"
 #include "Actions/SkillAction.h"
 #include "Actions/UltimateAction.h"
-#include "Actions/EmberCallAction.h"
-#include "Actions/VexBulwarkAction.h"
-#include "Actions/ZaraFrostbindAction.h"
+#include "Characters/Lyra/EmberCallAction.h"
+#include "Characters/Vex/VexBulwarkAction.h"
+#include "Characters/Zara/ZaraFrostbindAction.h"
 #include "Entities/PlayableCharacter.h"
 #include "Characters/AbilityRegistry.h"
 #include "Characters/CharacterRegistry.h"

@@ -20,16 +20,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\EidolonBreach\src\Actions\BasicStrikeAction.cpp" />
-    <ClCompile Include="..\EidolonBreach\src\Actions\EmberCallAction.cpp" />
-    <ClCompile Include="..\EidolonBreach\src\Actions\LyraUltimateAction.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Actions\SkillAction.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Actions\UltimateAction.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Actions\UseConsumableAction.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Actions\VentAction.cpp" />
-    <ClCompile Include="..\EidolonBreach\src\Actions\VexBulwarkAction.cpp" />
-    <ClCompile Include="..\EidolonBreach\src\Actions\VexUltimateAction.cpp" />
-    <ClCompile Include="..\EidolonBreach\src\Actions\ZaraFrostBindAction.cpp" />
-    <ClCompile Include="..\EidolonBreach\src\Actions\ZaraUltimateAction.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Battle\Battle.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Battle\FormationManager.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Battle\ResonanceField.cpp" />
@@ -38,6 +32,12 @@
     <ClCompile Include="..\EidolonBreach\src\Battle\TargetingHeuristics.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Characters\AbilityRegistry.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Characters\CharacterRegistry.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Characters\Lyra\EmberCallAction.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Characters\Lyra\LyraUltimateAction.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Characters\Vex\VexBulwarkAction.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Characters\Vex\VexUltimateAction.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Characters\Zara\ZaraFrostBindAction.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Characters\Zara\ZaraUltimateAction.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Core\DataLoader.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Core\Effects\BurnEffect.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Core\Effects\RegenEffect.cpp" />
@@ -85,6 +85,8 @@
     <ClCompile Include="tests\Battle\test_TargetingHeuristics.cpp" />
     <ClCompile Include="tests\Battle\test_TurnOrder.cpp" />
     <ClCompile Include="tests\Characters\test_CharacterRegistry.cpp" />
+    <ClCompile Include="tests\Characters\test_CharacterUltimates.cpp" />
+    <ClCompile Include="tests\Characters\test_SlotSkillActions.cpp" />
     <ClCompile Include="tests\Core\Effects\test_BurnEffect.cpp" />
     <ClCompile Include="tests\Core\Effects\test_RegenEffect.cpp" />
     <ClCompile Include="tests\Core\Effects\test_ShieldEffect.cpp" />

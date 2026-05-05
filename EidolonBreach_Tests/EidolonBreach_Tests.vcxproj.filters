@@ -45,17 +45,17 @@
     <Filter Include="Characters">
       <UniqueIdentifier>{6e070a3e-e194-4ede-bdd3-fb92eb8fd4ee}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Characters\Lyra">
+      <UniqueIdentifier>{110d86d0-6e8d-49ea-b3fa-74c56d87150c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Characters\Vex">
+      <UniqueIdentifier>{7585874d-5381-43eb-a1f6-7bae3e7ec25e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Characters\Zara">
+      <UniqueIdentifier>{743398d4-6ed3-4a86-997d-094e2ea91485}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="tests\Actions\test_BasicStrikeAction.cpp">
-      <Filter>Actions</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\Actions\test_SkillAction.cpp">
-      <Filter>Actions</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\Actions\test_UltimateAction.cpp">
-      <Filter>Actions</Filter>
-    </ClCompile>
     <ClCompile Include="tests\Battle\test_TurnOrder.cpp">
       <Filter>Battle</Filter>
     </ClCompile>
@@ -103,15 +103,6 @@
     </ClCompile>
     <ClCompile Include="..\EidolonBreach\src\Battle\Battle.cpp">
       <Filter>Battle</Filter>
-    </ClCompile>
-    <ClCompile Include="..\EidolonBreach\src\Actions\BasicStrikeAction.cpp">
-      <Filter>Actions</Filter>
-    </ClCompile>
-    <ClCompile Include="..\EidolonBreach\src\Actions\SkillAction.cpp">
-      <Filter>Actions</Filter>
-    </ClCompile>
-    <ClCompile Include="..\EidolonBreach\src\Actions\UltimateAction.cpp">
-      <Filter>Actions</Filter>
     </ClCompile>
     <ClCompile Include="tests\EidolonBreach_Tests.cpp" />
     <ClCompile Include="..\EidolonBreach\src\UI\ConsoleRenderer.cpp">
@@ -168,12 +159,6 @@
     <ClCompile Include="tests\Core\test_BattleState.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="tests\Actions\test_VentActions.cpp">
-      <Filter>Actions</Filter>
-    </ClCompile>
-    <ClCompile Include="..\EidolonBreach\src\Actions\VentAction.cpp">
-      <Filter>Actions</Filter>
-    </ClCompile>
     <ClCompile Include="tests\Entities\test_Exposure.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
@@ -197,15 +182,6 @@
     </ClCompile>
     <ClCompile Include="..\EidolonBreach\src\Battle\TargetingHeuristics.cpp">
       <Filter>Battle</Filter>
-    </ClCompile>
-    <ClCompile Include="..\EidolonBreach\src\Actions\UseConsumableAction.cpp">
-      <Filter>Actions</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\Actions\test_UseConsumableAction.cpp">
-      <Filter>Actions</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\Actions\testActionCategory.cpp">
-      <Filter>Actions</Filter>
     </ClCompile>
     <ClCompile Include="tests\Entities\test_EnemyBreakMechanics.cpp">
       <Filter>Entities</Filter>
@@ -255,9 +231,6 @@
     <ClCompile Include="..\EidolonBreach\src\Entities\Summon.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
-    <ClCompile Include="..\EidolonBreach\src\Actions\EmberCallAction.cpp">
-      <Filter>Actions</Filter>
-    </ClCompile>
     <ClCompile Include="tests\Battle\test_StanceModifiers.cpp">
       <Filter>Battle</Filter>
     </ClCompile>
@@ -278,15 +251,6 @@
     </ClCompile>
     <ClCompile Include="tests\Entities\test_EnemyRegistry.cpp">
       <Filter>Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="tests\Characters\test_CharacterRegistry.cpp">
-      <Filter>Characters</Filter>
-    </ClCompile>
-    <ClCompile Include="..\EidolonBreach\src\Characters\AbilityRegistry.cpp">
-      <Filter>Characters</Filter>
-    </ClCompile>
-    <ClCompile Include="..\EidolonBreach\src\Characters\CharacterRegistry.cpp">
-      <Filter>Characters</Filter>
     </ClCompile>
     <ClCompile Include="..\EidolonBreach\src\Core\DataLoader.cpp">
       <Filter>Core</Filter>
@@ -309,26 +273,11 @@
     <ClCompile Include="..\EidolonBreach\src\Vestiges\VoidHungerVestige.cpp">
       <Filter>Vestiges</Filter>
     </ClCompile>
-    <ClCompile Include="..\EidolonBreach\src\Actions\ZaraFrostBindAction.cpp">
-      <Filter>Actions</Filter>
-    </ClCompile>
-    <ClCompile Include="..\EidolonBreach\src\Actions\VexBulwarkAction.cpp">
-      <Filter>Actions</Filter>
-    </ClCompile>
     <ClCompile Include="tests\Battle\test_FixedDungeon.cpp">
       <Filter>Battle</Filter>
     </ClCompile>
     <ClCompile Include="tests\Entities\test_ResonatingProc.cpp">
       <Filter>Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="..\EidolonBreach\src\Actions\LyraUltimateAction.cpp">
-      <Filter>Actions</Filter>
-    </ClCompile>
-    <ClCompile Include="..\EidolonBreach\src\Actions\VexUltimateAction.cpp">
-      <Filter>Actions</Filter>
-    </ClCompile>
-    <ClCompile Include="..\EidolonBreach\src\Actions\ZaraUltimateAction.cpp">
-      <Filter>Actions</Filter>
     </ClCompile>
     <ClCompile Include="tests\Entities\test_SurgingProc.cpp">
       <Filter>Entities</Filter>
@@ -341,6 +290,72 @@
     </ClCompile>
     <ClCompile Include="tests\Entities\test_EffectTagCache.cpp">
       <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Characters\Lyra\EmberCallAction.cpp">
+      <Filter>Characters\Lyra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Characters\Lyra\LyraUltimateAction.cpp">
+      <Filter>Characters\Lyra</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Characters\Vex\VexBulwarkAction.cpp">
+      <Filter>Characters\Vex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Characters\Vex\VexUltimateAction.cpp">
+      <Filter>Characters\Vex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Characters\Zara\ZaraFrostBindAction.cpp">
+      <Filter>Characters\Zara</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Characters\Zara\ZaraUltimateAction.cpp">
+      <Filter>Characters\Zara</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Actions\test_BasicStrikeAction.cpp">
+      <Filter>Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Actions\test_SkillAction.cpp">
+      <Filter>Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Actions\test_UltimateAction.cpp">
+      <Filter>Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Actions\test_UseConsumableAction.cpp">
+      <Filter>Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Actions\test_VentActions.cpp">
+      <Filter>Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Actions\testActionCategory.cpp">
+      <Filter>Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Characters\test_CharacterRegistry.cpp">
+      <Filter>Characters</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Characters\test_CharacterUltimates.cpp">
+      <Filter>Characters</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Characters\test_SlotSkillActions.cpp">
+      <Filter>Characters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Characters\AbilityRegistry.cpp">
+      <Filter>Characters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Characters\CharacterRegistry.cpp">
+      <Filter>Characters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Actions\BasicStrikeAction.cpp">
+      <Filter>Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Actions\SkillAction.cpp">
+      <Filter>Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Actions\UltimateAction.cpp">
+      <Filter>Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Actions\UseConsumableAction.cpp">
+      <Filter>Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Actions\VentAction.cpp">
+      <Filter>Actions</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

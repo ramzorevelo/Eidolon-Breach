@@ -20,16 +20,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Actions\BasicStrikeAction.cpp" />
-    <ClCompile Include="src\Actions\EmberCallAction.cpp" />
-    <ClCompile Include="src\Actions\LyraUltimateAction.cpp" />
     <ClCompile Include="src\Actions\SkillAction.cpp" />
     <ClCompile Include="src\Actions\UltimateAction.cpp" />
     <ClCompile Include="src\Actions\UseConsumableAction.cpp" />
     <ClCompile Include="src\Actions\VentAction.cpp" />
-    <ClCompile Include="src\Actions\VexBulwarkAction.cpp" />
-    <ClCompile Include="src\Actions\VexUltimateAction.cpp" />
-    <ClCompile Include="src\Actions\ZaraFrostBindAction.cpp" />
-    <ClCompile Include="src\Actions\ZaraUltimateAction.cpp" />
     <ClCompile Include="src\Battle\Battle.cpp" />
     <ClCompile Include="src\Battle\FormationManager.cpp" />
     <ClCompile Include="src\Battle\ResonanceField.cpp" />
@@ -38,6 +32,12 @@
     <ClCompile Include="src\Battle\TargetingHeuristics.cpp" />
     <ClCompile Include="src\Characters\AbilityRegistry.cpp" />
     <ClCompile Include="src\Characters\CharacterRegistry.cpp" />
+    <ClCompile Include="src\Characters\Lyra\EmberCallAction.cpp" />
+    <ClCompile Include="src\Characters\Lyra\LyraUltimateAction.cpp" />
+    <ClCompile Include="src\Characters\Vex\VexBulwarkAction.cpp" />
+    <ClCompile Include="src\Characters\Vex\VexUltimateAction.cpp" />
+    <ClCompile Include="src\Characters\Zara\ZaraFrostBindAction.cpp" />
+    <ClCompile Include="src\Characters\Zara\ZaraUltimateAction.cpp" />
     <ClCompile Include="src\Core\AchievementSystem.cpp" />
     <ClCompile Include="src\Core\DataLoader.cpp" />
     <ClCompile Include="src\Core\Effects\BurnEffect.cpp" />
@@ -86,18 +86,12 @@
   <ItemGroup>
     <ClInclude Include="nlohmann\json.hpp" />
     <ClInclude Include="src\Actions\BasicStrikeAction.h" />
-    <ClInclude Include="src\Actions\EmberCallAction.h" />
     <ClInclude Include="src\Actions\IAction.h" />
-    <ClInclude Include="src\Actions\LyraUltimateAction.h" />
     <ClInclude Include="src\Actions\SkillAction.h" />
     <ClInclude Include="src\Actions\SlotState.h" />
     <ClInclude Include="src\Actions\UltimateAction.h" />
     <ClInclude Include="src\Actions\UseConsumableAction.h" />
     <ClInclude Include="src\Actions\VentAction.h" />
-    <ClInclude Include="src\Actions\VexBulwarkAction.h" />
-    <ClInclude Include="src\Actions\VexUltimateAction.h" />
-    <ClInclude Include="src\Actions\ZaraFrostBindAction.h" />
-    <ClInclude Include="src\Actions\ZaraUltimateAction.h" />
     <ClInclude Include="src\Battle\Battle.h" />
     <ClInclude Include="src\Battle\BattleState.h" />
     <ClInclude Include="src\Battle\FormationManager.h" />
@@ -109,9 +103,16 @@
     <ClInclude Include="src\Battle\TurnSlot.h" />
     <ClInclude Include="src\Characters\AbilityRegistry.h" />
     <ClInclude Include="src\Characters\CharacterRegistry.h" />
-    <ClInclude Include="src\Characters\Lyra.h" />
-    <ClInclude Include="src\Characters\Vex.h" />
-    <ClInclude Include="src\Characters\Zara.h" />
+    <ClInclude Include="src\Characters\Lyra\EmberCallAction.h" />
+    <ClInclude Include="src\Characters\Lyra\Ignis.h" />
+    <ClInclude Include="src\Characters\Lyra\Lyra.h" />
+    <ClInclude Include="src\Characters\Lyra\LyraUltimateAction.h" />
+    <ClInclude Include="src\Characters\Vex\Vex.h" />
+    <ClInclude Include="src\Characters\Vex\VexBulwarkAction.h" />
+    <ClInclude Include="src\Characters\Vex\VexUltimateAction.h" />
+    <ClInclude Include="src\Characters\Zara\Zara.h" />
+    <ClInclude Include="src\Characters\Zara\ZaraFrostBindAction.h" />
+    <ClInclude Include="src\Characters\Zara\ZaraUltimateAction.h" />
     <ClInclude Include="src\Core\AchievementSystem.h" />
     <ClInclude Include="src\Core\ActionData.h" />
     <ClInclude Include="src\Core\ActionResult.h" />
