@@ -125,9 +125,16 @@ void ConsoleRenderer::renderUnit(const Unit *unit, const std::string &label, boo
         const auto *pc{dynamic_cast<const PlayableCharacter *>(unit)};
         if (pc)
         {
-            // Energy only; SP is now shown at party level
-            std::cout << "    Energy: ";
+            // Energy
+            std::cout << "    Energy:   ";
             printBar(pc->getEnergy(), PlayableCharacter::kMaxEnergy, 10);
+            std::cout << '\n';
+
+            // Exposure gauge — always shown so the risk state is never hidden
+            std::cout << "    Exposure: ";
+            printBar(pc->getExposure(), PlayableCharacter::kMaxExposure, 10);
+            if (pc->isFractured())
+                std::cout << "  [FRACTURED]";
             std::cout << '\n';
         }
     }
@@ -168,12 +175,21 @@ void ConsoleRenderer::renderActionMenu(const PlayableCharacter &character,
               << PlayableCharacter::kMaxEnergy << '\n';
     std::cout << "Actions:\n";
     const auto &abilities = character.getAbilities();
+    std::size_t displayIndex{1};
     for (std::size_t i{0}; i < abilities.size(); ++i)
     {
-        std::cout << "  [" << (i + 1) << "] " << abilities[i]->label();
+        const ActionData &data{abilities[i]->getActionData()};
+
+        // Arch Skill is hidden from the menu until unlocked at level 20.
+        // Vent, Basic Attack, Ultimates, and Slot Skills are always shown.
+        if (data.category == ActionCategory::ArchSkill && !character.isArchSkillUnlocked())
+            continue;
+
+        std::cout << "  [" << displayIndex << "] " << abilities[i]->label();
         if (!abilities[i]->isAvailable(character, party))
             std::cout << " [UNAVAILABLE]";
         std::cout << '\n';
+        ++displayIndex;
     }
 }
 

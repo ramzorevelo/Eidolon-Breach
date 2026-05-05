@@ -77,14 +77,26 @@ bool PlayableCharacter::canVent() const
 std::size_t PlayableCharacter::selectActionIndex(const Party &allies,
                                                  IInputHandler &input)
 {
+    // Build the filtered list of visible ability indices — mirrors renderActionMenu().
+    std::vector<std::size_t> visibleIndices{};
+    visibleIndices.reserve(m_abilities.size());
+    for (std::size_t i{0}; i < m_abilities.size(); ++i)
+    {
+        const ActionData &data{m_abilities[i]->getActionData()};
+        if (data.category == ActionCategory::ArchSkill && !m_archSkillUnlocked)
+            continue;
+        visibleIndices.push_back(i);
+    }
+
     while (true)
     {
-        std::size_t idx{input.getActionChoice(m_abilities.size())};
-        if (m_abilities[idx]->isAvailable(*this, allies))
-            return idx;
+        // Input handler receives the count of visible options, not the raw ability count.
+        const std::size_t choice{input.getActionChoice(visibleIndices.size())};
+        const std::size_t internalIdx{visibleIndices[choice]};
+        if (m_abilities[internalIdx]->isAvailable(*this, allies))
+            return internalIdx;
     }
 }
-
 std::optional<TargetInfo> PlayableCharacter::selectTarget(const Party &enemies,
                                                           IInputHandler &input,
                                                           IRenderer &renderer)
