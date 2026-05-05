@@ -24,30 +24,30 @@ class IStatusEffect
   public:
     virtual ~IStatusEffect() = default;
 
-    // --- Identity ---
+    // Identity
     /** @return Unique lowercase identifier (e.g. "burn"). Use EffectIds constants. */
     virtual std::string_view getId() const = 0;
     /** @return Display name (e.g. "Burn"). */
     virtual std::string_view getName() const = 0;
 
-    // --- Duration ---
+    // Duration
     /**
      * @brief Duration in ticks remaining, or std::nullopt for permanent effects.
      * Permanent effects are never removed by the duration check in tickEffects().
      */
     virtual std::optional<int> getDuration() const = 0;
 
-    // --- Categorisation ---
+    // Categorisation
     virtual bool isBuff() const = 0;
     virtual bool isDebuff() const = 0;
 
-    // --- Tag System ---
+    // Tag System
     /** @return All tags on this effect (e.g. {"Debuff", "DoT", "Blaze"}). */
     virtual const std::vector<std::string> &getTags() const = 0;
     /** @return true if this effect carries the given tag. */
     virtual bool hasTag(std::string_view tag) const = 0;
 
-    // --- Lifecycle Hooks ---
+    // Lifecycle Hooks
     /** Called once when the effect is first applied to a Unit. */
     virtual void onApply(Unit &owner) = 0;
     /**
@@ -60,13 +60,13 @@ class IStatusEffect
     /** Called when the effect is removed before natural expiry (e.g. cleanse). */
     virtual void onRemove(Unit &owner) = 0;
 
-    // --- Stat Modification (two-pass ordering, see §2.12.3) ---
+    // Stat Modification
     /** Pass 1: flat additions. Return modified Stats. */
     virtual Stats modifyStatsFlat(Stats base) const = 0;
     /** Pass 2: percentage multipliers applied after all flat mods. Return modified Stats. */
     virtual Stats modifyStatsPct(Stats base) const = 0;
 
-    // --- Shield Absorption ---
+    // Shield Absorption
     /**
      * @brief Attempt to absorb incoming direct damage.
      * @param incoming Damage amount after DEF reduction.
@@ -76,10 +76,11 @@ class IStatusEffect
      * DoT ticks call takeTrueDamage() and bypass this entirely.
      */
     virtual int absorbDamage(int incoming) = 0;
+
     /** @return true when a shield's absorb pool is fully depleted. */
     virtual bool isExhausted() const = 0;
 
-    // --- Duration Extension ---
+    // Duration Extension
     /**
      * @brief Add turns to the remaining duration.
      * Passing a negative value decrements. Has no effect on permanent effects.

@@ -6,7 +6,6 @@
  *        registry bridges JSON ability ID strings to the correct concrete IAction.
  *
  *        Register all abilities before CharacterRegistry::create() is called.
- *        No global state — constructed and injected.
  */
 
 #include "Actions/IAction.h"

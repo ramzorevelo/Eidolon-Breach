@@ -1,14 +1,13 @@
 #pragma once
 /**
  * @file VentAction.h
- * @brief Vent action [V]: reduces Exposure to 0, ends the character's turn (see §2.10.4).
+ * @brief Vent action [V]: reduces Exposure to 0, ends the character's turn.
  */
 
 #include "Actions/IAction.h"
 
 /**
- * @brief 0 SP, 0 Momentum cost. Available when 0 < Exposure < 100.
- * Stubs Exposure logic until PlayableCharacter::m_exposure is added in Commit 10.
+ * @brief 0 SP, 0 energy cost. Available when 0 < Exposure < 100.
  */
 class VentAction : public IAction
 {

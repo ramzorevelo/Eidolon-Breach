@@ -32,10 +32,8 @@ constexpr std::string_view kTerra = "Terra";
 constexpr std::string_view kAether = "Aether";
 } // namespace EffectTags
 
-// ---------------------------------------------------------------------------
 // EffectTagFlag — bitmask representation of EffectTags for O(1) queries.
 // Mirrors the string constants in EffectTags above; new tags get new bits here.
-// ---------------------------------------------------------------------------
 enum class EffectTagFlag : uint16_t
 {
     None = 0,

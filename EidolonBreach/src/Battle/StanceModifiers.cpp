@@ -1,7 +1,7 @@
 /**
  * @file StanceModifiers.cpp
  * @brief StanceModifiers implementation. Add new character entries to each
- *        function as new Synchrons are added in Phase 9.
+ *        function as new Synchrons are added.
  */
 
 #include "Battle/StanceModifiers.h"
@@ -62,7 +62,7 @@ int applyResonanceModifier(std::string_view stanceId,
     if (stanceId.empty())
         return baseAmount;
 
-    // --- Lyra: Predator ---
+    // Lyra: Predator
     // Basic attacks add +1 to the Blaze Resonance vote via an extra contribution point.
     // This manifests as +1 gauge contribution when actionAffinity == Blaze.
     if (stanceId == LyraStances::kPredator)
@@ -73,9 +73,8 @@ int applyResonanceModifier(std::string_view stanceId,
         return baseAmount;
     }
 
-    // --- Lyra: Conflagration ---
+    // Lyra: Conflagration
     // Each consecutive Blaze action adds +8 gauge flat.
-    // Turn-number tracking is a Phase 9 refinement; Phase 8 stub: always +8 for Blaze.
     if (stanceId == LyraStances::kConflagration)
     {
         constexpr int kChainBonus{8};
@@ -84,7 +83,7 @@ int applyResonanceModifier(std::string_view stanceId,
         return baseAmount;
     }
 
-    // --- Lyra: Ember ---
+    // Lyra: Ember 
     // At high Exposure (>= 60), +20% contribution.
     // Exposure check requires a PC reference — handled in applyResonanceContribution
     // in Battle.cpp which passes pc. For now, stub: always +2 for any affinity.
@@ -94,7 +93,7 @@ int applyResonanceModifier(std::string_view stanceId,
         return std::max(0, baseAmount + kEmberBonus);
     }
 
-    // --- Vex: Bastion ---
+    // Vex: Bastion 
     // Terra actions contribute +2 extra — steady defensive energy.
     if (stanceId == VexStances::kBastion)
     {
@@ -104,7 +103,7 @@ int applyResonanceModifier(std::string_view stanceId,
         return baseAmount;
     }
 
-    // --- Vex: Resonance ---
+    // Vex: Resonance 
     // SP-surplus play generates +3 extra on Terra actions.
     if (stanceId == VexStances::kResonance)
     {
@@ -114,15 +113,15 @@ int applyResonanceModifier(std::string_view stanceId,
         return baseAmount;
     }
 
-    // --- Vex: Fracture ---
-    // High-Exposure commitment releases raw energy — any affinity gains +4.
+    // Vex: Fracture 
+    // High-Exposure commitment releases raw energy; any affinity gains +4.
     if (stanceId == VexStances::kFracture)
     {
         constexpr int kFractureBonus{4};
         return std::max(0, baseAmount + kFractureBonus);
     }
 
-    // --- Zara: Glacial ---
+    // Zara: Glacial
     // Frost control chains deepen the field — +3 to Frost contributions.
     if (stanceId == ZaraStances::kGlacial)
     {
@@ -132,8 +131,8 @@ int applyResonanceModifier(std::string_view stanceId,
         return baseAmount;
     }
 
-    // --- Zara: Shatter ---
-    // Break-hunting sharpens the edge — +2 to Frost, oriented toward toughness lanes.
+    // Zara: Shatter
+    // Break-hunting sharpens the edge. +2 to Frost, oriented toward toughness lanes.
     if (stanceId == ZaraStances::kShatter)
     {
         constexpr int kFrostBonus{2};
@@ -142,8 +141,8 @@ int applyResonanceModifier(std::string_view stanceId,
         return baseAmount;
     }
 
-    // --- Zara: Convergence ---
-    // SP surplus channels into the field — +2 to all affinities.
+    // Zara: Convergence
+    // SP surplus channels into the field;  +2 to all affinities.
     if (stanceId == ZaraStances::kConvergence)
     {
         constexpr int kConvergeBonus{2};

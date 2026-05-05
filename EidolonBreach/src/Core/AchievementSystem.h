@@ -2,8 +2,7 @@
 /**
  * @file AchievementSystem.h
  * @brief Subscribes to battle and run events to track achievement progress.
- *        Phase 7 stub: handlers are registered but contain no logic.
- *        Full threshold checking and AchievementUnlockedEvent emission in Phase 8.
+ *        Handlers are currently no-ops; logic is added when achievements are designed.
  */
 
 #include "Core/EventBus.h"

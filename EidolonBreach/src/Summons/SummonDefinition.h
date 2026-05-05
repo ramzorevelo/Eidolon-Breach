@@ -17,7 +17,7 @@ struct SummonDefinition
     std::string displayName{};
     Stats baseStats{};             ///< hp, maxHp, atk, def, spd. Set at registration.
     std::optional<int> duration{}; ///< Turns before auto-expiry. nullopt = until destroyed.
-    bool canTaunt{false};          ///< Reserved for Phase 9 taunt mechanic.
-    bool autoMoveFront{false};     ///< Reserved for Phase 9 formation mechanic.
+    bool canTaunt{false};          
+    bool autoMoveFront{false};     
     std::vector<SummonAction> actions{};
 };

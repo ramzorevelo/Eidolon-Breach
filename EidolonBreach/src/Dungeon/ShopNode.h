@@ -14,7 +14,7 @@ class ShopNode : public MapNode
     /**
      * @param registry    Shared item registry. Must outlive this node.
      * @param stockIds    IDs of items offered. Caller controls stock composition.
-     * @param rngSeed     Seed used when randomly rolling stock (unused until Phase 9).
+     * @param rngSeed     Seed used when randomly rolling stock.
      */
     explicit ShopNode(const ItemRegistry &registry,
                       std::vector<std::string> stockIds,

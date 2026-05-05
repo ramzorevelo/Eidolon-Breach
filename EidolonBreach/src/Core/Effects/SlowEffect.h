@@ -29,7 +29,7 @@ class SlowEffect : public StatusEffectBase
      * @brief Reduces base.spd by m_slowRatio in pass 2 (percentage).
      *
      * Applied after all flat additions so that the slowRatio operates on
-     * the already-flat-modified SPD value (see §2.12.3 two-pass order).
+     * the already-flat-modified SPD value.
      */
     Stats modifyStatsPct(Stats base) const override;
 

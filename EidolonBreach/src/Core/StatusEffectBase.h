@@ -26,18 +26,18 @@ class StatusEffectBase : public IStatusEffect
                      std::optional<int> duration,
                      std::initializer_list<std::string_view> tags);
 
-    // --- IStatusEffect: Identity ---
+    // IStatusEffect: Identity 
     std::string_view getId() const override;
     std::string_view getName() const override;
 
-    // --- IStatusEffect: Duration ---
+    // IStatusEffect: Duration 
     std::optional<int> getDuration() const override;
 
-    // --- IStatusEffect: Tags ---
+    // IStatusEffect: Tags 
     const std::vector<std::string> &getTags() const override;
     bool hasTag(std::string_view tag) const override;
 
-    // --- IStatusEffect: No-op defaults (override in subclasses as needed) ---
+    //  IStatusEffect: No-op defaults (override in subclasses as needed) 
     void onApply(Unit & /*owner*/) override {}
     std::string onTick(Unit & /*owner*/) override
     {

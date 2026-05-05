@@ -452,9 +452,6 @@
     <ClInclude Include="src\Entities\Summon.h">
       <Filter>Entities</Filter>
     </ClInclude>
-    <ClInclude Include="src\Summons\Ignis.h">
-      <Filter>Summons</Filter>
-    </ClInclude>
     <ClInclude Include="src\Battle\StanceModifiers.h">
       <Filter>Battle</Filter>
     </ClInclude>

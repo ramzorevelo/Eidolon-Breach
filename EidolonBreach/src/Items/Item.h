@@ -61,7 +61,7 @@ struct ResonanceModifier
 /**
  * @brief Reduces HP damage taken by a fixed amount when the incoming action's
  *        affinity matches. Applied in Unit::takeDamage() before the DEF formula.
- *        (Flat reduction, not percentage — percentage comes from IStatusEffect.)
+ *        (Flat reduction, not percentage. Percentage comes from IStatusEffect.)
  */
 struct AffinityResistance
 {

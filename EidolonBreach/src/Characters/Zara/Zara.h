@@ -18,5 +18,5 @@ constexpr std::string_view kConvergence = "zara_convergence"; ///< SP-surplus / 
 
 namespace ZaraIds
 {
-constexpr std::string_view kId = "zara"; ///< Must match PlayableCharacter id in data/characters.json.
+constexpr std::string_view kId = "zara"; 
 } // namespace ZaraIds

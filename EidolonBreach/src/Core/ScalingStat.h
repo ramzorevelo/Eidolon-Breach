@@ -5,7 +5,7 @@
  */
 
 /**
- * @brief Scaling stat for damage calculation (see §2.3.5).
+ * @brief Scaling stat for damage calculation.
  *
  * Stored in ActionData so ATK-scaling, DEF-scaling, and HP-scaling
  * actions all use the same combat-loop code in CombatUtils.

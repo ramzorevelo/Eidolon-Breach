@@ -2,7 +2,6 @@
 /**
  * @file BattleState.h
  * @brief Global battle context passed to takeTurn() and execute().
- *        Extend this struct rather than passing Battle& to game logic layers.
  */
 
 #include "Core/Affinity.h"

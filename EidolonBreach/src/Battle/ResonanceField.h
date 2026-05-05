@@ -1,7 +1,7 @@
 #pragma once
 /**
  * @file ResonanceField.h
- * @brief Shared gauge tracking affinity votes for player actions (see §2.3.7).
+ * @brief Shared gauge tracking affinity votes for player actions.
  */
 
 #include "Core/Affinity.h"
@@ -44,7 +44,6 @@ class ResonanceField
      * All other affinity votes reset to 0. Gauge resets to 0.
      *
      * On a vote tie, the affinity with the lower enum value wins deterministically.
-     * (Phase 9 may replace this with a configurable tie-break.)
      *
      * @return The affinity that triggered.
      */

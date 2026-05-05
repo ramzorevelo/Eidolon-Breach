@@ -23,7 +23,6 @@ enum class TargetMode
     SingleAny,  // Enemy or ally. 
 
     // Formation-based: player picks center, hits center + up to 2 adjacent.
-    // Resolution stubbed as SingleEnemy/SingleAlly until Phase 6 (FormationManager).
     SplashEnemy, 
     SplashAlly,  
 

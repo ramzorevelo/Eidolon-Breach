@@ -1,7 +1,7 @@
 #pragma once
 /**
  * @file MetaProgress.h
- * @brief Cross-run persistent state. Injected by reference — never a singleton.
+ * @brief Cross-run persistent state. Injected by reference.
  *        loadFromFile is a static named constructor returning a value.
  *        Serialized to save.json via nlohmann/json.
  */
@@ -18,9 +18,9 @@
 /** Per-character insight data stored in MetaProgress. */
 struct CharacterInsightData
 {
-    int echoCount{0};                         ///< Resonance Echoes earned; capped at kMaxEchoes.
-    bool bondTrialComplete{false};            ///< Phase 9.
-    std::vector<std::string> chosenAspects{}; ///< Phase 9 Aspect Tree nodes.
+    int echoCount{0};                          
+    bool bondTrialComplete{false};            
+    std::vector<std::string> chosenAspects{}; 
 };
 
 class MetaProgress

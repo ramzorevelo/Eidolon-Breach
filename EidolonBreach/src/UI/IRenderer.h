@@ -56,7 +56,8 @@ class IRenderer
     virtual void renderResonanceField(const ResonanceField &field) = 0;
     /**
      * @brief Render the action menu for the active player character.
-     * @param character The acting character (for name, momentum, SP).
+     * @param character The acting character (for name, 
+     , SP).
      * @param party     The player party (for shared SP display).
      */
     virtual void renderActionMenu(const PlayableCharacter &character,

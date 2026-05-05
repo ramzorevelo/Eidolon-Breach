@@ -39,7 +39,7 @@ public:
      * Pass 1: modifyStatsFlat() on every effect in insertion order.
      * Pass 2: modifyStatsPct() on every effect in insertion order.
      * Flat modifiers always precede percentage multipliers regardless of
-     * the order in which effects were applied (see §2.12.3).
+     * the order in which effects were applied.
      */
     [[nodiscard]] virtual Stats getFinalStats() const;
 
@@ -57,14 +57,13 @@ public:
     virtual void takeDamage(int amount);
     void heal(int amount);
 
-        // --- Direct damage (bypasses shield absorption — for DoT effects) ---
     /**
      * @brief Reduces HP without running the shield absorption pass.
      * Use for DoT ticks (BurnEffect::onTick). Direct attacks call takeDamage().
      */
     virtual void takeTrueDamage(int amount);
 
-    // --- Effect Management ---
+    //  Effect Management 
     /**
      * @brief Apply a status effect to this unit.
      *

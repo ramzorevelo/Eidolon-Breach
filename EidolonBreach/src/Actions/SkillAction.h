@@ -7,7 +7,6 @@
 class SkillAction : public IAction
 {
   public:
-    /** @param skillPower Damage coefficient applied to user ATK (default 2.0). */
     explicit SkillAction(float skillPower = 2.0f);
 
     std::string label() const override;
