@@ -82,7 +82,7 @@ class PlayableCharacter : public Unit
 
     [[nodiscard]] bool isArchSkillUnlocked() const
     {
-        return m_archSkillUnlocked;
+        return hasFlag(CharFlag::ArchSkillUnlocked);
     }
 
     /**
@@ -137,25 +137,28 @@ class PlayableCharacter : public Unit
 
     [[nodiscard]] bool isBreachbornActive() const
     {
-        return m_breachbornActive;
+        return hasFlag(CharFlag::BreachbornActive);
     }
+
     [[nodiscard]] bool isFractured() const
     {
-        return m_fractured;
+        return hasFlag(CharFlag::Fractured);
     }
+
     /** @brief Directly applies Fracture state. Used by Battle after Breachborn ends,
      *         and by tests to set up Fracture scenarios without running a full battle. */
     void applyFracture()
     {
-        m_fractured = true;
+        setFlag(CharFlag::Fractured);
     }
+
     /**
      * @brief Activates Breachborn for 3 turns. Safe to call while Fractured
      *        (refreshes the counter without changing Fracture status).
      */
     void activateBreachborn()
     {
-        m_breachbornActive = true;
+        setFlag(CharFlag::BreachbornActive);
         m_breachbornTurnsRemaining = 3;
     }
 
@@ -166,13 +169,13 @@ class PlayableCharacter : public Unit
      */
     bool tickBreachborn()
     {
-        if (!m_breachbornActive)
+        if (!hasFlag(CharFlag::BreachbornActive))
             return false;
         --m_breachbornTurnsRemaining;
         if (m_breachbornTurnsRemaining <= 0)
         {
-            m_breachbornActive = false;
-            m_fractured = true;
+            clearFlag(CharFlag::BreachbornActive);
+            setFlag(CharFlag::Fractured);
             return true;
         }
         return false;
@@ -186,28 +189,28 @@ class PlayableCharacter : public Unit
     
     [[nodiscard]] bool isResonatingProcArmed() const
     {
-        return m_resonatingProcArmed;
+        return hasFlag(CharFlag::ResonatingProcArmed);
     }
     void armResonatingProc()
     {
-        m_resonatingProcArmed = true;
+        setFlag(CharFlag::ResonatingProcArmed);
     }
     void consumeResonatingProc()
     {
-        m_resonatingProcArmed = false;
+        clearFlag(CharFlag::ResonatingProcArmed);
     }
 
     [[nodiscard]] bool isSurgingProcArmed() const
     {
-        return m_surgingProcArmed;
+        return hasFlag(CharFlag::SurgingProcArmed);
     }
     void armSurgingProc()
     {
-        m_surgingProcArmed = true;
+        setFlag(CharFlag::SurgingProcArmed);
     }
     void consumeSurgingProc()
     {
-        m_surgingProcArmed = false;
+        clearFlag(CharFlag::SurgingProcArmed);
     }
 
     // Consumable cooldown
@@ -303,13 +306,39 @@ class PlayableCharacter : public Unit
                                                IInputHandler &input,
                                                IRenderer &renderer);
     int m_archSkillCooldown{0};
-    bool m_archSkillUnlocked{false};
     int m_consumableCooldown{0};
-    bool m_consumableUsedThisBattle{false};
-    bool m_resonatingProcArmed{false};
-    bool m_surgingProcArmed{false};
-    bool m_breachbornActive{false};
     int m_breachbornTurnsRemaining{0};
-    bool m_fractured{false};
     CharacterEquipment m_equipment{};
+
+    enum class CharFlag : uint16_t
+    {
+        None = 0,
+        ArchSkillUnlocked = 1 << 0,
+        ResonatingProcArmed = 1 << 1,
+        SurgingProcArmed = 1 << 2,
+        BreachbornActive = 1 << 3,
+        Fractured = 1 << 4,
+        ConsumableUsedThisBattle = 1 << 5,
+    };
+
+    static constexpr uint16_t kBattleResetFlagsMask =
+        static_cast<uint16_t>(CharFlag::ResonatingProcArmed) |
+        static_cast<uint16_t>(CharFlag::SurgingProcArmed) |
+        static_cast<uint16_t>(CharFlag::BreachbornActive) |
+        static_cast<uint16_t>(CharFlag::ConsumableUsedThisBattle);
+
+    uint16_t m_flags{0};
+
+    void setFlag(CharFlag f)
+    {
+        m_flags |= static_cast<uint16_t>(f);
+    }
+    void clearFlag(CharFlag f)
+    {
+        m_flags &= static_cast<uint16_t>(~static_cast<uint16_t>(f));
+    }
+    [[nodiscard]] bool hasFlag(CharFlag f) const
+    {
+        return (m_flags & static_cast<uint16_t>(f)) != 0;
+    }
 };
