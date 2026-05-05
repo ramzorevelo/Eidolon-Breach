@@ -39,7 +39,7 @@ void Enemy::applyToughnessHit(int amount, Affinity sourceAffinity)
     {
         m_isBroken = true;
         m_brokenTurnsRemaining = 1;
-        m_toughness = m_maxToughness; // reset immediately per GDD §4.10
+        m_toughness = m_maxToughness; // reset immediately
     }
 }
 
@@ -86,7 +86,7 @@ void Enemy::takeDamage(int amount)
 
 void Enemy::takeTrueDamage(int amount)
 {
-    // DoT during the break window also benefits from the bonus (GDD §4.10).
+    // DoT during the break window also benefits from the bonus.
     int effective{m_isBroken
                       ? static_cast<int>(static_cast<float>(amount) * m_brokenDamageBonus)
                       : amount};

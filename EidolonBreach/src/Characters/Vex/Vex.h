@@ -18,5 +18,5 @@ constexpr std::string_view kFracture = "vex_fracture";   ///< High-Exposure / Sa
 
 namespace VexIds
 {
-constexpr std::string_view kId = "vex"; ///< Must match PlayableCharacter id in data/characters.json.
+constexpr std::string_view kId = "vex";
 } // namespace VexIds

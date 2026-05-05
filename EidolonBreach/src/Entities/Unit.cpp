@@ -1,13 +1,14 @@
+/**
+ * @file Unit.cpp
+ * @brief Implementation of the abstract Unit class.
+ */
+
 #include "Entities/Unit.h"
 #include "Core/ActionResult.h"
 #include "Core/EffectIds.h"
 #include <algorithm>
 #include <utility>
 
-/**
- * @file Unit.cpp
- * @brief Implementation of the abstract Unit class.
- */
 Unit::Unit(std::string id,
            std::string name,
            Stats stats,
@@ -27,9 +28,9 @@ const Stats &Unit::getBaseStats() const
 Stats Unit::getFinalStats() const
 {
     Stats result{getBaseStats()};
-    for (const auto &effect : m_effects) // pass 1: flat additions
+    for (const auto &effect : m_effects)  
         result = effect->modifyStatsFlat(result);
-    for (const auto &effect : m_effects) // pass 2: percentage multipliers
+    for (const auto &effect : m_effects)  
         result = effect->modifyStatsPct(result);
     return result;
 }
@@ -41,7 +42,6 @@ void Unit::takeDamage(int amount)
 {
     int remaining{std::max(0, amount)};
 
-    // Run the shield absorption pass.
     for (auto &effect : m_effects)
     {
         if (remaining <= 0)
@@ -53,7 +53,6 @@ void Unit::takeDamage(int amount)
 
 void Unit::takeTrueDamage(int amount)
 {
-    // Bypasses shield absorption — used by DoT effects (see BurnEffect::onTick).
     m_stats.hp = std::max(0, m_stats.hp - amount);
 }
 

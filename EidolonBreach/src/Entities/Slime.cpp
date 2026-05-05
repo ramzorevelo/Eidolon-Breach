@@ -10,7 +10,7 @@ namespace
 constexpr int kSlimeRegenInterval{4};
 constexpr int kSlimeRegenAmount{20};
 constexpr int kSlimeBaseDamage{12};
-constexpr int kSlimeSplitImpactDamage{8}; ///< Simulates fragment impact until Phase 6 spawn.
+constexpr int kSlimeSplitImpactDamage{8}; 
 } // namespace
 
 Slime::Slime(std::string name, int maxHp, int maxToughness)
@@ -24,8 +24,6 @@ Slime::Slime(std::string name, int maxHp, int maxToughness)
 {
     addDrop(Drop{Drop::Type::Gold, 5, {}, 1.0f});
 
-    // Split: deals impact damage to all player units (stub).
-    // Full behaviour (spawning two Slime Fragments) requires FormationManager (Phase 6).
     setBreakEffect(BreakEffect{
         "slime_split", "Split",
         [](Enemy & /*broken*/, BattleState &state)

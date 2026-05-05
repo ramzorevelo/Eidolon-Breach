@@ -1,7 +1,7 @@
 #pragma once
 /**
  * @file ConsoleRenderer.h
- * @brief Console implementation of IRenderer using std::cout (Phases 0–2 placeholder).
+ * @brief Console implementation of IRenderer using std::cout.
  */
 
 #include "UI/IRenderer.h"
@@ -13,7 +13,6 @@ class Party;
 class Unit;
 class ResonanceField;
 
-/** Scrolling console renderer. Replaced by SDL3Renderer in Phase 3+. */
 class ConsoleRenderer : public IRenderer
 {
   public:

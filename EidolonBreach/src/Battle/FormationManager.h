@@ -3,8 +3,7 @@
  * @file FormationManager.h
  * @brief Manages the 5-slot linear formation for one side of a battle.
  *        Party owns unit lifetimes; FormationManager holds non-owning pointers.
- *        Push/pull overflow damage is computed here; the caller applies it via
- *        Unit::takeTrueDamage() — FormationManager never calls takeTrueDamage itself.
+ *        Push/pull overflow damage is computed here.
  */
 
 #include "Core/CombatConstants.h"

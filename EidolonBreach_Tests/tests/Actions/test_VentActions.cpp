@@ -93,7 +93,7 @@ TEST_CASE("VentAction: ActionData has zero costs and Self targeting")
     VentAction vent{};
     const ActionData &data = vent.getActionData();
     CHECK(data.spCost == 0);
-    CHECK(data.momentumCost == 0);
-    CHECK(data.momentumGain == 0);
+    CHECK(data.energyCost == 0);
+    CHECK(data.energyGain == 0);
     CHECK(data.targetMode == TargetMode::Self);
 }

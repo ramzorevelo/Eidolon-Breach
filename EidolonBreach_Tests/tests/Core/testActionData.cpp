@@ -15,8 +15,8 @@ TEST_CASE("ActionData: default-constructed values are correct")
     CHECK(data.skillPower == doctest::Approx(1.0f));
     CHECK(data.scaling == ScalingStat::ATK);
     CHECK(data.spCost == 0);
-    CHECK(data.momentumCost == 0);
-    CHECK(data.momentumGain == 0);
+    CHECK(data.energyCost == 0);
+    CHECK(data.energyGain == 0);
     CHECK(data.toughnessDamage == 0);
     CHECK(data.targetMode == TargetMode::SingleEnemy);
     CHECK(data.affinity == Affinity::Aether);

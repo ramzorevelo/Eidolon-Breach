@@ -2,7 +2,6 @@
 /**
  * @file TreasureNode.h
  * @brief Map node that awards gold and a Common vestige.
- *        Full vestige table and discard UI added in Phase 9.
  */
 
 #include "Dungeon/MapNode.h"

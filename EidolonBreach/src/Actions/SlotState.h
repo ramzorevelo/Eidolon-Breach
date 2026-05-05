@@ -2,9 +2,6 @@
 /**
  * @file SlotState.h
  * @brief SlotState and EquippedSkillSet for PlayableCharacter equippable skill slots.
- *
- * Slot 1 unlocks at kSlot1UnlockLevel (20). Slot 2 at kSlot2UnlockLevel (40).
- * The Arch Skill is NOT a slot — it is a fixed member of PlayableCharacter.
  */
 
 #include <array>

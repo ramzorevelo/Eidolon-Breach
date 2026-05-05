@@ -2,7 +2,6 @@
 /**
  * @file VestigeFactory.h
  * @brief Creates Vestige instances by rarity tier.
- *        Phase 9 fills the full table; Phase 7 provides the five initial vestiges.
  */
 
 #include "Vestiges/IVestige.h"

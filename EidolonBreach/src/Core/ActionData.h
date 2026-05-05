@@ -1,7 +1,7 @@
 #pragma once
 /**
  * @file ActionData.h
- * @brief Data-driven parameters for every player action (see §2.3.2).
+ * @brief Data-driven parameters for every player action.
  */
 
 #include "Core/Affinity.h"
@@ -10,7 +10,7 @@
 
 /**
  * @brief Categorises an action for stance signal tracking and equip-screen validation.
- *        Used by Battle::processPlayerTurn() (Phase 6) and UseConsumableAction.
+ *        Used by Battle::processPlayerTurn() and UseConsumableAction.
  */
 enum class ActionCategory
 {
@@ -30,8 +30,8 @@ struct ActionData
     float skillPower{1.0f};
     ScalingStat scaling{ScalingStat::ATK};
     int spCost{0};
-    int momentumCost{0}; ///< Renamed to energyCost in a future refactor.
-    int momentumGain{0}; ///< Renamed to energyGain in a future refactor.
+    int energyCost{0}; 
+    int energyGain{0}; 
     int toughnessDamage{0};
     TargetMode targetMode{TargetMode::SingleEnemy};
     Affinity affinity{Affinity::Aether};

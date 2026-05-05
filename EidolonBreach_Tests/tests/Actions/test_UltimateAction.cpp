@@ -12,7 +12,7 @@
 #include <ostream>
 #include <string>
 
-TEST_CASE("UltimateAction: requires full Momentum, resets it and refunds 5")
+TEST_CASE("UltimateAction: requires full Energy, resets it and refunds 5")
 {
     Party allies, enemies;
     allies.gainSp(50);
@@ -20,16 +20,15 @@ TEST_CASE("UltimateAction: requires full Momentum, resets it and refunds 5")
     auto heroRaw = makeHero();
     auto *heroPtr = heroRaw.get();
     allies.addUnit(std::move(heroRaw));
-
     auto enemyRaw = makeEnemy(100, 50);
     auto *enemyPtr = enemyRaw.get();
     enemies.addUnit(std::move(enemyRaw));
 
     UltimateAction ult;
-    CHECK(!ult.isAvailable(*heroPtr, allies)); // momentum 0
+    CHECK(!ult.isAvailable(*heroPtr, allies)); // energy 0
 
     heroPtr->gainEnergy(100);
-    CHECK(ult.isAvailable(*heroPtr, allies)); // momentum 100
+    CHECK(ult.isAvailable(*heroPtr, allies)); // energy 100
 
     TargetInfo t{TargetInfo::Type::Enemy, 0};
     ActionResult result = ult.execute(*heroPtr, allies, enemies, t);

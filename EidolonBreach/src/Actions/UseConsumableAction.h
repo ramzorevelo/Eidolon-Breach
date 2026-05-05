@@ -5,7 +5,7 @@
  *        No SP cost. No Energy gain. Ends the character's turn.
  *        Availability: canUseConsumable() && item still has quantity > 0.
  *
- * Targeting (GDD §4.12, §4.13):
+ * Targeting:
  *   ConsumableHeal  → lowest-HP ally (auto-select, overridable).
  *   ModifyExposure  → self only.
  *   Default         → self.

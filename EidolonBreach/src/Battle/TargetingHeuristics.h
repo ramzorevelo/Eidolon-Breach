@@ -1,11 +1,10 @@
 #pragma once
 /**
  * @file TargetingHeuristics.h
- * @brief Auto-select targeting heuristics for ally-targeting skills (GDD §4.12).
+ * @brief Auto-select targeting heuristics for ally-targeting skills.
  *
  * Called by PlayableCharacter::selectTarget() when the action's TargetMode
  * requires an ally and no explicit player override has been made.
- * The player may override these defaults with left/right arrow (Phase 3+ SDL).
  */
 
 #include "Core/TargetInfo.h"

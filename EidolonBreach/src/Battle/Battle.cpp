@@ -98,7 +98,7 @@ void Battle::runBattleLoop(BattleState &state)
         m_renderer.renderTurnOrder(turnOrder);
         for (const auto &slot : turnOrder)
         {
-            if (!slot.unit->isAlive() || isBattleOver())
+            if (!slot.unit || !slot.unit->isAlive() || isBattleOver())
                 continue;
 
             m_renderer.renderPartyStatus(m_playerParty, m_enemyParty);
@@ -132,8 +132,10 @@ void Battle::runBattleLoop(BattleState &state)
                     s->tickDuration();
                     if (s->isExpired())
                     {
-                        m_renderer.renderMessage(slot.unit->getName() + " fades away.");
-                        m_playerParty.removeUnit(slot.unit->getId());
+                        const std::string name{slot.unit->getName()};
+                        const std::string id{slot.unit->getId()};
+                        m_renderer.renderMessage(name + " fades away.");
+                        m_playerParty.removeUnit(id);
                     }
                 }
             }

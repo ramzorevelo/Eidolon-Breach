@@ -3,7 +3,7 @@
  * @brief Tests for Unit effect management, takeTrueDamage, and shield absorption.
  *
  * Integration tests that require concrete effects (getFinalStats with SlowEffect,
- * tickEffects with Burn/Regen) are in test_UnitEffectsIntegration.cpp (Commit 5).
+ * tickEffects with Burn/Regen) are in test_UnitEffectsIntegration.cpp.
  */
 #include "Core/EffectIds.h"
 #include "Core/StatusEffectBase.h"

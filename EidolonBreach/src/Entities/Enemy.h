@@ -22,8 +22,6 @@ class Enemy;
 /**
  * @brief Fired once when an enemy's Toughness gauge first hits zero.
  *        Battle calls onBreak immediately after detecting isBroken().
- *        state.playerParty / state.enemyParty are nullptr until Phase 6;
- *        all callbacks must null-check before dereferencing them.
  */
 struct BreakEffect
 {

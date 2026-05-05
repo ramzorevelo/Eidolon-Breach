@@ -2,7 +2,7 @@
 /**
  * @file MapNode.h
  * @brief Abstract base for all dungeon nodes.
- *        MetaProgress is injected by reference — never accessed as a singleton.
+ *        MetaProgress is injected by reference.
  */
 
 #include <string>

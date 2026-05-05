@@ -1,12 +1,12 @@
 #pragma once
 /**
  * @file UltimateAction.h
- * @brief Ultimate [R]: requires full Momentum (100), resets to 0, refunds 5.
+ * @brief Ultimate [R]: requires full energy (100), resets to 0, refunds 5.
  */
 
 #include "Actions/IAction.h"
 
-/** Ultimate: available only when Momentum = 100. Resets Momentum to 0, refunds 5. */
+/** Ultimate: available only when energy = 100. Resets energy to 0, refunds 5. */
 class UltimateAction : public IAction
 {
   public:

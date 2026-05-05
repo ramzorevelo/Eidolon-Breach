@@ -11,7 +11,7 @@ namespace
 constexpr int kGolemHeavySlamInterval{3};
 constexpr int kGolemHeavySlamDamage{35};
 constexpr int kGolemBaseDamage{20};
-constexpr int kCrumbleShieldAmount{25}; ///< Proxy for "DEF +15%" until Phase 9 balance pass.
+constexpr int kCrumbleShieldAmount{25};
 constexpr int kCrumbleShieldDuration{3};
 } // namespace
 

@@ -164,7 +164,7 @@ int main()
 {
     std::cout << "=== EIDOLON BREACH ===\n\n";
 
-    // --- Registries ---
+    //  Registries 
     AbilityRegistry abilityRegistry{buildAbilityRegistry()};
 
     CharacterRegistry characterRegistry{};
@@ -173,14 +173,14 @@ int main()
     SummonRegistry summonRegistry{};
     Ignis::registerIgnis(summonRegistry);
 
-    // --- MetaProgress ---
+    // MetaProgress
     MetaProgress meta{MetaProgress::loadFromFile("save.json")};
 
     // Unlock starting characters if this is a fresh save.
     for (const std::string &id : characterRegistry.getIds())
         meta.unlockCharacter(id);
 
-    // --- Party ---
+    // Party
     Party playerParty{};
     playerParty.gainSp(50);
 
@@ -194,11 +194,11 @@ int main()
 
     std::cout << "\nStarting run with " << playerParty.size() << " character(s).\n";
 
-        // --- Run ---
+    // Run
     const std::uint32_t seed{static_cast<std::uint32_t>(std::random_device{}())};
     std::cout << "Run seed: " << seed << '\n';
 
-    // --- Mode selection (Classic / Draft) ---
+    // Mode selection (Classic / Labyrinth)
     std::cout << "Mode: [1] Classic  [2] Eidolon Labyrinth\nChoice: ";
     int modeChoice{1};
     std::cin >> modeChoice;
@@ -210,7 +210,7 @@ int main()
 
     if (runMode == RunMode::Classic)
     {
-        // --- Classic dungeon selection ---
+        // Classic dungeon selection
         const auto &classicDungeons{DungeonTable::getClassicDungeons()};
 
         std::vector<const DungeonDefinition *> available{};
@@ -251,7 +251,7 @@ int main()
     }
     else
     {
-        // Draft mode uses the first dungeon as a default template for now
+        // Labyrinth mode uses the first dungeon as a default template for now
         selectedDungeon = &DungeonTable::getClassicDungeons().front();
         std::cout << "Eidolon Labyrinth: no XP earned. Attune available at Rest sites.\n";
     }
