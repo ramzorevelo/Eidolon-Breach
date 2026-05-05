@@ -7,7 +7,7 @@
 #include "Characters/AbilityRegistry.h"
 #include "Core/Affinity.h"
 #include "Core/DataLoader.h"
-
+#include "Actions/VentAction.h"
 #include "Entities/PlayableCharacter.h"
 #include <stdexcept>
 
@@ -65,6 +65,8 @@ CharacterRegistry::create(std::string_view characterId, int characterLevel) cons
         pc->tryUnlockSlot(static_cast<int>(i));
         pc->equipSkillToSlot(static_cast<int>(i), rawPtr);
     }
+
+    pc->addAbility(std::make_unique<VentAction>());
 
     pc->applyUnlocks(characterLevel);
 
