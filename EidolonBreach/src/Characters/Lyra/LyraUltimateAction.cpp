@@ -3,7 +3,7 @@
  * @brief LyraUltimateAction implementation.
  */
 
-#include "Actions/LyraUltimateAction.h"
+#include "Characters/Lyra/LyraUltimateAction.h"
 #include "Core/CombatConstants.h"
 #include "Core/CombatUtils.h"
 #include "Core/Effects/BurnEffect.h"

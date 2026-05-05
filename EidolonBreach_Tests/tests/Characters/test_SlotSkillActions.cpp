@@ -2,8 +2,8 @@
  * @file test_SlotSkillActions.cpp
  * @brief Tests for VexBulwarkAction and ZaraFrostbindAction.
  */
-#include "Actions/VexBulwarkAction.h"
-#include "Actions/ZaraFrostbindAction.h"
+#include "Characters/Vex/VexBulwarkAction.h"
+#include "Characters/Zara/ZaraFrostbindAction.h"
 #include "Core/EffectIds.h"
 #include "Entities/Party.h"
 #include "doctest.h"

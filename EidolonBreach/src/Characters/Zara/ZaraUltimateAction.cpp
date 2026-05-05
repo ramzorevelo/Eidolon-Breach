@@ -3,7 +3,7 @@
  * @brief ZaraUltimateAction implementation.
  */
 
-#include "Actions/ZaraUltimateAction.h"
+#include "Characters/Zara/ZaraUltimateAction.h"
 #include "Core/CombatUtils.h"
 #include "Core/Effects/SlowEffect.h"
 #include "Entities/Party.h"

@@ -2,9 +2,9 @@
  * @file test_CharacterUltimates.cpp
  * @brief Tests for LyraUltimateAction, VexUltimateAction, ZaraUltimateAction.
  */
-#include "Actions/LyraUltimateAction.h"
-#include "Actions/VexUltimateAction.h"
-#include "Actions/ZaraUltimateAction.h"
+#include "Characters/Lyra/LyraUltimateAction.h"
+#include "Characters/Vex/VexUltimateAction.h"
+#include "Characters/Zara/ZaraUltimateAction.h"
 #include "Core/EffectIds.h"
 #include "Entities/Party.h"
 #include "doctest.h"

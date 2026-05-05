@@ -3,7 +3,7 @@
  * @brief EmberCallAction implementation.
  */
 
-#include "Actions/EmberCallAction.h"
+#include "Characters/Lyra/EmberCallAction.h"
 #include "Entities/Party.h"
 #include "Entities/PlayableCharacter.h"
 

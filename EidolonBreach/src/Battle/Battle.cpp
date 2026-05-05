@@ -21,7 +21,7 @@
 #include "Entities/Summon.h"
 #include "Summons/SummonRegistry.h"
 #include "Battle/StanceModifiers.h"
-#include "Characters/Lyra.h"
+#include "Characters/Lyra/Lyra.h"
 
 Battle::Battle(Party &playerParty,
                Party &enemyParty,

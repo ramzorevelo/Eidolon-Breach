@@ -6,9 +6,9 @@
 
 #include "Battle/StanceModifiers.h"
 #include "Battle/BattleState.h"
-#include "Characters/Lyra.h"
-#include "Characters/Vex.h"
-#include "Characters/Zara.h"
+#include "Characters/Lyra/Lyra.h"
+#include "Characters/Vex/Vex.h"
+#include "Characters/Zara/Zara.h"
 #include "Core/Affinity.h"
 #include "Entities/PlayableCharacter.h"
 #include <algorithm>

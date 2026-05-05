@@ -2,7 +2,7 @@
  * @file VexBulwarkAction.cpp
  * @brief VexBulwarkAction implementation.
  */
-#include "Actions/VexBulwarkAction.h"
+#include "Characters/Vex/VexBulwarkAction.h"
 #include "Battle/TargetingHeuristics.h"
 #include "Core/Effects/ShieldEffect.h"
 #include "Entities/Party.h"

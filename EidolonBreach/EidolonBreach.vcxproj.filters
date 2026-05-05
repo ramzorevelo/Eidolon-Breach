@@ -52,19 +52,19 @@
     <Filter Include="data">
       <UniqueIdentifier>{2371734d-a1dc-4f7c-9604-f27a2c66721c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Characters\Lyra">
+      <UniqueIdentifier>{1fb21c14-1eaf-4370-b59c-4ee404e490c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Characters\Vex">
+      <UniqueIdentifier>{f76fa0c3-660b-4141-bf3f-eaf6168f336a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Characters\Zara">
+      <UniqueIdentifier>{eaeac08e-5969-46d7-aad8-01bdc8d25169}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Actions\BasicStrikeAction.cpp">
-      <Filter>Actions</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Actions\SkillAction.cpp">
-      <Filter>Actions</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Actions\UltimateAction.cpp">
-      <Filter>Actions</Filter>
     </ClCompile>
     <ClCompile Include="src\Battle\Battle.cpp">
       <Filter>Battle</Filter>
@@ -120,14 +120,8 @@
     <ClCompile Include="src\UI\ConsoleInputHandler.cpp">
       <Filter>UI</Filter>
     </ClCompile>
-    <ClCompile Include="src\Actions\VentAction.cpp">
-      <Filter>Actions</Filter>
-    </ClCompile>
     <ClCompile Include="src\Items\Inventory.cpp">
       <Filter>Items</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Actions\UseConsumableAction.cpp">
-      <Filter>Actions</Filter>
     </ClCompile>
     <ClCompile Include="src\Battle\TargetingHeuristics.cpp">
       <Filter>Battle</Filter>
@@ -192,9 +186,6 @@
     <ClCompile Include="src\Entities\Summon.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
-    <ClCompile Include="src\Actions\EmberCallAction.cpp">
-      <Filter>Actions</Filter>
-    </ClCompile>
     <ClCompile Include="src\Battle\StanceModifiers.cpp">
       <Filter>Battle</Filter>
     </ClCompile>
@@ -210,12 +201,6 @@
     <ClCompile Include="src\Entities\EnemyRegistry.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
-    <ClCompile Include="src\Characters\AbilityRegistry.cpp">
-      <Filter>Characters</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Characters\CharacterRegistry.cpp">
-      <Filter>Characters</Filter>
-    </ClCompile>
     <ClCompile Include="src\Vestiges\ResonantSurgevestige.cpp">
       <Filter>Vestiges</Filter>
     </ClCompile>
@@ -228,35 +213,47 @@
     <ClCompile Include="src\Dungeon\ShopNode.cpp">
       <Filter>Dungeon</Filter>
     </ClCompile>
-    <ClCompile Include="src\Actions\VexBulwarkAction.cpp">
+    <ClCompile Include="src\Actions\BasicStrikeAction.cpp">
       <Filter>Actions</Filter>
     </ClCompile>
-    <ClCompile Include="src\Actions\ZaraFrostBindAction.cpp">
+    <ClCompile Include="src\Actions\SkillAction.cpp">
       <Filter>Actions</Filter>
     </ClCompile>
-    <ClCompile Include="src\Actions\ZaraUltimateAction.cpp">
+    <ClCompile Include="src\Actions\UltimateAction.cpp">
       <Filter>Actions</Filter>
     </ClCompile>
-    <ClCompile Include="src\Actions\VexUltimateAction.cpp">
+    <ClCompile Include="src\Actions\UseConsumableAction.cpp">
       <Filter>Actions</Filter>
     </ClCompile>
-    <ClCompile Include="src\Actions\LyraUltimateAction.cpp">
+    <ClCompile Include="src\Actions\VentAction.cpp">
       <Filter>Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Characters\AbilityRegistry.cpp">
+      <Filter>Characters</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Characters\CharacterRegistry.cpp">
+      <Filter>Characters</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Characters\Lyra\EmberCallAction.cpp">
+      <Filter>Characters\Lyra</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Characters\Lyra\LyraUltimateAction.cpp">
+      <Filter>Characters\Lyra</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Characters\Vex\VexBulwarkAction.cpp">
+      <Filter>Characters\Vex</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Characters\Vex\VexUltimateAction.cpp">
+      <Filter>Characters\Vex</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Characters\Zara\ZaraFrostBindAction.cpp">
+      <Filter>Characters\Zara</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Characters\Zara\ZaraUltimateAction.cpp">
+      <Filter>Characters\Zara</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Actions\BasicStrikeAction.h">
-      <Filter>Actions</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Actions\IAction.h">
-      <Filter>Actions</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Actions\SkillAction.h">
-      <Filter>Actions</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Actions\UltimateAction.h">
-      <Filter>Actions</Filter>
-    </ClInclude>
     <ClInclude Include="src\Battle\Battle.h">
       <Filter>Battle</Filter>
     </ClInclude>
@@ -365,23 +362,14 @@
     <ClInclude Include="src\UI\IRenderer.h">
       <Filter>UI</Filter>
     </ClInclude>
-    <ClInclude Include="src\Actions\VentAction.h">
-      <Filter>Actions</Filter>
-    </ClInclude>
     <ClInclude Include="src\Battle\BattleState.h">
       <Filter>Battle</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Actions\SlotState.h">
-      <Filter>Actions</Filter>
     </ClInclude>
     <ClInclude Include="src\Items\Inventory.h">
       <Filter>Items</Filter>
     </ClInclude>
     <ClInclude Include="src\Items\Item.h">
       <Filter>Items</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Actions\UseConsumableAction.h">
-      <Filter>Actions</Filter>
     </ClInclude>
     <ClInclude Include="src\Battle\TargetingHeuristics.h">
       <Filter>Battle</Filter>
@@ -467,12 +455,6 @@
     <ClInclude Include="src\Summons\Ignis.h">
       <Filter>Summons</Filter>
     </ClInclude>
-    <ClInclude Include="src\Actions\EmberCallAction.h">
-      <Filter>Actions</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Characters\Lyra.h">
-      <Filter>Characters</Filter>
-    </ClInclude>
     <ClInclude Include="src\Battle\StanceModifiers.h">
       <Filter>Battle</Filter>
     </ClInclude>
@@ -490,18 +472,6 @@
     </ClInclude>
     <ClInclude Include="nlohmann\json.hpp">
       <Filter>nlohmann</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Characters\AbilityRegistry.h">
-      <Filter>Characters</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Characters\CharacterRegistry.h">
-      <Filter>Characters</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Characters\Vex.h">
-      <Filter>Characters</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Characters\Zara.h">
-      <Filter>Characters</Filter>
     </ClInclude>
     <ClInclude Include="src\Vestiges\ResonantSurgeVestige.h">
       <Filter>Vestiges</Filter>
@@ -524,20 +494,62 @@
     <ClInclude Include="src\Dungeon\DungeonTable.h">
       <Filter>Dungeon</Filter>
     </ClInclude>
-    <ClInclude Include="src\Actions\VexBulwarkAction.h">
+    <ClInclude Include="src\Actions\BasicStrikeAction.h">
       <Filter>Actions</Filter>
     </ClInclude>
-    <ClInclude Include="src\Actions\ZaraFrostBindAction.h">
+    <ClInclude Include="src\Actions\IAction.h">
       <Filter>Actions</Filter>
     </ClInclude>
-    <ClInclude Include="src\Actions\ZaraUltimateAction.h">
+    <ClInclude Include="src\Actions\SkillAction.h">
       <Filter>Actions</Filter>
     </ClInclude>
-    <ClInclude Include="src\Actions\VexUltimateAction.h">
+    <ClInclude Include="src\Actions\SlotState.h">
       <Filter>Actions</Filter>
     </ClInclude>
-    <ClInclude Include="src\Actions\LyraUltimateAction.h">
+    <ClInclude Include="src\Actions\UltimateAction.h">
       <Filter>Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Actions\UseConsumableAction.h">
+      <Filter>Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Actions\VentAction.h">
+      <Filter>Actions</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Characters\AbilityRegistry.h">
+      <Filter>Characters</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Characters\CharacterRegistry.h">
+      <Filter>Characters</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Characters\Lyra\EmberCallAction.h">
+      <Filter>Characters\Lyra</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Characters\Lyra\Ignis.h">
+      <Filter>Characters\Lyra</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Characters\Lyra\Lyra.h">
+      <Filter>Characters\Lyra</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Characters\Lyra\LyraUltimateAction.h">
+      <Filter>Characters\Lyra</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Characters\Vex\Vex.h">
+      <Filter>Characters\Vex</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Characters\Vex\VexBulwarkAction.h">
+      <Filter>Characters\Vex</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Characters\Vex\VexUltimateAction.h">
+      <Filter>Characters\Vex</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Characters\Zara\Zara.h">
+      <Filter>Characters\Zara</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Characters\Zara\ZaraFrostBindAction.h">
+      <Filter>Characters\Zara</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Characters\Zara\ZaraUltimateAction.h">
+      <Filter>Characters\Zara</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

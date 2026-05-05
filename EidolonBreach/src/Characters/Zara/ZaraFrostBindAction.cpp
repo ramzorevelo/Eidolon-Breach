@@ -2,7 +2,7 @@
  * @file ZaraFrostbindAction.cpp
  * @brief ZaraFrostbindAction implementation.
  */
-#include "Actions/ZaraFrostbindAction.h"
+#include "Characters/Zara/ZaraFrostbindAction.h"
 #include "Core/Effects/SlowEffect.h"
 #include "Entities/Party.h"
 #include "Entities/PlayableCharacter.h"
