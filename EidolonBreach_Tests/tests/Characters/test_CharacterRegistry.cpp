@@ -101,8 +101,8 @@ TEST_CASE("CharacterRegistry: created character has all three abilities register
 
     auto pc{chars.create("vex")};
     REQUIRE(pc != nullptr);
-    // basic + archSkill + ultimate = 3
-    CHECK(pc->getAbilities().size() == 4);
+    // basic + archSkill + ultimate + slot1 + vent = 5
+    CHECK(pc->getAbilities().size() == 5);
 }
 
 TEST_CASE("CharacterRegistry: getIds returns all registered ids in order")
@@ -188,3 +188,28 @@ TEST_CASE("CharacterRegistry: Vex Slot 1 pre-unlocked with EarthenShield")
     CHECK(pc->getEquippedSkills().slots[0].equippedSkill->label() ==
           "Earthen Shield (25 SP - Shield one ally)");
 }
+
+
+TEST_CASE("CharacterRegistry: all characters have VentAction in ability list")
+{
+    AbilityRegistry abilities{makeAbilityRegistry()};
+    CharacterRegistry chars{};
+    chars.loadFromJson("data/characters.json", abilities);
+
+    for (const auto &id : chars.getIds())
+    {
+        auto pc{chars.create(id)};
+        REQUIRE(pc != nullptr);
+        bool hasVent{false};
+        for (const auto &ability : pc->getAbilities())
+        {
+            if (ability->getActionData().category == ActionCategory::Vent)
+            {
+                hasVent = true;
+                break;
+            }
+        }
+        CHECK(hasVent); // every Synchron must have Vent
+    }
+}
+

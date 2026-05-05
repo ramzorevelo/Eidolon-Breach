@@ -3,34 +3,41 @@
         "lyra": {
             "bondTrialComplete": false,
             "chosenAspects": [],
-            "echoCount": 4
+            "echoCount": 5
         },
         "vex": {
             "bondTrialComplete": false,
             "chosenAspects": [],
-            "echoCount": 4
+            "echoCount": 5
         },
         "zara": {
             "bondTrialComplete": false,
             "chosenAspects": [],
-            "echoCount": 4
+            "echoCount": 5
         }
     },
     "characterXP": {
-        "ignis": 40,
-        "lyra": 25,
-        "vex": 25,
-        "zara": 25
+        "ignis": 510,
+        "lyra": 296,
+        "vex": 296,
+        "zara": 296
     },
     "clearedDungeonIds": [
-        "dungeon_01"
+        "dungeon_01",
+        "dungeon_02",
+        "dungeon_03",
+        "dungeon_04"
     ],
     "currency": 0,
     "draftModeUnlocked": false,
-    "highestFloorReached": 1,
-    "masteryEventLog": {},
-    "playerLevel": 2,
-    "playerXp": 238,
+    "highestFloorReached": 5,
+    "masteryEventLog": {
+        "lyra": [
+            "lyra_predator"
+        ]
+    },
+    "playerLevel": 3,
+    "playerXp": 667,
     "unlockedCharacterIds": [
         "lyra",
         "vex",
