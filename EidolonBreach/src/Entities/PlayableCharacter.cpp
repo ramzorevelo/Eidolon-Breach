@@ -71,7 +71,7 @@ void PlayableCharacter::modifyExposure(int delta)
 
 bool PlayableCharacter::canVent() const
 {
-    return m_exposure > 0 && m_exposure < kMaxExposure && !m_fractured;
+    return m_exposure > 0 && m_exposure < kMaxExposure && !hasFlag(CharFlag::Fractured);
 }
 
 std::size_t PlayableCharacter::selectActionIndex(const Party &allies,
@@ -83,7 +83,7 @@ std::size_t PlayableCharacter::selectActionIndex(const Party &allies,
     for (std::size_t i{0}; i < m_abilities.size(); ++i)
     {
         const ActionData &data{m_abilities[i]->getActionData()};
-        if (data.category == ActionCategory::ArchSkill && !m_archSkillUnlocked)
+        if (data.category == ActionCategory::ArchSkill && !hasFlag(CharFlag::ArchSkillUnlocked))
             continue;
         visibleIndices.push_back(i);
     }
@@ -218,14 +218,14 @@ void PlayableCharacter::tickArchSkillCooldown()
 
 bool PlayableCharacter::canUseConsumable() const
 {
-    return m_consumableCooldown == 0 && !m_consumableUsedThisBattle;
+    return m_consumableCooldown == 0 && !hasFlag(CharFlag::ConsumableUsedThisBattle);
 }
 
 void PlayableCharacter::consumeConsumableAction(bool multiTurnEffect)
 {
     m_consumableCooldown = CombatConstants::kConsumableCooldownTurns;
     if (multiTurnEffect)
-        m_consumableUsedThisBattle = true;
+        setFlag(CharFlag::ConsumableUsedThisBattle);
 }
 
 void PlayableCharacter::tickConsumableCooldown()
@@ -236,7 +236,7 @@ void PlayableCharacter::tickConsumableCooldown()
 void PlayableCharacter::resetBattleConsumableState()
 {
     m_consumableCooldown = 0;
-    m_consumableUsedThisBattle = false;
+    m_flags &= ~kBattleResetFlagsMask;
 }
 
 void PlayableCharacter::resetArchSkillCooldown()
@@ -247,7 +247,7 @@ void PlayableCharacter::resetArchSkillCooldown()
 void PlayableCharacter::applyUnlocks(int level)
 {
     if (level >= CombatConstants::kArchSkillUnlockLevel)
-        m_archSkillUnlocked = true;
+        setFlag(CharFlag::ArchSkillUnlocked);
     if (level >= CombatConstants::kSlot2UnlockLevel)
         tryUnlockSlot(1);
 }
