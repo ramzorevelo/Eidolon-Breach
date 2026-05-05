@@ -1,5 +1,6 @@
 #include "Entities/Unit.h"
 #include "Core/ActionResult.h"
+#include "Core/EffectIds.h"
 #include <algorithm>
 #include <utility>
 
@@ -58,17 +59,20 @@ void Unit::takeTrueDamage(int amount)
 
 void Unit::applyEffect(std::unique_ptr<IStatusEffect> effect)
 {
-    // Refresh semantics: replace existing effect with the same ID.
     for (auto &existing : m_effects)
     {
         if (existing->getId() == effect->getId())
         {
             existing = std::move(effect);
             existing->onApply(*this);
+            for (const auto &tag : existing->getTags()) 
+                m_activeTags |= tagToFlag(tag);         
             return;
         }
     }
     effect->onApply(*this);
+    for (const auto &tag : effect->getTags()) 
+        m_activeTags |= tagToFlag(tag);       
     m_effects.push_back(std::move(effect));
 }
 
@@ -81,6 +85,7 @@ void Unit::removeEffect(std::string_view id)
     {
         (*it)->onRemove(*this);
         m_effects.erase(it);
+        rebuildTagCache(); 
     }
 }
 
@@ -96,6 +101,7 @@ void Unit::removeEffectsByTag(std::string_view tag)
                        [tag](const auto &e)
                        { return e->hasTag(tag); }),
         m_effects.end());
+    rebuildTagCache();
 }
 
 void Unit::extendEffectsByTag(std::string_view tag, int turns)
@@ -115,10 +121,7 @@ bool Unit::hasEffect(std::string_view id) const
 
 bool Unit::hasEffectWithTag(std::string_view tag) const
 {
-    for (const auto &effect : m_effects)
-        if (effect->hasTag(tag))
-            return true;
-    return false;
+    return (m_activeTags & tagToFlag(tag)) != 0;
 }
 
 std::vector<std::string> Unit::tickEffects()
@@ -149,6 +152,7 @@ std::vector<std::string> Unit::tickEffects()
                                   (e->getDuration().has_value() && *e->getDuration() <= 0);
                        }),
         m_effects.end());
+    rebuildTagCache();
 
     return messages;
 }
@@ -161,4 +165,12 @@ const std::vector<std::unique_ptr<IStatusEffect>> &Unit::getEffects() const
 void Unit::heal(int amount)
 {
     m_stats.hp = std::min(m_stats.maxHp, m_stats.hp + amount);
+}
+
+void Unit::rebuildTagCache()
+{
+    m_activeTags = 0;
+    for (const auto &effect : m_effects)
+        for (const auto &tag : effect->getTags())
+            m_activeTags |= tagToFlag(tag);
 }

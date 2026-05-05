@@ -339,6 +339,9 @@
     <ClCompile Include="tests\Entities\test_CharFlag.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
+    <ClCompile Include="tests\Entities\test_EffectTagCache.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="external\doctest.h">

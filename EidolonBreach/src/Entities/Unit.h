@@ -156,6 +156,7 @@ protected:
     Stats       m_stats;
     Affinity    m_affinity;
     std::vector<std::unique_ptr<IStatusEffect>> m_effects;
+    uint16_t m_activeTags{0};
     /**
      * @brief Returns the flat affinity resistance for the given affinity.
      *        Base implementation returns 0. PlayableCharacter overrides to
@@ -167,4 +168,5 @@ protected:
         (void)affinity;
         return 0;
     }
+    void rebuildTagCache();
 }; 
