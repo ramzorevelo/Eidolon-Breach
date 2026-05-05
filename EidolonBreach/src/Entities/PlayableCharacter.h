@@ -143,7 +143,12 @@ class PlayableCharacter : public Unit
     {
         return m_fractured;
     }
-
+    /** @brief Directly applies Fracture state. Used by Battle after Breachborn ends,
+     *         and by tests to set up Fracture scenarios without running a full battle. */
+    void applyFracture()
+    {
+        m_fractured = true;
+    }
     /**
      * @brief Activates Breachborn for 3 turns. Safe to call while Fractured
      *        (refreshes the counter without changing Fracture status).

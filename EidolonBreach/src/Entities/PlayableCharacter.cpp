@@ -71,7 +71,7 @@ void PlayableCharacter::modifyExposure(int delta)
 
 bool PlayableCharacter::canVent() const
 {
-    return m_exposure > 0 && m_exposure < kMaxExposure;
+    return m_exposure > 0 && m_exposure < kMaxExposure && !m_fractured;
 }
 
 std::size_t PlayableCharacter::selectActionIndex(const Party &allies,
