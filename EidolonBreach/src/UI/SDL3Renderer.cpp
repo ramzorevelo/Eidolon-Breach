@@ -1,36 +1,95 @@
 /**
  * @file SDL3Renderer.cpp
- * @brief SDL3Renderer stub. All IRenderer methods are no-ops pending implementation.
- *        Constructor/destructor are fully functional.
+ * @brief SDL3Renderer implementation.
+ *
+ * Rendering contract: every public render*() method updates cached state and
+ * calls redrawAll(). redrawAll() is the single point that clears, composites
+ * all panels, and presents. No other function calls SDL_RenderPresent.
  */
 
 #include "UI/SDL3Renderer.h"
 #include "Battle/ResonanceField.h"
 #include "Battle/TurnSlot.h"
+#include "Core/ActionData.h"
 #include "Core/ActionResult.h"
+#include "Core/Affinity.h"
 #include "Core/Drop.h"
+#include "Entities/Enemy.h"
 #include "Entities/Party.h"
 #include "Entities/PlayableCharacter.h"
 #include <stdexcept>
+#include <string>
+
+// ---- Internal helpers -------------------------------------------------------
+
+namespace
+{
+struct RGB
+{
+    Uint8 r, g, b;
+};
+
+RGB affinityColor(Affinity a)
+{
+    switch (a)
+    {
+    case Affinity::Blaze:
+        return {204, 85, 0};
+    case Affinity::Frost:
+        return {80, 180, 220};
+    case Affinity::Tempest:
+        return {160, 100, 220};
+    case Affinity::Terra:
+        return {80, 160, 60};
+    case Affinity::Aether:
+        return {200, 180, 255};
+    default:
+        return {180, 180, 180};
+    }
+}
+
+/// Truncate a string to maxChars, appending '~' if cut.
+std::string truncate(const std::string &s, std::size_t maxChars)
+{
+    if (s.size() <= maxChars)
+        return s;
+    return s.substr(0, maxChars - 1) + "~";
+}
+} // namespace
+
+// ---- Construction / destruction --------------------------------------------
 
 SDL3Renderer::SDL3Renderer(const char *windowTitle, int width, int height)
     : m_windowWidth{width}, m_windowHeight{height}
 {
     if (!SDL_Init(SDL_INIT_VIDEO))
-        throw std::runtime_error{std::string{"SDL3Renderer: SDL_Init failed: "} + SDL_GetError()};
+        throw std::runtime_error{
+            std::string{"SDL3Renderer: SDL_Init failed: "} + SDL_GetError()};
 
     if (!TTF_Init())
-        throw std::runtime_error{std::string{"SDL3Renderer: TTF_Init failed: "} + SDL_GetError()};
+        throw std::runtime_error{
+            std::string{"SDL3Renderer: TTF_Init failed: "} + SDL_GetError()};
 
     m_window = SDL_CreateWindow(windowTitle, width, height, SDL_WINDOW_RESIZABLE);
     if (!m_window)
-        throw std::runtime_error{std::string{"SDL3Renderer: CreateWindow failed: "} + SDL_GetError()};
+        throw std::runtime_error{
+            std::string{"SDL3Renderer: CreateWindow failed: "} + SDL_GetError()};
 
     m_renderer = SDL_CreateRenderer(m_window, nullptr);
     if (!m_renderer)
-        throw std::runtime_error{std::string{"SDL3Renderer: CreateRenderer failed: "} + SDL_GetError()};
+        throw std::runtime_error{
+            std::string{"SDL3Renderer: CreateRenderer failed: "} + SDL_GetError()};
 
     computePanelLayout(width, height);
+
+    m_font = TTF_OpenFont("data/fonts/ShareTechMono-Regular.ttf", 16);
+    if (!m_font)
+        SDL_Log("SDL3Renderer: font load failed: %s", SDL_GetError());
+
+    // Initial clear so the window isn't garbage before the first render call.
+    SDL_SetRenderDrawColor(m_renderer, 18, 18, 24, 255);
+    SDL_RenderClear(m_renderer);
+    SDL_RenderPresent(m_renderer);
 }
 
 SDL3Renderer::~SDL3Renderer()
@@ -54,44 +113,325 @@ SDL3Renderer::~SDL3Renderer()
     SDL_Quit();
 }
 
-// Layout 
+// ---- Layout -----------------------------------------------------------------
 
 void SDL3Renderer::computePanelLayout(int w, int h)
 {
     const float fw = static_cast<float>(w);
     const float fh = static_cast<float>(h);
     const float turnH = fh * 0.10f;
-    const float logH = fh * 0.15f;
-    const float hintH = 28.f;
+    const float logH = fh * 0.18f;
+    const float hintH = 26.f;
     const float mainH = fh - turnH - logH - hintH;
     const float menuW = fw * 0.35f;
     const float logW = fw - menuW;
 
     m_turnOrderPanel = {0.f, 0.f, fw, turnH};
-    m_playerPanel = {0.f, turnH, fw * 0.18f, mainH};
-    m_playerForm = {fw * 0.18f, turnH, fw * 0.22f, mainH};
+    m_playerPanel = {0.f, turnH, fw * 0.22f, mainH};
     m_centerPanel = {fw * 0.40f, turnH, fw * 0.06f, mainH};
-    m_enemyForm = {fw * 0.46f, turnH, fw * 0.22f, mainH};
     m_enemyPanel = {fw * 0.68f, turnH, fw * 0.32f, mainH};
     m_actionMenu = {0.f, turnH + mainH, menuW, logH};
     m_logPanel = {menuW, turnH + mainH, logW, logH};
     m_hintBar = {0.f, fh - hintH, fw, hintH};
 }
 
-// Frame helpers 
+// Core render loop 
 
-void SDL3Renderer::beginFrame()
+void SDL3Renderer::redrawAll()
 {
+    // Clear the entire backbuffer.
     SDL_SetRenderDrawColor(m_renderer, 18, 18, 24, 255);
     SDL_RenderClear(m_renderer);
-}
 
-void SDL3Renderer::endFrame()
-{
+    // Draw every panel from cached state.
+    drawTurnOrderStrip();
+
+    if (m_cachedPlayerParty || m_cachedEnemyParty)
+    {
+        drawPlayerPanel();
+        drawEnemyPanel();
+    }
+
+    if (m_cachedResonanceField)
+        drawCenterPanel();
+
+    if (m_cachedActiveCharacter && m_cachedActiveParty)
+        drawActionMenuPanel();
+
+    drawLogPanel();
+    drawHintBarPanel();
+
     SDL_RenderPresent(m_renderer);
 }
 
-// Drawing helpers 
+// Per-panel draw helpers 
+
+void SDL3Renderer::drawTurnOrderStrip()
+{
+    fillRect(m_turnOrderPanel, 30, 30, 45, 255);
+
+    if (m_cachedTurnOrder.empty() || !m_font)
+        return;
+
+    const float slotW = m_turnOrderPanel.w / static_cast<float>(m_cachedTurnOrder.size());
+    const float badgeH = m_turnOrderPanel.h * 0.60f;
+    const float badgeY = m_turnOrderPanel.y + (m_turnOrderPanel.h - badgeH) * 0.5f;
+
+    for (std::size_t i = 0; i < m_cachedTurnOrder.size(); ++i)
+    {
+        const TurnSlot &slot = m_cachedTurnOrder[i];
+        if (!slot.unit)
+            continue;
+
+        const float badgeX = m_turnOrderPanel.x + static_cast<float>(i) * slotW + slotW * 0.05f;
+        const float badgeW = slotW * 0.90f;
+        const SDL_FRect badge{badgeX, badgeY, badgeW, badgeH};
+        const auto [r, g, b] = affinityColor(slot.unit->getAffinity());
+
+        // Player units: full color. Enemies: dimmed to 40%.
+        if (slot.isPlayer)
+            fillRect(badge, r, g, b);
+        else
+            fillRect(badge, r * 2 / 5, g * 2 / 5, b * 2 / 5);
+
+        // Name initial(s) centered in badge.
+        const std::string label = slot.unit->getName().substr(0, 1);
+        renderText(label,
+                   badgeX + badgeW * 0.30f,
+                   badgeY + badgeH * 0.15f,
+                   255, 255, 255);
+    }
+}
+
+void SDL3Renderer::drawPlayerPanel()
+{
+    fillRect(m_playerPanel, 22, 22, 32, 255);
+
+    if (!m_cachedPlayerParty || !m_font)
+        return;
+
+    const float nameH = 18.f;
+    const float barH = 6.f;
+    const float thinH = 4.f;
+    const float gapH = 4.f;
+    const float unitH = nameH + barH + gapH + thinH + gapH + thinH + 10.f;
+    const float barW = m_playerPanel.w - 12.f;
+    const float barX = m_playerPanel.x + 6.f;
+
+    float py = m_playerPanel.y + 8.f;
+
+    for (std::size_t i = 0; i < m_cachedPlayerParty->size(); ++i)
+    {
+        const Unit *u = m_cachedPlayerParty->getUnitAt(i);
+        if (!u)
+            continue;
+
+        const auto *pc = dynamic_cast<const PlayableCharacter *>(u);
+        const auto [r, g, b] = affinityColor(u->getAffinity());
+
+        // Name: grey out if dead.
+        if (u->isAlive())
+            renderText(u->getName(), barX, py, r, g, b);
+        else
+            renderText(u->getName() + " [KO]", barX, py, 80, 80, 80);
+        py += nameH;
+
+        if (!u->isAlive())
+        {
+            py += unitH - nameH;
+            continue;
+        }
+
+        // HP bar: green fill.
+        const float hpFrac = (u->getMaxHp() > 0)
+                                 ? static_cast<float>(u->getHp()) / static_cast<float>(u->getMaxHp())
+                                 : 0.f;
+        renderBar({barX, py, barW, barH}, hpFrac, 60, 190, 60, 70, 25, 25);
+        py += barH + gapH;
+
+        if (pc)
+        {
+            // Energy bar: gold fill.
+            const float enFrac = static_cast<float>(pc->getEnergy()) / static_cast<float>(PlayableCharacter::kMaxEnergy);
+            renderBar({barX, py, barW, thinH}, enFrac, 220, 180, 0, 45, 35, 0);
+            py += thinH + gapH;
+
+            // Exposure bar: orange fill.
+            const float expFrac = static_cast<float>(pc->getExposure()) / static_cast<float>(PlayableCharacter::kMaxExposure);
+            renderBar({barX, py, barW, thinH}, expFrac, 220, 75, 0, 35, 18, 0);
+            py += thinH;
+
+            if (pc->isFractured())
+            {
+                renderText("[FRAC]", barX, py, 200, 40, 40);
+                py += 14.f;
+            }
+        }
+        py += 10.f;
+    }
+}
+
+void SDL3Renderer::drawEnemyPanel()
+{
+    fillRect(m_enemyPanel, 22, 22, 32, 255);
+
+    if (!m_cachedEnemyParty || !m_font)
+        return;
+
+    const float nameH = 18.f;
+    const float barH = 6.f;
+    const float thinH = 4.f;
+    const float gapH = 4.f;
+    const float barW = m_enemyPanel.w - 12.f;
+    const float barX = m_enemyPanel.x + 6.f;
+
+    float ey = m_enemyPanel.y + 8.f;
+
+    for (std::size_t i = 0; i < m_cachedEnemyParty->size(); ++i)
+    {
+        const Unit *u = m_cachedEnemyParty->getUnitAt(i);
+        if (!u)
+            continue;
+
+        const auto [r, g, b] = affinityColor(u->getAffinity());
+
+        if (!u->isAlive())
+        {
+            renderText(u->getName() + " [KO]", barX, ey, 80, 80, 80);
+            ey += nameH + barH + gapH + thinH + 10.f;
+            continue;
+        }
+
+        renderText(u->getName(), barX, ey, r, g, b);
+        ey += nameH;
+
+        // HP bar: red fill.
+        const float hpFrac = (u->getMaxHp() > 0)
+                                 ? static_cast<float>(u->getHp()) / static_cast<float>(u->getMaxHp())
+                                 : 0.f;
+        renderBar({barX, ey, barW, barH}, hpFrac, 200, 55, 55, 70, 25, 25);
+        ey += barH + gapH;
+
+        // Toughness bar: white fill (Enemy only).
+        const auto *e = dynamic_cast<const Enemy *>(u);
+        if (e)
+        {
+            const float toughFrac = (e->getMaxToughness() > 0)
+                                        ? static_cast<float>(e->getToughness()) / static_cast<float>(e->getMaxToughness())
+                                        : 0.f;
+            const bool broken = e->isBroken();
+            renderBar({barX, ey, barW, thinH},
+                      toughFrac,
+                      broken ? 255 : 210,
+                      broken ? 80 : 210,
+                      broken ? 0 : 210,
+                      50, 50, 50);
+        }
+        ey += thinH + 10.f;
+    }
+}
+
+void SDL3Renderer::drawCenterPanel()
+{
+    fillRect(m_centerPanel, 20, 20, 32, 255);
+
+    if (!m_cachedResonanceField || !m_font)
+        return;
+
+    renderText("RF", m_centerPanel.x + 4.f, m_centerPanel.y + 4.f, 160, 160, 220);
+
+    const std::array<Affinity, 5> affinities{
+        Affinity::Blaze, Affinity::Frost, Affinity::Tempest,
+        Affinity::Terra, Affinity::Aether};
+
+    float barY = m_centerPanel.y + 22.f;
+    const float barW = m_centerPanel.w - 8.f;
+
+    for (Affinity a : affinities)
+    {
+        const float votes = static_cast<float>(m_cachedResonanceField->getVotes(a));
+        const float maxVotes = 5.f;
+        const auto [r, g, b] = affinityColor(a);
+        renderBar({m_centerPanel.x + 4.f, barY, barW, 5.f},
+                  votes / maxVotes, r, g, b, 28, 28, 38);
+        barY += 9.f;
+    }
+}
+
+void SDL3Renderer::drawActionMenuPanel()
+{
+    fillRect(m_actionMenu, 20, 20, 30, 255);
+
+    if (!m_cachedActiveCharacter || !m_cachedActiveParty || !m_font)
+        return;
+
+    // Header: character name + shared SP.
+    const std::string header = m_cachedActiveCharacter->getName() + "  SP:" + std::to_string(m_cachedActiveParty->getSp());
+    renderText(header, m_actionMenu.x + 6.f, m_actionMenu.y + 4.f, 220, 220, 220);
+
+    static const std::array<std::string, 6> kKeys{"Q", "E", "1", "2", "R", "V"};
+
+    // Max label chars that fit the panel at 16px monospace (~9.6px/char → ~31 chars).
+    static constexpr std::size_t kMaxLabel = 30;
+
+    float rowY = m_actionMenu.y + 22.f;
+    const float rowH = 20.f;
+    std::size_t keyIdx = 0;
+
+    for (const auto &action : m_cachedActiveCharacter->getAbilities())
+    {
+        if (!action || keyIdx >= kKeys.size())
+            break;
+
+        // Mirror selectActionIndex() filtering: skip hidden Arch Skill.
+        const ActionData &data = action->getActionData();
+        if (data.category == ActionCategory::ArchSkill && !m_cachedActiveCharacter->isArchSkillUnlocked())
+            continue;
+
+        const bool available = action->isAvailable(*m_cachedActiveCharacter,
+                                                   *m_cachedActiveParty);
+        const Uint8 brightness = available ? 220 : 70;
+        const std::string row = "[" + kKeys[keyIdx] + "] " + truncate(action->label(), kMaxLabel);
+
+        renderText(row, m_actionMenu.x + 6.f, rowY, brightness, brightness, brightness);
+        rowY += rowH;
+        ++keyIdx;
+    }
+}
+
+void SDL3Renderer::drawLogPanel()
+{
+    fillRect(m_logPanel, 14, 14, 20, 255);
+
+    if (!m_font || m_log.empty())
+        return;
+
+    const float lineH = 18.f;
+    const int visibleLines = static_cast<int>(m_logPanel.h / lineH);
+    const int total = static_cast<int>(m_log.size());
+    const int start = std::max(0, total - visibleLines - m_logScrollOffset);
+
+    float ly = m_logPanel.y + 4.f;
+
+    for (int i = start; i < total && ly + lineH <= m_logPanel.y + m_logPanel.h; ++i)
+    {
+        renderText(m_log[static_cast<std::size_t>(i)],
+                   m_logPanel.x + 6.f, ly, 200, 200, 200);
+        ly += lineH;
+    }
+}
+
+void SDL3Renderer::drawHintBarPanel()
+{
+    fillRect(m_hintBar, 12, 12, 18, 255);
+
+    if (!m_font || m_cachedHint.empty())
+        return;
+
+    renderText(m_cachedHint, m_hintBar.x + 8.f, m_hintBar.y + 4.f, 120, 120, 140);
+}
+
+// Low-level drawing primitives 
 
 void SDL3Renderer::fillRect(const SDL_FRect &rect, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 {
@@ -103,11 +443,10 @@ void SDL3Renderer::renderBar(const SDL_FRect &rect, float fraction,
                              Uint8 fr, Uint8 fg, Uint8 fb,
                              Uint8 br, Uint8 bg, Uint8 bb)
 {
-    // Background (empty portion).
     fillRect(rect, br, bg, bb);
 
-    // Filled portion: clamp fraction to [0, 1].
-    const float clamped = (fraction < 0.f) ? 0.f : (fraction > 1.f ? 1.f : fraction);
+    const float clamped = fraction < 0.f ? 0.f : fraction > 1.f ? 1.f
+                                                                : fraction;
     if (clamped > 0.f)
     {
         const SDL_FRect filled{rect.x, rect.y, rect.w * clamped, rect.h};
@@ -138,16 +477,104 @@ void SDL3Renderer::renderText(const std::string &text, float x, float y,
     SDL_DestroyTexture(texture);
 }
 
-// IRenderer stubs 
+// ---- IRenderer implementation ----------------------------------------------
+// Each method: (1) update cached state, (2) call redrawAll().
 
-void SDL3Renderer::renderActionResult(const std::string &, const ActionResult &) {}
-void SDL3Renderer::renderBreak(const std::string &) {}
-void SDL3Renderer::renderStunned(const std::string &) {}
-void SDL3Renderer::renderVictory(const std::string &, std::optional<Drop>) {}
-void SDL3Renderer::renderDefeat(const std::string &) {}
-void SDL3Renderer::renderPartyStatus(const Party &, const Party &) {}
-void SDL3Renderer::renderMessage(const std::string &) {}
-void SDL3Renderer::renderResonanceField(const ResonanceField &) {}
-void SDL3Renderer::renderActionMenu(const PlayableCharacter &, const Party &) {}
-void SDL3Renderer::renderTargetList(const std::vector<std::string> &) {}
-void SDL3Renderer::renderTurnOrder(const std::vector<TurnSlot> &) {}
+void SDL3Renderer::renderTurnOrder(const std::vector<TurnSlot> &order)
+{
+    m_cachedTurnOrder = order;
+    redrawAll();
+}
+
+void SDL3Renderer::renderPartyStatus(const Party &playerParty, const Party &enemyParty)
+{
+    m_cachedPlayerParty = &playerParty;
+    m_cachedEnemyParty = &enemyParty;
+    redrawAll();
+}
+
+void SDL3Renderer::renderResonanceField(const ResonanceField &field)
+{
+    m_cachedResonanceField = &field;
+    redrawAll();
+}
+
+void SDL3Renderer::renderActionMenu(const PlayableCharacter &character, const Party &party)
+{
+    m_cachedActiveCharacter = &character;
+    m_cachedActiveParty = &party;
+    redrawAll();
+}
+
+void SDL3Renderer::renderHintBar(const std::string &hint)
+{
+    m_cachedHint = hint;
+    redrawAll();
+}
+
+void SDL3Renderer::renderMessage(const std::string &message)
+{
+    m_log.push_back(message);
+    if (static_cast<int>(m_log.size()) > kMaxLogLines)
+        m_log.erase(m_log.begin());
+    m_logScrollOffset = 0;
+    redrawAll();
+}
+
+void SDL3Renderer::renderActionResult(const std::string &actorName,
+                                      const ActionResult &result)
+{
+    std::string line = actorName + ": ";
+    switch (result.type)
+    {
+    case ActionResult::Type::Damage:
+        line += "dealt " + std::to_string(result.value) + " dmg";
+        break;
+    case ActionResult::Type::Heal:
+        line += "healed " + std::to_string(result.value) + " HP";
+        break;
+    case ActionResult::Type::Skip:
+        line += result.flavorText.empty() ? "skipped" : result.flavorText;
+        break;
+    case ActionResult::Type::Charge:
+        line += "charges energy";
+        break;
+    }
+    if (!result.flavorText.empty() && result.type != ActionResult::Type::Skip)
+        line += " \x97 " + result.flavorText; // em-dash via code point
+    renderMessage(line);
+}
+
+void SDL3Renderer::renderBreak(const std::string &enemyName)
+{
+    renderMessage("** " + enemyName + " BROKEN **");
+}
+
+void SDL3Renderer::renderStunned(const std::string &enemyName)
+{
+    renderMessage(enemyName + " stunned - turn skipped");
+}
+
+void SDL3Renderer::renderVictory(const std::string &enemyName, std::optional<Drop> drop)
+{
+    renderMessage(enemyName + " defeated!");
+    if (drop)
+        renderMessage("  Drop: " + drop->itemId);
+}
+
+void SDL3Renderer::renderDefeat(const std::string &playerName)
+{
+    renderMessage(playerName + " has fallen.");
+}
+
+void SDL3Renderer::renderTargetList(const std::vector<std::string> &names)
+{
+    std::string line = "Target: ";
+    for (std::size_t i = 0; i < names.size(); ++i)
+    {
+        if (i > 0)
+            line += " / ";
+        line += std::to_string(i + 1) + "." + names[i];
+    }
+    renderMessage(line);
+}

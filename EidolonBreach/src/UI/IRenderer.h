@@ -72,4 +72,9 @@ class IRenderer
      * @param order Slots in the order units will act this round.
      */
     virtual void renderTurnOrder(const std::vector<TurnSlot> &order) = 0;
+    /**
+     * @brief Render the context-sensitive key binding hint at the bottom of the screen.
+     * @param hint One-line string describing current valid inputs.
+     */
+    virtual void renderHintBar(const std::string &hint) = 0;
 };

@@ -21,4 +21,5 @@ class NullRenderer : public IRenderer
     void renderActionMenu(const PlayableCharacter &, const Party &) override {}
     void renderTargetList(const std::vector<std::string> &) override {}
     void renderTurnOrder(const std::vector<TurnSlot> &) override {}
+    void renderHintBar(const std::string &) override {}
 };

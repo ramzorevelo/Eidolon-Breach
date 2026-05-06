@@ -61,6 +61,9 @@
     <Filter Include="Characters\Zara">
       <UniqueIdentifier>{eaeac08e-5969-46d7-aad8-01bdc8d25169}</UniqueIdentifier>
     </Filter>
+    <Filter Include="data\fonts">
+      <UniqueIdentifier>{dfb52097-1de0-464b-a5de-286ccc9fc0e4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -568,5 +571,10 @@
     <None Include="data\characters.json">
       <Filter>data</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="data\fonts\ShareTechMono-Regular.ttf">
+      <Filter>data\fonts</Filter>
+    </Font>
   </ItemGroup>
 </Project>

@@ -18,9 +18,9 @@
     },
     "characterXP": {
         "ignis": 946,
-        "lyra": 564,
-        "vex": 564,
-        "zara": 564
+        "lyra": 567,
+        "vex": 567,
+        "zara": 567
     },
     "clearedDungeonIds": [
         "dungeon_01",
@@ -37,7 +37,7 @@
         ]
     },
     "playerLevel": 3,
-    "playerXp": 766,
+    "playerXp": 838,
     "unlockedCharacterIds": [
         "lyra",
         "vex",
