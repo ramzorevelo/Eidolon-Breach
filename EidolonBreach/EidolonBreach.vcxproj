@@ -73,6 +73,7 @@
     <ClCompile Include="src\Summons\SummonRegistry.cpp" />
     <ClCompile Include="src\UI\ConsoleInputHandler.cpp" />
     <ClCompile Include="src\UI\ConsoleRenderer.cpp" />
+    <ClCompile Include="src\UI\SDL3InputHandler.cpp" />
     <ClCompile Include="src\UI\SDL3Renderer.cpp" />
     <ClCompile Include="src\Vestiges\AttunistGambitVestige.cpp" />
     <ClCompile Include="src\Vestiges\EchoingStrikeVestige.cpp" />
@@ -173,6 +174,7 @@
     <ClInclude Include="src\UI\ConsoleRenderer.h" />
     <ClInclude Include="src\UI\IInputHandler.h" />
     <ClInclude Include="src\UI\IRenderer.h" />
+    <ClInclude Include="src\UI\SDL3InputHandler.h" />
     <ClInclude Include="src\UI\SDL3Renderer.h" />
     <ClInclude Include="src\Vestiges\AttunistGambitVestige.h" />
     <ClInclude Include="src\Vestiges\EchoingStrikeVestige.h" />

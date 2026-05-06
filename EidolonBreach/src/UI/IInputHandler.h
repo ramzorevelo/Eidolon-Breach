@@ -7,10 +7,13 @@
  */
 
 #include <cstddef>
-
+#include <limits>
 class IInputHandler
 {
   public:
+    static constexpr std::size_t kCancelChoice{
+        std::numeric_limits<std::size_t>::max()};
+
     virtual ~IInputHandler() = default;
 
     /**

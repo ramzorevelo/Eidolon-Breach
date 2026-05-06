@@ -50,9 +50,9 @@ ActionResult Slime::performAttack()
 std::string Slime::getIntentLabel() const
 {
     if (isBroken())
-        return "Stunned (skip)";
+        return "";
     // Next turn's turn count will be m_turnCount + 1.
     if ((m_turnCount + 1) % kSlimeRegenInterval == 0)
-        return "Regenerates";
+        return "regenerate";
     return "Attacks";
 }

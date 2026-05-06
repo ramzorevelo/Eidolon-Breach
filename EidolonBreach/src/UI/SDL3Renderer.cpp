@@ -20,7 +20,7 @@
 #include <stdexcept>
 #include <string>
 
-// ---- Internal helpers -------------------------------------------------------
+// Internal helpers 
 
 namespace
 {
@@ -57,7 +57,7 @@ std::string truncate(const std::string &s, std::size_t maxChars)
 }
 } // namespace
 
-// ---- Construction / destruction --------------------------------------------
+// Construction / destruction 
 
 SDL3Renderer::SDL3Renderer(const char *windowTitle, int width, int height)
     : m_windowWidth{width}, m_windowHeight{height}
@@ -113,7 +113,7 @@ SDL3Renderer::~SDL3Renderer()
     SDL_Quit();
 }
 
-// ---- Layout -----------------------------------------------------------------
+// Layout 
 
 void SDL3Renderer::computePanelLayout(int w, int h)
 {
@@ -123,13 +123,15 @@ void SDL3Renderer::computePanelLayout(int w, int h)
     const float logH = fh * 0.18f;
     const float hintH = 26.f;
     const float mainH = fh - turnH - logH - hintH;
-    const float menuW = fw * 0.35f;
+    const float menuW = fw * 0.42f;
     const float logW = fw - menuW;
+    const float statW = fw * 0.20f; 
+    const float rfW = fw * 0.08f;
 
     m_turnOrderPanel = {0.f, 0.f, fw, turnH};
-    m_playerPanel = {0.f, turnH, fw * 0.22f, mainH};
-    m_centerPanel = {fw * 0.40f, turnH, fw * 0.06f, mainH};
-    m_enemyPanel = {fw * 0.68f, turnH, fw * 0.32f, mainH};
+    m_playerPanel = {0.f, turnH, statW, mainH};
+    m_centerPanel = {(fw - rfW) * 0.5f, turnH, rfW, mainH};
+    m_enemyPanel = {fw - statW, turnH, statW, mainH};
     m_actionMenu = {0.f, turnH + mainH, menuW, logH};
     m_logPanel = {menuW, turnH + mainH, logW, logH};
     m_hintBar = {0.f, fh - hintH, fw, hintH};
@@ -214,11 +216,11 @@ void SDL3Renderer::drawPlayerPanel()
     const float barH = 6.f;
     const float thinH = 4.f;
     const float gapH = 4.f;
-    const float unitH = nameH + barH + gapH + thinH + gapH + thinH + 10.f;
     const float barW = m_playerPanel.w - 12.f;
     const float barX = m_playerPanel.x + 6.f;
 
     float py = m_playerPanel.y + 8.f;
+    int aliveIdx = 0;
 
     for (std::size_t i = 0; i < m_cachedPlayerParty->size(); ++i)
     {
@@ -227,22 +229,28 @@ void SDL3Renderer::drawPlayerPanel()
             continue;
 
         const auto *pc = dynamic_cast<const PlayableCharacter *>(u);
+        const bool highlighted = (!m_highlightingEnemies && m_highlightedTargetIndex == aliveIdx);
         const auto [r, g, b] = affinityColor(u->getAffinity());
 
-        // Name: grey out if dead.
+        if (highlighted)
+            fillRect({m_playerPanel.x, py, m_playerPanel.w, nameH}, 60, 80, 60, 255);
+
         if (u->isAlive())
-            renderText(u->getName(), barX, py, r, g, b);
+        {
+            const std::string nameStr = (highlighted ? "> " : "  ") + u->getName();
+            renderText(nameStr, barX, py, r, g, b);
+            ++aliveIdx;
+        }
         else
-            renderText(u->getName() + " [KO]", barX, py, 80, 80, 80);
+        {
+            renderText("  " + u->getName() + " [KO]", barX, py, 80, 80, 80);
+        }
         py += nameH;
 
         if (!u->isAlive())
-        {
-            py += unitH - nameH;
             continue;
-        }
 
-        // HP bar: green fill.
+        // HP bar.
         const float hpFrac = (u->getMaxHp() > 0)
                                  ? static_cast<float>(u->getHp()) / static_cast<float>(u->getMaxHp())
                                  : 0.f;
@@ -251,12 +259,12 @@ void SDL3Renderer::drawPlayerPanel()
 
         if (pc)
         {
-            // Energy bar: gold fill.
+            // Energy bar.
             const float enFrac = static_cast<float>(pc->getEnergy()) / static_cast<float>(PlayableCharacter::kMaxEnergy);
             renderBar({barX, py, barW, thinH}, enFrac, 220, 180, 0, 45, 35, 0);
             py += thinH + gapH;
 
-            // Exposure bar: orange fill.
+            // Exposure bar.
             const float expFrac = static_cast<float>(pc->getExposure()) / static_cast<float>(PlayableCharacter::kMaxExposure);
             renderBar({barX, py, barW, thinH}, expFrac, 220, 75, 0, 35, 18, 0);
             py += thinH;
@@ -287,22 +295,22 @@ void SDL3Renderer::drawEnemyPanel()
 
     float ey = m_enemyPanel.y + 8.f;
 
+    int aliveIdx = 0;
     for (std::size_t i = 0; i < m_cachedEnemyParty->size(); ++i)
     {
         const Unit *u = m_cachedEnemyParty->getUnitAt(i);
-        if (!u)
+        if (!u || !u->isAlive())
             continue;
 
+        const bool highlighted = (m_highlightingEnemies && m_highlightedTargetIndex == aliveIdx);
         const auto [r, g, b] = affinityColor(u->getAffinity());
 
-        if (!u->isAlive())
-        {
-            renderText(u->getName() + " [KO]", barX, ey, 80, 80, 80);
-            ey += nameH + barH + gapH + thinH + 10.f;
-            continue;
-        }
+        // Draw highlight bar behind name
+        if (highlighted)
+            fillRect({m_enemyPanel.x, ey, m_enemyPanel.w, nameH}, 60, 60, 80, 255);
 
-        renderText(u->getName(), barX, ey, r, g, b);
+        const std::string nameStr = (highlighted ? "> " : "  ") + u->getName();
+        renderText(nameStr, barX, ey, r, g, b);
         ey += nameH;
 
         // HP bar: red fill.
@@ -328,6 +336,7 @@ void SDL3Renderer::drawEnemyPanel()
                       50, 50, 50);
         }
         ey += thinH + 10.f;
+        ++aliveIdx;
     }
 }
 
@@ -391,7 +400,7 @@ void SDL3Renderer::drawActionMenuPanel()
         const bool available = action->isAvailable(*m_cachedActiveCharacter,
                                                    *m_cachedActiveParty);
         const Uint8 brightness = available ? 220 : 70;
-        const std::string row = "[" + kKeys[keyIdx] + "] " + truncate(action->label(), kMaxLabel);
+        const std::string row = "[" + kKeys[keyIdx] + "] " + action->label();
 
         renderText(row, m_actionMenu.x + 6.f, rowY, brightness, brightness, brightness);
         rowY += rowH;
@@ -529,9 +538,13 @@ void SDL3Renderer::renderActionResult(const std::string &actorName,
     {
     case ActionResult::Type::Damage:
         line += "dealt " + std::to_string(result.value) + " dmg";
+        if (!result.targetName.empty())
+            line += " to " + result.targetName;
         break;
     case ActionResult::Type::Heal:
         line += "healed " + std::to_string(result.value) + " HP";
+        if (!result.targetName.empty())
+            line += " on " + result.targetName;
         break;
     case ActionResult::Type::Skip:
         line += result.flavorText.empty() ? "skipped" : result.flavorText;
@@ -541,7 +554,7 @@ void SDL3Renderer::renderActionResult(const std::string &actorName,
         break;
     }
     if (!result.flavorText.empty() && result.type != ActionResult::Type::Skip)
-        line += " \x97 " + result.flavorText; // em-dash via code point
+        line += " — " + result.flavorText;
     renderMessage(line);
 }
 
@@ -567,14 +580,27 @@ void SDL3Renderer::renderDefeat(const std::string &playerName)
     renderMessage(playerName + " has fallen.");
 }
 
-void SDL3Renderer::renderTargetList(const std::vector<std::string> &names)
+void SDL3Renderer::renderTargetList(const std::vector<std::string> & /*names*/,
+                                    bool isAllyTarget)
 {
-    std::string line = "Target: ";
-    for (std::size_t i = 0; i < names.size(); ++i)
-    {
-        if (i > 0)
-            line += " / ";
-        line += std::to_string(i + 1) + "." + names[i];
-    }
-    renderMessage(line);
+    m_highlightedTargetIndex = 0;
+    m_highlightingEnemies = !isAllyTarget;
+    redrawAll();
+}
+
+void SDL3Renderer::clearTargetHighlight()
+{
+    m_highlightedTargetIndex = -1;
+    redrawAll();
+}
+
+void SDL3Renderer::updateTargetHighlight(int index)
+{
+    m_highlightedTargetIndex = index;
+    redrawAll();
+}
+
+void SDL3Renderer::presentPause(int ms)
+{
+    SDL_Delay(static_cast<Uint32>(ms));
 }

@@ -164,6 +164,6 @@ ActionResult Enemy::performAttack()
 std::string Enemy::getIntentLabel() const
 {
     if (m_isBroken)
-        return "Stunned (skip)";
-    return "Attacks";
+        return "";
+    return "attack";
 }

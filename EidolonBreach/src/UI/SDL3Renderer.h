@@ -46,10 +46,13 @@ class SDL3Renderer : public IRenderer
     void renderResonanceField(const ResonanceField &field) override;
     void renderActionMenu(const PlayableCharacter &character,
                           const Party &party) override;
-    void renderTargetList(const std::vector<std::string> &names) override;
+    void renderTargetList(const std::vector<std::string> &names,
+                          bool isAllyTarget = false) override;
     void renderTurnOrder(const std::vector<TurnSlot> &order) override;
     void renderHintBar(const std::string &hint) override;
-
+    void clearTargetHighlight() override;
+    void updateTargetHighlight(int index) override;
+    void presentPause(int ms) override;
   private:
     // SDL handles 
     SDL_Window *m_window{nullptr};
@@ -113,4 +116,7 @@ class SDL3Renderer : public IRenderer
 
     void renderText(const std::string &text, float x, float y,
                     Uint8 r, Uint8 g, Uint8 b);
+
+    int m_highlightedTargetIndex{-1}; // -1 = no active targeting
+    bool m_highlightingEnemies{true}; // true = enemy panel, false = player panel
 };

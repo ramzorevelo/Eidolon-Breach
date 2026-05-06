@@ -30,7 +30,8 @@ class ConsoleRenderer : public IRenderer
     void renderActionMenu(const PlayableCharacter &character,
                           const Party &party) override;
 
-    void renderTargetList(const std::vector<std::string> &names) override;
+    void renderTargetList(const std::vector<std::string> &names,
+                          bool isAllyTarget = false) override;
     void renderTurnOrder(const std::vector<TurnSlot> &order) override;
   private:
     static void printBar(int current, int maximum, int width = 20);

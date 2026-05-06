@@ -56,8 +56,8 @@ ActionResult StoneGolem::performAttack()
 std::string StoneGolem::getIntentLabel() const
 {
     if (isBroken())
-        return "Stunned (skip)";
+        return "";
     if ((m_turnCount + 1) % kGolemHeavySlamInterval == 0)
-        return "Heavy Slam!";
+        return "use Heavy Slam";
     return "Attacks";
 }

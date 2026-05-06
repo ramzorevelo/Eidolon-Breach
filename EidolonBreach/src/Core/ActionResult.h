@@ -66,4 +66,5 @@ struct ActionResult
      *        Processed by Battle after execute() returns; never set by the action itself.
      */
     std::optional<SummonEffect> summonEffect{};
+    std::string targetName{}; // display name of primary target; empty if none/AoE
 };
