@@ -191,6 +191,9 @@
     <None Include="data\enemies.json" />
     <None Include="data\items.json" />
   </ItemGroup>
+  <ItemGroup>
+    <Font Include="data\fonts\ShareTechMono-Regular.ttf" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
