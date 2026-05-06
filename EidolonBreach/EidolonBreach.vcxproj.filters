@@ -252,6 +252,9 @@
     <ClCompile Include="src\Characters\Zara\ZaraUltimateAction.cpp">
       <Filter>Characters\Zara</Filter>
     </ClCompile>
+    <ClCompile Include="src\UI\SDL3Renderer.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Battle\Battle.h">
@@ -547,6 +550,9 @@
     </ClInclude>
     <ClInclude Include="src\Characters\Zara\ZaraUltimateAction.h">
       <Filter>Characters\Zara</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\SDL3Renderer.h">
+      <Filter>UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

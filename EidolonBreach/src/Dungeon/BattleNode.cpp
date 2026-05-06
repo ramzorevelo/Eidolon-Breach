@@ -3,6 +3,7 @@
  * @brief BattleNode implementation.
  */
 
+#include "UI/SDL3Renderer.h"
 #include "Dungeon/BattleNode.h"
 #include "Core/RunContext.h"
 #include "Battle/Battle.h"
@@ -52,7 +53,8 @@ void BattleNode::runBattle(Party &party,
     m_populateEnemies(enemyParty);
     applyFloorAffinityModifiers(enemyParty);
 
-    ConsoleRenderer renderer{};
+    //ConsoleRenderer renderer{};
+    SDL3Renderer renderer{"Eidolon Breach", 1280, 720};
     ConsoleInputHandler inputHandler{};
     Battle battle{party, enemyParty, renderer, inputHandler,
                   runCtx, eventBus, nullptr, m_summonRegistry};

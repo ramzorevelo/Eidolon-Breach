@@ -2,6 +2,7 @@
  * @file main.cpp
  * @brief Entry point. Loads registries from data/ and runs a dungeon.
  */
+#include "UI/SDL3Renderer.h"
 #include "Dungeon/DungeonTable.h"
 #include "Dungeon/DungeonDefinition.h"
 #include <limits>
