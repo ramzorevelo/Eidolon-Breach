@@ -12,7 +12,8 @@
 #include "Dungeon/BattleNode.h"
 #include "Dungeon/EncounterTable.h"
 #include "Entities/EnemyRegistry.h"
-#include "Core/BattleEvents.h"
+#include "UI/IRenderer.h"
+#include "UI/IInputHandler.h"
 #include "Dungeon/ShopNode.h"
 #include "Items/ItemRegistry.h"
 #include "Dungeon/BossNode.h"
@@ -30,7 +31,6 @@
 #include "Entities/VampireBat.h"
 #include "Summons/SummonRegistry.h"
 #include <algorithm>
-#include <iostream>
 #include <limits>
 #include <random>
 
@@ -394,7 +394,8 @@ void Dungeon::buildFixedGraph(std::uint32_t seed,
     for (std::size_t i{0}; i + 1 < m_layers.size(); ++i)
         m_layers[i][0].nextIndices.push_back(0);
 }
-bool Dungeon::run(Party &party, MetaProgress &meta)
+bool Dungeon::run(Party &party, MetaProgress &meta,
+                  IRenderer &renderer, IInputHandler &input)
 {
     int floorsCleared{0};
 
@@ -418,34 +419,30 @@ bool Dungeon::run(Party &party, MetaProgress &meta)
     for (int i{0}; i < static_cast<int>(m_layers[0].size()); ++i)
         reachable.push_back(i);
 
-    for (int layer{0}; layer < static_cast<int>(m_layers.size()); ++layer)
+   for (int layer{0}; layer < static_cast<int>(m_layers.size()); ++layer)
     {
         if (party.isAllDead())
             break;
 
-        std::cout << "\n--- Floor " << (layer + 1)
-                  << "/" << m_layers.size()
-                  << " | Affinity: "
-                  << affinityToString(m_floorAffinities[static_cast<std::size_t>(layer)])
-                  << " ---\n";
+        renderer.renderMessage("--- Floor " + std::to_string(layer + 1) + "/" + std::to_string(m_layers.size()) + "  Affinity: " + affinityToString(m_floorAffinities[static_cast<std::size_t>(layer)]) + " ---");
 
-        const int chosen{presentChoices(party, meta, layer, reachable)};
+        const int chosen = presentChoices(party, meta, layer, reachable,
+                                          renderer, input);
         if (chosen == -1)
-        {
             break;
-        }
 
         ++floorsCleared;
         meta.highestFloorReached = std::max(meta.highestFloorReached, floorsCleared);
-        const std::size_t discoveriesBefore{m_runContext.activeDiscoveries.size()};
+
+        const std::size_t discoveriesBefore = m_runContext.activeDiscoveries.size();
         m_runContext.checkAndActivateDiscoveries();
         if (m_runContext.activeDiscoveries.size() > discoveriesBefore)
-            std::cout << "\n>> FIELD DISCOVERY ACTIVATED! <<\n";
+            renderer.renderMessage(">> FIELD DISCOVERY ACTIVATED! <<");
+
         reachable = getReachableIndices(layer, std::vector<int>{chosen});
     }
 
-    const bool playerWon{!party.isAllDead() &&
-                         floorsCleared == static_cast<int>(m_layers.size())};
+    const bool playerWon = !party.isAllDead() && floorsCleared == static_cast<int>(m_layers.size());
     if (playerWon)
     {
         const bool isFirstClear{meta.clearedDungeonIds.count(m_currentDungeon.id) == 0};
@@ -462,8 +459,8 @@ bool Dungeon::run(Party &party, MetaProgress &meta)
             xpAwarded += CombatConstants::kPlayerXpFirstClearBonus;
 
         const int newPlayerLevel{meta.gainPlayerXp(xpAwarded)};
-        std::cout << "Player XP gained: " << xpAwarded
-                  << "  (Player Level: " << newPlayerLevel << ")\n";
+        renderer.renderMessage("Player XP gained: " + std::to_string(xpAwarded)
+            + "  (Player Level: " + std::to_string(newPlayerLevel) + ")");
     }
 
     m_eventBus.emit(RunCompletedEvent{playerWon, floorsCleared});
@@ -471,49 +468,43 @@ bool Dungeon::run(Party &party, MetaProgress &meta)
     return playerWon;
 }
 
-int Dungeon::presentChoices(Party &party,
-                            MetaProgress &meta,
+int Dungeon::presentChoices(Party &party, MetaProgress &meta,
                             int layerIndex,
-                            const std::vector<int> &reachable)
+                            const std::vector<int> &reachable,
+                            IRenderer &renderer, IInputHandler &input)
 {
-    const auto &layer{m_layers[static_cast<std::size_t>(layerIndex)]};
+    const auto &layer = m_layers[static_cast<std::size_t>(layerIndex)];
 
     std::vector<int> choices{};
     for (int idx : reachable)
         if (idx < static_cast<int>(layer.size()))
             choices.push_back(idx);
-
     if (choices.empty())
         choices.push_back(0);
 
-    int chosenIndex{choices[0]};
+    int chosenIndex = choices[0];
 
     if (choices.size() == 1)
     {
-        std::cout << "Path: "
-                  << layer[static_cast<std::size_t>(chosenIndex)].content->description()
-                  << "\n";
+        renderer.renderMessage("Path: " + layer[static_cast<std::size_t>(chosenIndex)].content->description());
+        renderer.presentPause(300);
         layer[static_cast<std::size_t>(chosenIndex)].content->enter(
-            party, meta, m_runContext, m_eventBus);
+            party, meta, m_runContext, m_eventBus, renderer, input);
     }
     else
     {
-        std::cout << "Choose a path:\n";
-        for (std::size_t i{0}; i < choices.size(); ++i)
-            std::cout << "  [" << (i + 1) << "] "
-                      << layer[static_cast<std::size_t>(choices[i])].content->description()
-                      << "\n";
+        std::vector<std::string> options{};
+        for (int idx : choices)
+            options.push_back(
+                layer[static_cast<std::size_t>(idx)].content->description());
 
-        std::size_t pick{1};
-        std::cout << "Path: ";
-        std::cin >> pick;
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        if (pick < 1 || pick > choices.size())
-            pick = 1;
+        input.setMenuContext("CHOOSE PATH", options);
+        renderer.renderSelectionMenu("CHOOSE PATH", options);
+        const std::size_t pick = input.getMenuChoice(options.size());
 
-        chosenIndex = choices[pick - 1];
+        chosenIndex = choices[pick];
         layer[static_cast<std::size_t>(chosenIndex)].content->enter(
-            party, meta, m_runContext, m_eventBus);
+            party, meta, m_runContext, m_eventBus, renderer, input);
     }
 
     return party.isAllDead() ? -1 : chosenIndex;

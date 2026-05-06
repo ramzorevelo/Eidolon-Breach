@@ -32,8 +32,17 @@ class SDL3InputHandler : public IInputHandler
      * @return 0-based target index.
      */
     std::size_t getTargetChoice(std::size_t numTargets) override;
+    std::size_t getMenuChoice(std::size_t numOptions) override;
 
+    void setMenuContext(const std::string &title,
+                        const std::vector<std::string> &options)
+    {
+        m_menuTitle = title;
+        m_menuOptions = options;
+    }
   private:
     IRenderer &m_renderer;
     std::size_t m_bufferedActionIdx{std::numeric_limits<std::size_t>::max()};
+    std::string m_menuTitle{};
+    std::vector<std::string> m_menuOptions{};
 };

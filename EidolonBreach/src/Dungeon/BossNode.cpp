@@ -8,7 +8,8 @@
 #include "Entities/Party.h"
 #include "Core/CombatConstants.h"
 #include "Entities/PlayableCharacter.h"
-#include <iostream>
+#include "UI/IRenderer.h"
+#include "UI/IInputHandler.h"
 
 BossNode::BossNode(std::function<void(Party &)> populateEnemies,
                    Affinity floorAffinity,
@@ -18,27 +19,23 @@ BossNode::BossNode(std::function<void(Party &)> populateEnemies,
           std::move(populateEnemies), floorAffinity, dungeonEnemyLevel, summonRegistry}
 {
 }
-void BossNode::enter(Party &party,
-                     MetaProgress &meta,
-                     RunContext &runCtx,
-                     EventBus &eventBus)
+void BossNode::enter(Party &party, MetaProgress &meta,
+                     RunContext &runCtx, EventBus &eventBus,
+                     IRenderer &renderer, IInputHandler &input)
 {
-    std::cout << "\n=== BOSS ENCOUNTER ===\n"
-              << "The final guardian of the breach awaits.\n"
-              << "Press Enter to proceed...";
-    std::cin.get();
+    renderer.renderMessage("=== BOSS ENCOUNTER ===");
+    renderer.renderMessage("The final guardian of the breach awaits.");
+    renderer.renderMessage("Exposure spikes by " + std::to_string(CombatConstants::kEliteExposureSpike) + " for all party members!");
+    renderer.presentPause(800);
 
-    std::cout << "Exposure spikes by " << CombatConstants::kEliteExposureSpike
-              << " for all party members!\n";
-
-    for (std::size_t i{0}; i < party.size(); ++i)
+    for (std::size_t i = 0; i < party.size(); ++i)
     {
-        Unit *u{party.getUnitAt(i)};
+        Unit *u = party.getUnitAt(i);
         if (auto *pc = dynamic_cast<PlayableCharacter *>(u))
             pc->modifyExposure(CombatConstants::kEliteExposureSpike);
     }
 
-    runBattle(party, meta, runCtx, eventBus);
+    runBattle(party, meta, runCtx, eventBus, renderer, input);
 }
 
 std::string BossNode::description() const

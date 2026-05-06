@@ -5,16 +5,17 @@
 
 #include "Dungeon/EventNode.h"
 #include "Entities/Party.h"
-#include <iostream>
+#include "UI/IRenderer.h"
+#include "UI/IInputHandler.h"
 
-void EventNode::enter(Party &party,
-                      MetaProgress & /*meta*/,
-                      RunContext & /*runCtx*/,
-                      EventBus & /*eventBus*/)
+void EventNode::enter(Party &party, MetaProgress & /*meta*/,
+                      RunContext & /*runCtx*/, EventBus & /*eventBus*/,
+                      IRenderer &renderer, IInputHandler & /*input*/)
 {
-    std::cout << "\n=== MYSTERIOUS SIGNAL ===\n"
-              << "A faint resonance echoes through the breach...\n"
-              << "[Nothing of note occurs. Event table added in a later update.]\n";
+    renderer.renderMessage("=== MYSTERIOUS SIGNAL ===");
+    renderer.renderMessage("A faint resonance echoes through the breach...");
+    renderer.renderMessage("[Nothing of note occurs. Event table added later.]");
+    renderer.presentPause(600);
     (void)party;
 }
 

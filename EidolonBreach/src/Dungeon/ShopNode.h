@@ -8,6 +8,9 @@
 #include "Items/ItemRegistry.h"
 #include <cstdint>
 
+class IRenderer;
+class IInputHandler;
+
 class ShopNode : public MapNode
 {
   public:
@@ -21,7 +24,8 @@ class ShopNode : public MapNode
                       std::uint32_t rngSeed = 0u);
 
     void enter(Party &party, MetaProgress &meta,
-               RunContext &runCtx, EventBus &eventBus) override;
+               RunContext &runCtx, EventBus &eventBus,
+               IRenderer &renderer, IInputHandler &input) override;
 
     [[nodiscard]] std::string description() const override;
 

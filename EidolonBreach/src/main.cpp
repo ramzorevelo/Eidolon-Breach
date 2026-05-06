@@ -2,34 +2,33 @@
  * @file main.cpp
  * @brief Entry point. Loads registries from data/ and runs a dungeon.
  */
-#include "UI/SDL3Renderer.h"
-#include "Dungeon/DungeonTable.h"
-#include "Dungeon/DungeonDefinition.h"
-#include <limits>
 #include "Actions/BasicStrikeAction.h"
-#include "Core/RunContext.h"
 #include "Actions/SkillAction.h"
-#include "Characters/Lyra/LyraUltimateAction.h"
-#include "Characters/Vex/VexUltimateAction.h"
-#include "Characters/Zara/ZaraUltimateAction.h"
 #include "Actions/UltimateAction.h"
 #include "Characters/AbilityRegistry.h"
 #include "Characters/CharacterRegistry.h"
+#include "Characters/Lyra/EmberCallAction.h"
+#include "Characters/Lyra/Ignis.h"
+#include "Characters/Lyra/LyraUltimateAction.h"
+#include "Characters/Vex/VexBulwarkAction.h"
+#include "Characters/Vex/VexUltimateAction.h"
+#include "Characters/Zara/ZaraFrostbindAction.h"
+#include "Characters/Zara/ZaraUltimateAction.h"
 #include "Core/CombatConstants.h"
 #include "Core/MetaProgress.h"
+#include "Core/RunContext.h"
 #include "Dungeon/Dungeon.h"
+#include "Dungeon/DungeonDefinition.h"
+#include "Dungeon/DungeonTable.h"
 #include "Entities/Party.h"
 #include "Entities/PlayableCharacter.h"
-#include "Characters/Lyra/Ignis.h"
+#include "UI/IInputHandler.h"
 #include "Summons/SummonRegistry.h"
-#include "Characters/Lyra/EmberCallAction.h"
-#include "Characters/Vex/VexBulwarkAction.h"
-#include "Characters/Zara/ZaraFrostbindAction.h"
+#include "UI/SDL3InputHandler.h"
+#include "UI/SDL3Renderer.h"
 #include <algorithm>
-#include <iostream>
 #include <memory>
 #include <random>
-#include <sstream>
 
 static AbilityRegistry buildAbilityRegistry()
 {
@@ -52,15 +51,12 @@ static AbilityRegistry buildAbilityRegistry()
     reg.registerAbility("zara_ultimate",
                         []
                         { return std::make_unique<ZaraUltimateAction>(); });
-    // Lyra's Ember Call 
     reg.registerAbility("lyra_ember_call",
                         []
                         { return std::make_unique<EmberCallAction>(); });
-    // Vex's Bulwark
     reg.registerAbility("vex_bulwark",
                         []
                         { return std::make_unique<VexBulwarkAction>(); });
-    // Zara's Frostbind
     reg.registerAbility("zara_frostbind",
                         []
                         { return std::make_unique<ZaraFrostbindAction>(); });
@@ -73,7 +69,9 @@ static AbilityRegistry buildAbilityRegistry()
  */
 static void selectParty(Party &party,
                         const CharacterRegistry &characterRegistry,
-                        const MetaProgress &meta)
+                        const MetaProgress &meta,
+                        IRenderer &renderer,
+                        IInputHandler &input)
 {
     std::vector<std::string> available{};
     for (const std::string &id : characterRegistry.getIds())
@@ -82,7 +80,8 @@ static void selectParty(Party &party,
 
     if (available.empty())
     {
-        std::cout << "No characters unlocked. Cannot start run.\n";
+        renderer.renderMessage("No characters unlocked. Cannot start run.");
+        renderer.presentPause(1000);
         return;
     }
 
@@ -101,71 +100,36 @@ static void selectParty(Party &party,
         return;
     }
 
-    // Display selection menu.
-    std::cout << "\n=== CHARACTER SELECT ===\n";
-    std::cout << "Choose up to " << CombatConstants::kMaxPlayerCharacters
-              << " characters (enter numbers separated by spaces, e.g. 1 2):\n\n";
-
-    for (std::size_t i{0}; i < available.size(); ++i)
+    // Build options list for the menu.
+    std::vector<std::string> options{};
+    for (std::size_t i = 0; i < available.size(); ++i)
     {
-        const std::string &id{available[i]};
-        auto pc{characterRegistry.create(id)};
+        const auto pc = characterRegistry.create(available[i]);
         if (!pc)
             continue;
-
-        const int level{meta.characterLevels.count(id) > 0
-                            ? meta.characterLevels.at(id)
-                            : 1};
-        const Stats &s{pc->getBaseStats()};
-
-        std::cout << "  [" << (i + 1) << "] "
-                  << pc->getName()
-                  << " [" << characterRegistry.getArchetype(available[i]) << "]"
-                  << "  Lv." << level
-                  << "  HP:" << s.maxHp
-                  << " ATK:" << s.atk
-                  << " DEF:" << s.def
-                  << " SPD:" << s.spd
-                  << '\n';
+        const int level = meta.characterLevels.count(available[i]) > 0
+                              ? meta.characterLevels.at(available[i])
+                              : 1;
+        const Stats &s = pc->getBaseStats();
+        options.push_back(pc->getName() + " [" + characterRegistry.getArchetype(available[i]) + "]" + "  Lv." + std::to_string(level) + "  HP:" + std::to_string(s.maxHp) + " ATK:" + std::to_string(s.atk) + " SPD:" + std::to_string(s.spd));
     }
 
-    std::cout << "\nSelection: ";
+    input.setMenuContext("CHARACTER SELECT", options);
+    renderer.renderSelectionMenu("CHARACTER SELECT", options);
+    const std::size_t pick = input.getMenuChoice(options.size());
 
-    std::vector<std::size_t> chosen{};
-    std::string line{};
-    std::getline(std::cin, line);
-    std::istringstream iss{line};
-    std::size_t input{};
-    while (iss >> input)
-    {
-        if (input >= 1 && input <= available.size())
-            if (std::find(chosen.begin(), chosen.end(), input) == chosen.end())
-                chosen.push_back(input);
-        if (chosen.size() >= static_cast<std::size_t>(CombatConstants::kMaxPlayerCharacters))
-            break;
-    }
-
-    // Fallback: auto-pick first character if nothing valid entered.
-    if (chosen.empty())
-        chosen.push_back(1);
-
-        for (std::size_t idx : chosen)
-    {
-        const std::string &id{available[idx - 1]};
-        const int level{meta.characterLevels.count(id) > 0
-                            ? meta.characterLevels.at(id)
-                            : 1};
-        auto pc{characterRegistry.create(id, level)};
-        if (pc)
-            party.addUnit(std::move(pc));
-    }
+    const std::string &chosenId = available[pick];
+    const int level = meta.characterLevels.count(chosenId) > 0
+                          ? meta.characterLevels.at(chosenId)
+                          : 1;
+    auto pc = characterRegistry.create(chosenId, level);
+    if (pc)
+        party.addUnit(std::move(pc));
 }
 
 int main()
 {
-    std::cout << "=== EIDOLON BREACH ===\n\n";
-
-    //  Registries 
+    // Registries
     AbilityRegistry abilityRegistry{buildAbilityRegistry()};
 
     CharacterRegistry characterRegistry{};
@@ -174,44 +138,55 @@ int main()
     SummonRegistry summonRegistry{};
     Ignis::registerIgnis(summonRegistry);
 
+    SDL3Renderer renderer{"Eidolon Breach", 1280, 720};
+    SDL3InputHandler input{renderer};
+
     // MetaProgress
     MetaProgress meta{MetaProgress::loadFromFile("save.json")};
 
     // Unlock starting characters if this is a fresh save.
     for (const std::string &id : characterRegistry.getIds())
-        meta.unlockCharacter(id);
+        std::ignore = meta.unlockCharacter(id);
 
     // Party
     Party playerParty{};
     playerParty.gainSp(50);
 
-    selectParty(playerParty, characterRegistry, meta);
+    try
+    {
+    selectParty(playerParty, characterRegistry, meta, renderer, input);
 
     if (playerParty.size() == 0)
     {
-        std::cout << "No characters selected. Exiting.\n";
+        renderer.renderMessage("No characters selected. Exiting.");
+        renderer.presentPause(1000);
         return 0;
     }
 
-    std::cout << "\nStarting run with " << playerParty.size() << " character(s).\n";
+    renderer.renderMessage("Starting run with " + std::to_string(playerParty.size()) + " character(s).");
 
-    // Run
+    // Run seed
     const std::uint32_t seed{static_cast<std::uint32_t>(std::random_device{}())};
-    std::cout << "Run seed: " << seed << '\n';
+    renderer.renderMessage("Run seed: " + std::to_string(seed));
+    renderer.presentPause(600);
 
-    // Mode selection (Classic / Labyrinth)
-    std::cout << "Mode: [1] Classic  [2] Eidolon Labyrinth\nChoice: ";
-    int modeChoice{1};
-    std::cin >> modeChoice;
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    const RunMode runMode{modeChoice == 2 ? RunMode::EidolonLabyrinth : RunMode::Classic};
+    // Mode selection
+    const std::vector<std::string> modeOptions{
+        "Classic",
+        "Eidolon Labyrinth"};
+    input.setMenuContext("SELECT MODE", modeOptions);
+    renderer.renderSelectionMenu("SELECT MODE", modeOptions);
+    const std::size_t modeChoice = input.getMenuChoice(modeOptions.size());
+    const RunMode runMode{modeChoice == 1
+                              ? RunMode::EidolonLabyrinth
+                              : RunMode::Classic};
 
     Dungeon dungeon{};
     const DungeonDefinition *selectedDungeon{nullptr};
 
     if (runMode == RunMode::Classic)
     {
-        // Classic dungeon selection
+        // Build list of available dungeons.
         const auto &classicDungeons{DungeonTable::getClassicDungeons()};
 
         std::vector<const DungeonDefinition *> available{};
@@ -226,45 +201,50 @@ int main()
         if (available.empty())
             available.push_back(&classicDungeons.front());
 
-        std::cout << "\n=== DUNGEON SELECT ===\n"
-                  << "  Player Level: " << meta.playerLevel << "\n\n";
-        for (std::size_t i{0}; i < available.size(); ++i)
+        // Build options for dungeon select menu.
+        std::vector<std::string> dungeonOptions{};
+        for (const auto *def : available)
         {
-            const auto &def{*available[i]};
-            const bool cleared{meta.clearedDungeonIds.count(def.id) > 0};
-            const int displayFloors{def.fixedLayout.empty()
-                                        ? def.numFloors
-                                        : static_cast<int>(def.fixedLayout.size())};
-            std::cout << "  [" << (i + 1) << "] " << def.name
-                      << "  (Rec. Lv." << def.recommendedPlayerLevel
-                      << " | Enemy Lv." << def.enemyLevel
-                      << " | " << displayFloors << " floors"
-                      << (cleared ? " | CLEARED" : "") << ")\n"
-                      << "      " << def.description << "\n";
+            const bool cleared{meta.clearedDungeonIds.count(def->id) > 0};
+            const int displayFloors{def->fixedLayout.empty()
+                                        ? def->numFloors
+                                        : static_cast<int>(def->fixedLayout.size())};
+            dungeonOptions.push_back(
+                def->name + "  Rec.Lv." + std::to_string(def->recommendedPlayerLevel) + " | EnemyLv." + std::to_string(def->enemyLevel) + " | " + std::to_string(displayFloors) + " floors" + (cleared ? " [CLEARED]" : ""));
         }
-        std::cout << "Select dungeon: ";
-        int dungeonChoice{1};
-        std::cin >> dungeonChoice;
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        if (dungeonChoice < 1 || dungeonChoice > static_cast<int>(available.size()))
-            dungeonChoice = 1;
-        selectedDungeon = available[static_cast<std::size_t>(dungeonChoice - 1)];
+
+        const std::string dungeonTitle = "DUNGEON SELECT  Player Lv." + std::to_string(meta.playerLevel);
+        input.setMenuContext(dungeonTitle, dungeonOptions);
+        renderer.renderSelectionMenu(dungeonTitle, dungeonOptions);
+        const std::size_t dungeonPick = input.getMenuChoice(dungeonOptions.size());
+
+        selectedDungeon = available[dungeonPick];
     }
     else
     {
-        // Labyrinth mode uses the first dungeon as a default template for now
         selectedDungeon = &DungeonTable::getClassicDungeons().front();
-        std::cout << "Eidolon Labyrinth: no XP earned. Attune available at Rest sites.\n";
+        renderer.renderMessage(
+            "Eidolon Labyrinth: no XP earned. Attune available at Rest sites.");
+        renderer.presentPause(600);
     }
 
-    dungeon.generate(seed, *selectedDungeon, &summonRegistry, runMode);
-    const bool won{dungeon.run(playerParty, meta)};
-    std::cout << (won ? "\n=== RUN COMPLETE ===\n" : "\n=== DEFEATED ===\n");
-
    
+        dungeon.generate(seed, *selectedDungeon, &summonRegistry, runMode);
+        const bool won{dungeon.run(playerParty, meta, renderer, input)};
+
+        renderer.renderMessage(won ? "=== RUN COMPLETE ===" : "=== DEFEATED ===");
+        renderer.presentPause(1000);
+    }
+    catch (const QuitException &)
+    {
+        renderer.clearBattleCache();
+        renderer.renderMessage("Saving and exiting...");
+        renderer.presentPause(500);
+    }
+
     meta.saveToFile("save.json");
-    std::cout << "Progress saved. Highest floor reached: "
-              << meta.highestFloorReached << '\n';
+    renderer.renderMessage("Progress saved. Highest floor reached: " + std::to_string(meta.highestFloorReached));
+    renderer.presentPause(800);
 
     return 0;
 }

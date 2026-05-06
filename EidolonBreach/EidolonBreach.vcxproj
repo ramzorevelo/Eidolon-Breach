@@ -57,6 +57,7 @@
     <ClCompile Include="src\Dungeon\RestNode.cpp" />
     <ClCompile Include="src\Dungeon\ShopNode.cpp" />
     <ClCompile Include="src\Dungeon\TreasureNode.cpp" />
+    <ClCompile Include="src\Dungeon\VestigeOffer.cpp" />
     <ClCompile Include="src\Entities\Enemy.cpp" />
     <ClCompile Include="src\Entities\EnemyRegistry.cpp" />
     <ClCompile Include="src\Entities\IAIStrategy.cpp" />
@@ -154,6 +155,7 @@
     <ClInclude Include="src\Dungeon\RestNode.h" />
     <ClInclude Include="src\Dungeon\ShopNode.h" />
     <ClInclude Include="src\Dungeon\TreasureNode.h" />
+    <ClInclude Include="src\Dungeon\VestigeOffer.h" />
     <ClInclude Include="src\Entities\Enemy.h" />
     <ClInclude Include="src\Entities\EnemyRegistry.h" />
     <ClInclude Include="src\Entities\IAIStrategy.h" />

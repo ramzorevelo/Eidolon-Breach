@@ -7,6 +7,9 @@
 
 #include "Dungeon/BattleNode.h"
 
+class IRenderer;
+class IInputHandler;
+
 class EliteNode : public BattleNode
 {
   public:
@@ -16,7 +19,8 @@ class EliteNode : public BattleNode
                        const SummonRegistry *summonRegistry = nullptr);
 
     void enter(Party &party, MetaProgress &meta,
-               RunContext &runCtx, EventBus &eventBus) override;
+               RunContext &runCtx, EventBus &eventBus,
+               IRenderer &renderer, IInputHandler &input) override;
 
     [[nodiscard]] std::string description() const override;
 };

@@ -26,7 +26,8 @@ class BattleNode : public MapNode
                         const SummonRegistry *summonRegistry = nullptr);
 
     void enter(Party &party, MetaProgress &meta,
-               RunContext &runCtx, EventBus &eventBus) override;
+               RunContext &runCtx, EventBus &eventBus,
+               IRenderer &renderer, IInputHandler &input) override;
 
     [[nodiscard]] std::string description() const override;
 
@@ -41,10 +42,9 @@ class BattleNode : public MapNode
      * @brief Run the battle without displaying an entry prompt.
      *        Call this from subclasses that show their own prompt before combat.
      */
-    void runBattle(Party &party,
-                   MetaProgress &meta,
-                   RunContext &runCtx,
-                   EventBus &eventBus);
+    void runBattle(Party &party, MetaProgress &meta,
+                   RunContext &runCtx, EventBus &eventBus,
+                   IRenderer &renderer, IInputHandler &input);
 
 
   private:
