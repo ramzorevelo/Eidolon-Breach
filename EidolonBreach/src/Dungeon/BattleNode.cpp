@@ -11,12 +11,12 @@
 #include "Core/CombatConstants.h"
 #include "Core/EventBus.h"
 #include "Core/MetaProgress.h"
+#include "UI/SDL3InputHandler.h"
 #include "Core/RunContext.h"
 #include "Entities/Enemy.h"
 #include "Entities/Party.h"
 #include "Entities/PlayableCharacter.h"
 #include "Entities/Unit.h"
-#include "UI/ConsoleInputHandler.h"
 #include "UI/ConsoleRenderer.h"
 #include <iostream>
 #include "Summons/SummonRegistry.h"
@@ -55,7 +55,7 @@ void BattleNode::runBattle(Party &party,
 
     //ConsoleRenderer renderer{};
     SDL3Renderer renderer{"Eidolon Breach", 1280, 720};
-    ConsoleInputHandler inputHandler{};
+    SDL3InputHandler inputHandler{renderer};
     Battle battle{party, enemyParty, renderer, inputHandler,
                   runCtx, eventBus, nullptr, m_summonRegistry};
     battle.run();

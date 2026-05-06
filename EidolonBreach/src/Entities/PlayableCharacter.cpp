@@ -118,9 +118,11 @@ std::optional<TargetInfo> PlayableCharacter::selectTarget(const Party &enemies,
     names.reserve(targets.size());
     for (const auto &[idx, unit] : targets)
         names.push_back(unit->getName());
-    renderer.renderTargetList(names);
+    renderer.renderTargetList(names, false);
 
     const std::size_t choice{input.getTargetChoice(targets.size())};
+    if (choice == IInputHandler::kCancelChoice)
+        return std::nullopt;
     return TargetInfo{TargetInfo::Type::Enemy, targets[choice].first};
 }
 
@@ -145,9 +147,11 @@ std::optional<TargetInfo> PlayableCharacter::selectAllyTarget(const Party &allie
     names.reserve(targets.size());
     for (const auto &[idx, unit] : targets)
         names.push_back(unit->getName());
-    renderer.renderTargetList(names);
+    renderer.renderTargetList(names, true);
 
     const std::size_t choice{input.getTargetChoice(targets.size())};
+    if (choice == IInputHandler::kCancelChoice)
+        return std::nullopt;
     return TargetInfo{TargetInfo::Type::Ally, targets[choice].first};
 }
 
@@ -160,36 +164,40 @@ ActionResult PlayableCharacter::takeTurn(Party &allies,
                                          Party &enemies,
                                          BattleState &state)
 {
-    displayActionMenu(allies, state.renderer);
-    const std::size_t actionIdx{selectActionIndex(allies, state.inputHandler)};
-
-    const TargetMode mode{m_abilities[actionIdx]->getActionData().targetMode};
-    std::optional<TargetInfo> target{};
-    switch (mode)
+    while (true)
     {
-    case TargetMode::Self:
-    case TargetMode::AllEnemies:
-    case TargetMode::AllAllies:
-        // No user selection — action resolves its own targets internally.
-        break;
-    case TargetMode::SingleAlly:
-    case TargetMode::SplashAlly:
-        target = selectAllyTarget(allies, state.inputHandler, state.renderer);
-        break;
-    default:
-        target = selectTarget(enemies, state.inputHandler, state.renderer);
-        break;
+        displayActionMenu(allies, state.renderer);
+        const std::size_t actionIdx{selectActionIndex(allies, state.inputHandler)};
+
+        const TargetMode mode{m_abilities[actionIdx]->getActionData().targetMode};
+        std::optional<TargetInfo> target{};
+
+        switch (mode)
+        {
+        case TargetMode::Self:
+        case TargetMode::AllEnemies:
+        case TargetMode::AllAllies:
+            break;
+        case TargetMode::SingleAlly:
+        case TargetMode::SplashAlly:
+            target = selectAllyTarget(allies, state.inputHandler, state.renderer);
+            if (!target.has_value())
+                continue; // cancelled. Re-show action menu
+            break;
+        default:
+            target = selectTarget(enemies, state.inputHandler, state.renderer);
+            if (!target.has_value())
+                continue; // cancelled. Re-show action menu
+            break;
+        }
+
+        const Affinity actionAffinity{m_abilities[actionIdx]->getAffinity()};
+        ActionResult result{
+            m_abilities[actionIdx]->execute(*this, allies, enemies, target)};
+        result.actionAffinity = actionAffinity;
+        ++state.turnNumber;
+        return result;
     }
-
-    const Affinity actionAffinity{m_abilities[actionIdx]->getAffinity()};
-    ActionResult result{m_abilities[actionIdx]->execute(*this, allies, enemies, target)};
-
-    // Resonance contribution is handled by Battle::applyResonanceContribution()
-    // to allow floor-affinity bonuses to be applied before submission.
-    result.actionAffinity = actionAffinity;
-    ++state.turnNumber;
-
-    return result;
 }
 
 void PlayableCharacter::tryUnlockSlot(int slotIndex)

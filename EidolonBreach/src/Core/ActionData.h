@@ -10,7 +10,8 @@
 
 /**
  * @brief Categorises an action for stance signal tracking and equip-screen validation.
- *        Used by Battle::processPlayerTurn() and UseConsumableAction.
+ *        Used by Battle::
+ () and UseConsumableAction.
  */
 enum class ActionCategory
 {

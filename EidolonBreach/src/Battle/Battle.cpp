@@ -96,14 +96,15 @@ void Battle::runBattleLoop(BattleState &state)
     {
         auto turnOrder{m_turnOrderCalc->calculate(m_playerParty, m_enemyParty)};
         m_renderer.renderTurnOrder(turnOrder);
-        for (const auto &slot : turnOrder)
+
+        for (std::size_t slotIdx = 0; slotIdx < turnOrder.size(); ++slotIdx)
         {
+            const TurnSlot &slot = turnOrder[slotIdx];
             if (!slot.unit || !slot.unit->isAlive() || isBattleOver())
                 continue;
 
             m_renderer.renderPartyStatus(m_playerParty, m_enemyParty);
 
-            // Snapshot both sides BEFORE ticking so DoT kills are detected correctly.
             const auto enemyAliveBefore{snapshotAliveStates(m_enemyParty)};
             const auto playerAliveBefore{snapshotAliveStates(m_playerParty)};
 
@@ -123,7 +124,7 @@ void Battle::runBattleLoop(BattleState &state)
                 processPlayerTurn(slot.unit, state);
             else
                 processEnemyTurn(slot.unit, state);
-            // Auto-remove expired summons at the end of their own turn.
+
             if (slot.unit->isSummon())
             {
                 auto *s{dynamic_cast<Summon *>(slot.unit)};
@@ -139,8 +140,19 @@ void Battle::runBattleLoop(BattleState &state)
                     }
                 }
             }
+
             if (checkAndHandleBattleEnd(state))
                 return;
+
+            // Update strip to show only remaining units this round.
+            const std::vector<TurnSlot> remaining{
+                turnOrder.begin() + static_cast<std::ptrdiff_t>(slotIdx) + 1,
+                turnOrder.end()};
+            m_renderer.renderTurnOrder(remaining);
+
+            // Brief pause after non-player turns so actions are readable.
+            if (!slot.isPlayer)
+                m_renderer.presentPause(350);
         }
     }
 }
@@ -213,6 +225,15 @@ void Battle::processPlayerTurn(Unit *unit, BattleState &state)
 
     // result is non-const so vestige onAction hooks can modify it.
     ActionResult result{unit->takeTurn(m_playerParty, m_enemyParty, state)};
+    state.renderer.clearTargetHighlight(); 
+
+    if (result.targetEnemyIndex >= 0 && state.enemyParty != nullptr)
+    {
+        const Unit *t{state.enemyParty->getUnitAt(
+            static_cast<std::size_t>(result.targetEnemyIndex))};
+        if (t)
+            result.targetName = t->getName();
+    }
 
     // onAction fires after execute() but before result is processed.
     // Vestiges may apply bonus toughness, refund SP, or modify exposureDelta here.
@@ -290,7 +311,7 @@ void Battle::processEnemyTurn(Unit *unit, BattleState &state)
 
     const std::string intent{unit->getIntentLabel()};
     if (!intent.empty())
-        m_renderer.renderMessage(">> " + unit->getName() + " intends: " + intent + " <<");
+        m_renderer.renderMessage(">> " + unit->getName() + " will " + intent + " <<");
 
     const ActionResult result{unit->takeTurn(m_enemyParty, m_playerParty, state)};
 

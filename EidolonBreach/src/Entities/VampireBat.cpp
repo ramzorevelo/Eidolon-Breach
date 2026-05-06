@@ -76,11 +76,9 @@ ActionResult VampireBat::performAttack()
 
 std::string VampireBat::getIntentLabel() const
 {
-    if (isBroken())
-        return "Stunned (skip)";
-    if (m_bloodlessActive)
-        return "Bloodless (skip)";
+    if (isBroken())    return "";
+    if (m_bloodlessActive) return "";  
     if ((m_turnCount + 1) % kBatLifedrainInterval == 0)
-        return "Lifedrain!";
-    return "Attacks";
+        return "use Lifedrain";
+    return "attack";
 }

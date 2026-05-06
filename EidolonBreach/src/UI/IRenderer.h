@@ -62,11 +62,7 @@ class IRenderer
      */
     virtual void renderActionMenu(const PlayableCharacter &character,
                                   const Party &party) = 0;
-    /**
-     * @brief Render the numbered list of valid targets before the input prompt.
-     * @param names Display name of each selectable target, in selection order.
-     */
-    virtual void renderTargetList(const std::vector<std::string> &names) = 0;
+   
     /**
      * @brief Render the upcoming turn order at the start of each round.
      * @param order Slots in the order units will act this round.
@@ -77,4 +73,19 @@ class IRenderer
      * @param hint One-line string describing current valid inputs.
      */
     virtual void renderHintBar(const std::string &hint) = 0;
+
+    virtual void clearTargetHighlight() {} // default no-op 
+
+    virtual void renderTargetList(const std::vector<std::string> &names,
+                                  bool isAllyTarget = false) = 0;
+    virtual void updateTargetHighlight(int index)
+    {
+        (void)index;
+    }
+
+    virtual void presentPause(int ms)
+    {
+        (void)ms;
+    }
+
 };
