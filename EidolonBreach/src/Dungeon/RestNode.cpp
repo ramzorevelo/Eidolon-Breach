@@ -2,56 +2,56 @@
  * @file RestNode.cpp
  * @brief RestNode implementation.
  */
-#include "Entities/PlayableCharacter.h"
-#include "Items/Item.h"
-#include <limits>
 #include "Dungeon/RestNode.h"
+#include "Actions/SlotState.h"
 #include "Core/CombatConstants.h"
+#include "Core/RunContext.h"
 #include "Entities/Party.h"
 #include "Entities/PlayableCharacter.h"
 #include "Entities/Unit.h"
-#include "Actions/SlotState.h"
-#include <iostream>
-#include <Core/RunContext.h>
+#include "Items/Item.h"
+#include "UI/IInputHandler.h"
+#include "UI/IRenderer.h"
 
-void RestNode::enter(Party &party,
-                     MetaProgress & /*meta*/,
-                     RunContext &runCtx,
-                     EventBus & /*eventBus*/)
+void RestNode::enter(Party &party, MetaProgress &meta,
+                     RunContext &runCtx, EventBus &eventBus,
+                     IRenderer &renderer, IInputHandler &input)
 {
-    const bool isDraft{runCtx.runMode == RunMode::EidolonLabyrinth};
-    std::cout << "\n=== REST SITE ===\n"
-              << "  [1] Heal - restore partial HP to all allies\n"
-              << "  [2] Purge - reduce all Exposure by "
-              << CombatConstants::kPurgeExposureReduction << "\n"
-              << "  [3] Equip - equip items from party inventory\n";
+    const bool isDraft = (runCtx.runMode == RunMode::EidolonLabyrinth);
+
+    std::vector<std::string> options{};
+    options.push_back("Heal — restore partial HP to all allies");
+    options.push_back("Purge — reduce all Exposure by " + std::to_string(CombatConstants::kPurgeExposureReduction));
+    options.push_back("Equip — equip items from party inventory");
     if (isDraft)
-        std::cout << "  [4] Attune - re-equip slot skills\n";
-    std::cout << "  [0] Continue\n"
-              << "Choose: ";
+        options.push_back("Attune — re-equip slot skills");
+    options.push_back("Continue");
 
-    int choice{0};
-    std::cin >> choice;
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    input.setMenuContext("REST SITE", options);
+    renderer.renderSelectionMenu("REST SITE", options);
+    const std::size_t choice = input.getMenuChoice(options.size());
 
-    switch (choice)
+    if (options[choice].rfind("Heal", 0) == 0)
     {
-    case 1:
         applyHeal(party);
-        break;
-    case 2:
-        applyPurge(party);
-        break;
-    case 3:
-        applyEquip(party);
-        break;
-    case 4:
-        if (isDraft)
-            applyAttune(party);
-        break;
-    default:
-        break;
+        renderer.renderMessage("The party rests and recovers HP.");
     }
+    else if (options[choice].rfind("Purge", 0) == 0)
+    {
+        applyPurge(party, renderer);
+    }
+    else if (options[choice].rfind("Equip", 0) == 0)
+    {
+        applyEquip(party, renderer, input);
+    }
+    else if (isDraft && options[choice].rfind("Attune", 0) == 0)
+    {
+        applyAttune(party, renderer);
+    }
+    // "Continue": fall through
+
+    (void)meta;
+    (void)eventBus;
 }
 
 std::string RestNode::description() const
@@ -67,13 +67,12 @@ void RestNode::applyHeal(Party &party) const
         if (u && u->isAlive())
         {
             const int missing{u->getMaxHp() - u->getHp()};
-            u->heal(missing / 2 + 10); // 50% missing + flat 10 floor
+            u->heal(missing / 2 + 10);
         }
     }
-    std::cout << "The party rests and recovers HP.\n";
 }
 
-void RestNode::applyPurge(Party &party) const
+void RestNode::applyPurge(Party &party, IRenderer &renderer) const
 {
     for (std::size_t i{0}; i < party.size(); ++i)
     {
@@ -83,14 +82,11 @@ void RestNode::applyPurge(Party &party) const
         if (auto *pc = dynamic_cast<PlayableCharacter *>(u))
             pc->modifyExposure(-CombatConstants::kPurgeExposureReduction);
     }
-    std::cout << "Exposure reduced across the party.\n";
+    renderer.renderMessage("Exposure reduced across the party.");
 }
-void RestNode::applyAttune(Party &party) const
+
+void RestNode::applyAttune(Party &party, IRenderer &renderer) const
 {
-    // Attune: for each PC with an unlocked slot, offer to equip an ability
-    // from their ability pool. Currently ability pools only contain basic/arch/ultimate;
-    // slot skills will be added per-character in a later content pass.
-    std::cout << "\n  [Attune] Slot skill re-equip:\n";
     bool attuneAvailable{false};
     for (std::size_t i{0}; i < party.size(); ++i)
     {
@@ -104,54 +100,52 @@ void RestNode::applyAttune(Party &party) const
             if (slots.slots[static_cast<std::size_t>(s)].unlocked)
             {
                 attuneAvailable = true;
-                std::cout << "    " << pc->getName()
-                          << " Slot " << (s + 1) << ": unlocked (no pool skills yet)\n";
+                renderer.renderMessage("  " + pc->getName() + " Slot " + std::to_string(s + 1) + ": unlocked (no pool skills yet)");
             }
         }
     }
     if (!attuneAvailable)
-        std::cout << "  No unlocked slots available to attune.\n";
+        renderer.renderMessage("No unlocked slots available to attune.");
 }
 
-void RestNode::applyEquip(Party &party) const
+void RestNode::applyEquip(Party &party,
+                          IRenderer &renderer,
+                          IInputHandler &input) const
 {
     const auto &equipment{party.getInventory().getEquipment()};
     if (equipment.empty())
     {
-        std::cout << "  No equipment in inventory.\n";
+        renderer.renderMessage("No equipment in inventory.");
         return;
     }
 
-    std::cout << "\n  Equipment available:\n";
-    for (std::size_t i{0}; i < equipment.size(); ++i)
+    // Build item selection menu.
+    std::vector<std::string> itemOptions{};
+    itemOptions.push_back("Cancel");
+    for (const Item &item : equipment)
     {
-        const Item &item{equipment[i]};
         const std::string slotStr{
             item.equipSlot.has_value()
-                ? (*item.equipSlot == EquipSlot::Weapon
-                       ? "Weapon"
+                ? (*item.equipSlot == EquipSlot::Weapon  ? "Weapon"
                    : *item.equipSlot == EquipSlot::Armor ? "Armor"
                                                          : "Accessory")
                 : "Unknown"};
-        std::cout << "  [" << (i + 1) << "] " << item.name
-                  << " (" << slotStr << ", " << item.goldValue << " gold)\n";
+        itemOptions.push_back(item.name + " (" + slotStr + ", " + std::to_string(item.goldValue) + " gold)");
     }
-    std::cout << "  [0] Cancel\n"
-              << "  Item: ";
 
-    int itemChoice{0};
-    std::cin >> itemChoice;
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    input.setMenuContext("SELECT ITEM TO EQUIP", itemOptions);
+    renderer.renderSelectionMenu("SELECT ITEM TO EQUIP", itemOptions);
+    const std::size_t itemChoice = input.getMenuChoice(itemOptions.size());
 
-    if (itemChoice < 1 || itemChoice > static_cast<int>(equipment.size()))
+    if (itemChoice == 0)
     {
-        std::cout << "  Cancelled.\n";
+        renderer.renderMessage("Cancelled.");
         return;
     }
 
-    const Item selectedItem{equipment[static_cast<std::size_t>(itemChoice - 1)]};
+    const Item selectedItem{equipment[itemChoice - 1]};
 
-    // Collect alive player characters only.
+    // Collect alive player characters.
     std::vector<PlayableCharacter *> pcs{};
     for (std::size_t i{0}; i < party.size(); ++i)
         if (auto *pc = dynamic_cast<PlayableCharacter *>(party.getUnitAt(i)))
@@ -160,38 +154,35 @@ void RestNode::applyEquip(Party &party) const
 
     if (pcs.empty())
     {
-        std::cout << "  No alive characters to equip.\n";
+        renderer.renderMessage("No alive characters to equip.");
         return;
     }
 
-    std::cout << "  Equip to:\n";
-    for (std::size_t i{0}; i < pcs.size(); ++i)
-        std::cout << "  [" << (i + 1) << "] " << pcs[i]->getName() << '\n';
-    std::cout << "  [0] Cancel\n"
-              << "  Character: ";
+    // Build character selection menu.
+    std::vector<std::string> charOptions{};
+    charOptions.push_back("Cancel");
+    for (const PlayableCharacter *pc : pcs)
+        charOptions.push_back(pc->getName());
 
-    int charChoice{0};
-    std::cin >> charChoice;
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    input.setMenuContext("EQUIP TO CHARACTER", charOptions);
+    renderer.renderSelectionMenu("EQUIP TO CHARACTER", charOptions);
+    const std::size_t charChoice = input.getMenuChoice(charOptions.size());
 
-    if (charChoice < 1 || charChoice > static_cast<int>(pcs.size()))
+    if (charChoice == 0)
     {
-        std::cout << "  Cancelled.\n";
+        renderer.renderMessage("Cancelled.");
         return;
     }
 
-    PlayableCharacter *target{pcs[static_cast<std::size_t>(charChoice - 1)]};
+    PlayableCharacter *target{pcs[charChoice - 1]};
     auto displaced{target->equip(selectedItem)};
+    party.getInventory().removeEquipmentAt(itemChoice - 1);
 
-    party.getInventory().removeEquipmentAt(
-        static_cast<std::size_t>(itemChoice - 1));
+    renderer.renderMessage(target->getName() + " equipped " + selectedItem.name + "!");
 
-    std::cout << "  " << target->getName() << " equipped " << selectedItem.name << "!\n";
-
-    // Return displaced item (if any) to inventory.
     if (displaced.has_value())
     {
         party.getInventory().addItem(*displaced, 1);
-        std::cout << "  " << displaced->name << " returned to inventory.\n";
+        renderer.renderMessage(displaced->name + " returned to inventory.");
     }
 }

@@ -2,7 +2,7 @@
  * @file EliteNode.cpp
  * @brief EliteNode implementation.
  */
-
+#include "Dungeon/VestigeOffer.h"
 #include "Dungeon/EliteNode.h"
 #include "Vestiges/IVestige.h"
 #include <limits>
@@ -12,38 +12,9 @@
 #include "Entities/PlayableCharacter.h"
 #include "Entities/Unit.h"
 #include "Vestiges/VestigeFactory.h"
-#include <iostream>
-
-namespace
-{
-void offerVestigeDiscard(Party &party, std::unique_ptr<IVestige> incoming)
-{
-    std::cout << "\n  Party is at vestige capacity (" << Party::kMaxVestiges << ").\n"
-              << "  Incoming: [" << incoming->getName() << "] — "
-              << incoming->getDescription() << "\n\n"
-              << "  Choose a vestige to discard, or [0] to keep your current loadout:\n";
-
-    const auto &vestiges{party.getVestiges()};
-    for (std::size_t i{0}; i < vestiges.size(); ++i)
-        std::cout << "  [" << (i + 1) << "] " << vestiges[i]->getName()
-                  << " — " << vestiges[i]->getDescription() << '\n';
-
-    std::cout << "  Discard: ";
-    int choice{0};
-    std::cin >> choice;
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-
-    if (choice < 1 || choice > static_cast<int>(vestiges.size()))
-    {
-        std::cout << "  Kept your current vestiges. " << incoming->getName() << " was discarded.\n";
-        return;
-    }
-
-    party.removeVestige(static_cast<std::size_t>(choice - 1));
-    party.addVestige(std::move(incoming));
-    std::cout << "  Vestige replaced.\n";
-}
-} // namespace
+#include <chrono>
+#include "UI/IRenderer.h"
+#include "UI/IInputHandler.h"   
 
 EliteNode::EliteNode(std::function<void(Party &)> populateEnemies,
                      Affinity floorAffinity,
@@ -54,37 +25,38 @@ EliteNode::EliteNode(std::function<void(Party &)> populateEnemies,
 {
 }
 
-void EliteNode::enter(Party &party,
-                      MetaProgress &meta,
-                      RunContext &runCtx,
-                      EventBus &eventBus)
+void EliteNode::enter(Party &party, MetaProgress &meta,
+                      RunContext &runCtx, EventBus &eventBus,
+                      IRenderer &renderer, IInputHandler &input)
 {
-    std::cout << "\n=== ELITE ENCOUNTER ===\n"
-              << "Exposure spikes by " << CombatConstants::kEliteExposureSpike
-              << " for all party members!\n";
+    renderer.renderMessage("=== ELITE ENCOUNTER ===");
+    renderer.renderMessage("Exposure spikes by " + std::to_string(CombatConstants::kEliteExposureSpike) + " for all party members!");
+    renderer.presentPause(600);
 
-    for (std::size_t i{0}; i < party.size(); ++i)
+    for (std::size_t i = 0; i < party.size(); ++i)
     {
-        Unit *u{party.getUnitAt(i)};
+        Unit *u = party.getUnitAt(i);
         if (auto *pc = dynamic_cast<PlayableCharacter *>(u))
             pc->modifyExposure(CombatConstants::kEliteExposureSpike);
     }
 
-    BattleNode::enter(party, meta, runCtx, eventBus);
+    BattleNode::enter(party, meta, runCtx, eventBus, renderer, input);
 
-    // Award a Corrupted vestige for defeating an Elite.
+    // Award Corrupted vestige after defeating elite
     if (!party.isAllDead())
     {
-        std::mt19937 rng{static_cast<std::uint32_t>(party.size())};
-        auto vestige{VestigeFactory::makeRandom(VestigeFactory::Rarity::Corrupted, rng)};
-        std::cout << "A Corrupted vestige manifests: [" << vestige->getName() << "]\n"
-                  << vestige->getDescription() << '\n';
-        auto overflow{party.addVestige(std::move(vestige))};
+        std::mt19937 rng{static_cast<std::uint32_t>(
+            std::chrono::steady_clock::now().time_since_epoch().count())};
+        auto vestige = VestigeFactory::makeRandom(VestigeFactory::Rarity::Corrupted, rng);
+        renderer.renderMessage("A Corrupted vestige resonates: [" + vestige->getName() + "]");
+        renderer.renderMessage(vestige->getDescription());
+        renderer.presentPause(400);
+
+        auto overflow = party.addVestige(std::move(vestige));
         if (overflow.has_value())
-            offerVestigeDiscard(party, std::move(*overflow));
+            DungeonHelpers::offerVestigeDiscard(party, std::move(*overflow), renderer, input);
     }
 }
-
 std::string EliteNode::description() const
 {
     return "[Elite] Dangerous foe - Exposure spike on entry.";

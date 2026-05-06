@@ -6,6 +6,9 @@
 
 #include "Dungeon/EliteNode.h"
 
+class IRenderer;
+class IInputHandler;
+
 class BossNode : public EliteNode
 {
   public:
@@ -15,7 +18,8 @@ class BossNode : public EliteNode
                       const SummonRegistry *summonRegistry = nullptr);
 
     void enter(Party &party, MetaProgress &meta,
-               RunContext &runCtx, EventBus &eventBus) override;
+               RunContext &runCtx, EventBus &eventBus,
+               IRenderer &renderer, IInputHandler &input) override;
 
     [[nodiscard]] std::string description() const override;
 };

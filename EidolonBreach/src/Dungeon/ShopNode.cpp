@@ -5,8 +5,9 @@
 #include "Dungeon/ShopNode.h"
 #include "Entities/Party.h"
 #include "Items/Inventory.h"
-#include <iostream>
 #include <limits>
+#include "UI/IRenderer.h"
+#include "UI/IInputHandler.h"
 #include <optional>
 
 ShopNode::ShopNode(const ItemRegistry &registry,
@@ -16,60 +17,52 @@ ShopNode::ShopNode(const ItemRegistry &registry,
 {
 }
 
-void ShopNode::enter(Party &party,
-                     MetaProgress & /*meta*/,
-                     RunContext & /*runCtx*/,
-                     EventBus & /*eventBus*/)
+void ShopNode::enter(Party &party, MetaProgress & /*meta*/,
+                     RunContext & /*runCtx*/, EventBus & /*eventBus*/,
+                     IRenderer &renderer, IInputHandler &input)
 {
-    std::cout << "\n=== SHOP ===\n"
-              << "  Gold: " << party.getInventory().gold << '\n';
-
     std::vector<Item> stock{};
     for (const std::string &id : m_stockIds)
     {
-        auto item{m_registry.create(id)};
+        auto item = m_registry.create(id);
         if (item.has_value())
             stock.push_back(std::move(*item));
     }
 
+    std::vector<std::string> options{};
+    options.push_back("Leave");
+    for (const auto &item : stock)
+        options.push_back(item.name + "  (" + std::to_string(item.goldValue) + " gold)");
+
+    const std::string title = "SHOP  —  Gold: " + std::to_string(party.getInventory().gold);
+
     if (stock.empty())
     {
-        std::cout << "  The shop shelves are empty.\n";
+        renderer.renderMessage("The shop shelves are empty.");
         return;
     }
 
-    for (std::size_t i{0}; i < stock.size(); ++i)
-    {
-        const Item &item{stock[i]};
-        std::cout << "  [" << (i + 1) << "] "
-                  << item.name
-                  << "  (" << item.goldValue << " gold)\n";
-    }
-    std::cout << "  [0] Leave\n"
-              << "Buy: ";
+    input.setMenuContext(title, options);
+    renderer.renderSelectionMenu(title, options);
+    const std::size_t choice = input.getMenuChoice(options.size());
 
-    int choice{0};
-    std::cin >> choice;
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-
-    if (choice < 1 || choice > static_cast<int>(stock.size()))
+    if (choice == 0)
     {
-        std::cout << "  You leave without buying anything.\n";
+        renderer.renderMessage("You leave without buying anything.");
         return;
     }
 
-    const Item &selected{stock[static_cast<std::size_t>(choice - 1)]};
+    const Item &selected = stock[choice - 1];
 
     if (party.getInventory().gold < selected.goldValue)
     {
-        std::cout << "  Not enough gold.\n";
+        renderer.renderMessage("Not enough gold.");
         return;
     }
 
     party.getInventory().gold -= selected.goldValue;
     party.getInventory().addItem(selected, 1);
-    std::cout << "  Purchased " << selected.name
-              << ". Gold remaining: " << party.getInventory().gold << '\n';
+    renderer.renderMessage("Purchased " + selected.name + ". Gold remaining: " + std::to_string(party.getInventory().gold));
 }
 
 std::string ShopNode::description() const

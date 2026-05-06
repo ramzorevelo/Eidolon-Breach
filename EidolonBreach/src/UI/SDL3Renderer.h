@@ -53,6 +53,10 @@ class SDL3Renderer : public IRenderer
     void clearTargetHighlight() override;
     void updateTargetHighlight(int index) override;
     void presentPause(int ms) override;
+    void renderSelectionMenu(const std::string &title,
+                             const std::vector<std::string> &options,
+                             std::size_t selected = 0) override;
+    void clearBattleCache();
   private:
     // SDL handles 
     SDL_Window *m_window{nullptr};
@@ -119,4 +123,7 @@ class SDL3Renderer : public IRenderer
 
     int m_highlightedTargetIndex{-1}; // -1 = no active targeting
     bool m_highlightingEnemies{true}; // true = enemy panel, false = player panel
+    TTF_Font *m_fontLarge{nullptr};   // used for full-screen selection menus
+    void renderTextEx(TTF_Font *font, const std::string &text,
+                      float x, float y, Uint8 r, Uint8 g, Uint8 b);
 };

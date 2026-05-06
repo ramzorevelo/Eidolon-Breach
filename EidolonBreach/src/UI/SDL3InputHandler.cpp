@@ -28,7 +28,7 @@ std::size_t SDL3InputHandler::getActionChoice(std::size_t numActions)
     while (SDL_WaitEvent(&event))
     {
         if (event.type == SDL_EVENT_QUIT)
-            return numActions;
+            throw QuitException{};
         if (event.type != SDL_EVENT_KEY_DOWN)
             continue;
         for (std::size_t i = 0; i < kNumActionKeys && i < numActions; ++i)
@@ -49,7 +49,7 @@ std::size_t SDL3InputHandler::getTargetChoice(std::size_t numTargets)
     while (SDL_WaitEvent(&event))
     {
         if (event.type == SDL_EVENT_QUIT)
-            return 0;
+            throw QuitException{};
         if (event.type != SDL_EVENT_KEY_DOWN)
             continue;
 
@@ -91,6 +91,53 @@ std::size_t SDL3InputHandler::getTargetChoice(std::size_t numTargets)
         case SDLK_KP_ENTER:
             return current;
         default:
+            break;
+        }
+    }
+    return 0;
+}
+
+std::size_t SDL3InputHandler::getMenuChoice(std::size_t numOptions)
+{
+    if (numOptions == 0)
+        return 0;
+
+    std::size_t current = 0;
+    SDL_Event event{};
+
+    while (SDL_WaitEvent(&event))
+    {
+        if (event.type == SDL_EVENT_QUIT)
+            throw QuitException{};
+        if (event.type != SDL_EVENT_KEY_DOWN)
+            continue;
+
+        switch (event.key.key)
+        {
+        case SDLK_UP:
+            if (current > 0)
+            {
+                --current;
+                m_renderer.renderSelectionMenu(m_menuTitle, m_menuOptions, current);
+            }
+            break;
+        case SDLK_DOWN:
+            if (current + 1 < numOptions)
+            {
+                ++current;
+                m_renderer.renderSelectionMenu(m_menuTitle, m_menuOptions, current);
+            }
+            break;
+        case SDLK_RETURN:
+        case SDLK_KP_ENTER:
+            return current;
+        default:
+            // Direct number key: 1 = index 0, 2 = index 1, etc.
+            for (std::size_t i = 0; i < numOptions && i < 9; ++i)
+            {
+                if (event.key.key == static_cast<SDL_Keycode>(SDLK_1 + static_cast<int>(i)))
+                    return i;
+            }
             break;
         }
     }

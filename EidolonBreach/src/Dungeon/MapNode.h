@@ -11,23 +11,21 @@ class Party;
 class MetaProgress;
 class RunContext;
 class EventBus;
+class IRenderer;
+class IInputHandler;
+
 
 class MapNode
 {
   public:
     virtual ~MapNode() = default;
 
-    /**
-     * @brief Execute the node's logic for the given party.
-     * @param party     The player party entering the node.
-     * @param meta      Cross-run persistent state.
-     * @param runCtx    Per-run signal and vote tracking state.
-     * @param eventBus  Event bus for cross-system notifications.
-     */
     virtual void enter(Party &party,
                        MetaProgress &meta,
                        RunContext &runCtx,
-                       EventBus &eventBus) = 0;
+                       EventBus &eventBus,
+                       IRenderer &renderer,
+                       IInputHandler &input) = 0;
 
     /** @return One-line description shown on the map screen. */
     [[nodiscard]] virtual std::string description() const = 0;

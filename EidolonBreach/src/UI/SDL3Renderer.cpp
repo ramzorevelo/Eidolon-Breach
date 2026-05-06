@@ -86,6 +86,11 @@ SDL3Renderer::SDL3Renderer(const char *windowTitle, int width, int height)
     if (!m_font)
         SDL_Log("SDL3Renderer: font load failed: %s", SDL_GetError());
 
+    m_fontLarge = TTF_OpenFont("data/fonts/ShareTechMono-Regular.ttf", 22);
+    if (!m_fontLarge)
+        SDL_Log("SDL3Renderer: large font load failed: %s", SDL_GetError());
+
+
     // Initial clear so the window isn't garbage before the first render call.
     SDL_SetRenderDrawColor(m_renderer, 18, 18, 24, 255);
     SDL_RenderClear(m_renderer);
@@ -94,6 +99,12 @@ SDL3Renderer::SDL3Renderer(const char *windowTitle, int width, int height)
 
 SDL3Renderer::~SDL3Renderer()
 {
+    if (m_fontLarge)
+    {
+        TTF_CloseFont(m_fontLarge);
+        m_fontLarge = nullptr;
+    }
+
     if (m_font)
     {
         TTF_CloseFont(m_font);
@@ -603,4 +614,88 @@ void SDL3Renderer::updateTargetHighlight(int index)
 void SDL3Renderer::presentPause(int ms)
 {
     SDL_Delay(static_cast<Uint32>(ms));
+}
+
+void SDL3Renderer::renderSelectionMenu(const std::string &title,
+                                       const std::vector<std::string> &options,
+                                       std::size_t selected)
+{
+    SDL_SetRenderDrawColor(m_renderer, 18, 18, 24, 255);
+    SDL_RenderClear(m_renderer);
+
+    if (!m_font)
+    {
+        SDL_RenderPresent(m_renderer);
+        return;
+    }
+
+    const float cx = m_windowWidth * 0.28f;
+    const float ty = m_windowHeight * 0.18f;
+
+    // Title
+    renderTextEx(m_fontLarge, "=== " + title + " ===", cx, ty, 220, 200, 100);
+
+    const float lineH = 30.f;
+    float optionY = ty + 36.f;
+
+    for (std::size_t i = 0; i < options.size(); ++i)
+    {
+        const bool isSelected = (i == selected);
+
+        if (isSelected)
+        {
+            const SDL_FRect highlight{cx - 4.f, optionY - 2.f,
+                                      m_windowWidth * 0.50f, lineH};
+            fillRect(highlight, 40, 40, 60, 255);
+        }
+        const std::size_t maxChars = static_cast<std::size_t>(m_windowWidth * 0.70f / 9.6f);
+        std::string display = options[i];
+        if (display.size() > maxChars)
+            display = display.substr(0, maxChars - 1) + "~";
+        const std::string row = (isSelected ? "> " : "  ") + std::to_string(i + 1) + ". " + options[i];
+        const Uint8 brightness = isSelected ? 255 : 160;
+        renderTextEx(m_fontLarge, row, cx, optionY,
+                     brightness, brightness, isSelected ? 100 : brightness);
+
+        optionY += lineH;
+    }
+
+    // Hint
+    renderTextEx(m_fontLarge,
+                 "[Up/Down] Navigate   [Enter] Confirm   [1-9] Direct select",
+                 cx, m_windowHeight * 0.88f, 100, 100, 120);
+
+    SDL_RenderPresent(m_renderer);
+}
+
+void SDL3Renderer::clearBattleCache()
+{
+    m_cachedPlayerParty = nullptr;
+    m_cachedEnemyParty = nullptr;
+    m_cachedActiveCharacter = nullptr;
+    m_cachedActiveParty = nullptr;
+    m_cachedResonanceField = nullptr;
+    m_cachedTurnOrder.clear();
+    m_highlightedTargetIndex = -1;
+    redrawAll();
+}
+
+void SDL3Renderer::renderTextEx(TTF_Font *font, const std::string &text,
+                                float x, float y, Uint8 r, Uint8 g, Uint8 b)
+{
+    if (!font || text.empty())
+        return;
+    const SDL_Color color{r, g, b, 255};
+    SDL_Surface *surface = TTF_RenderText_Blended(font, text.c_str(), 0, color);
+    if (!surface)
+        return;
+    SDL_Texture *texture = SDL_CreateTextureFromSurface(m_renderer, surface);
+    SDL_DestroySurface(surface);
+    if (!texture)
+        return;
+    float tw{}, th{};
+    SDL_GetTextureSize(texture, &tw, &th);
+    const SDL_FRect dst{x, y, tw, th};
+    SDL_RenderTexture(m_renderer, texture, nullptr, &dst);
+    SDL_DestroyTexture(texture);
 }

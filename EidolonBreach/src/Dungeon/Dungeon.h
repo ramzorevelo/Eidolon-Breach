@@ -51,7 +51,8 @@ class Dungeon
     /**
      * @brief Run the dungeon. Returns true if the player clears the boss.
      */
-    bool run(Party &party, MetaProgress &meta);
+    bool run(Party &party, MetaProgress &meta,
+             IRenderer &renderer, IInputHandler &input);
 
     [[nodiscard]] const DungeonDefinition &getCurrentDungeon() const
     {
@@ -82,10 +83,9 @@ class Dungeon
     void connectLayers(int layerIndex, std::mt19937 &rng);
 
     /// Returns the chosen node index, or -1 if the party died inside the node.
-    int presentChoices(Party &party,
-                       MetaProgress &meta,
-                       int layerIndex,
-                       const std::vector<int> &reachable);
+    int presentChoices(Party &party, MetaProgress &meta,
+                       int layerIndex, const std::vector<int> &reachable,
+                       IRenderer &renderer, IInputHandler &input);
 
     [[nodiscard]] std::vector<int> getReachableIndices(
         int layerIndex,

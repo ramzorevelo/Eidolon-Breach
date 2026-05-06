@@ -7,13 +7,17 @@
 #include "Dungeon/MapNode.h"
 #include <cstdint>
 
+class IRenderer;
+class IInputHandler;
+
 class TreasureNode : public MapNode
 {
   public:
     explicit TreasureNode(int goldAmount = 30, std::uint32_t vestigeRngSeed = 0u);
 
     void enter(Party &party, MetaProgress &meta,
-               RunContext &runCtx, EventBus &eventBus) override;
+               RunContext &runCtx, EventBus &eventBus,
+               IRenderer &renderer, IInputHandler &input) override;
 
     [[nodiscard]] std::string description() const override;
 

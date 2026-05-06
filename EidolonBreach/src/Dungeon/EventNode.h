@@ -7,11 +7,15 @@
 
 #include "Dungeon/MapNode.h"
 
+class IRenderer;
+class IInputHandler;
+
 class EventNode : public MapNode
 {
   public:
     void enter(Party &party, MetaProgress &meta,
-               RunContext &runCtx, EventBus &eventBus) override;
+               RunContext &runCtx, EventBus &eventBus,
+               IRenderer &renderer, IInputHandler &input) override;
 
     [[nodiscard]] std::string description() const override;
 };

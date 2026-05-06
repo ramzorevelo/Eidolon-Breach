@@ -17,4 +17,8 @@ class NullInputHandler : public IInputHandler
     {
         return 0;
     }
+    std::size_t getMenuChoice(std::size_t) override
+    {
+        return 0;
+    }
 };

@@ -261,6 +261,9 @@
     <ClCompile Include="src\UI\SDL3InputHandler.cpp">
       <Filter>UI</Filter>
     </ClCompile>
+    <ClCompile Include="src\Dungeon\VestigeOffer.cpp">
+      <Filter>Dungeon</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Battle\Battle.h">
@@ -562,6 +565,9 @@
     </ClInclude>
     <ClInclude Include="src\UI\SDL3InputHandler.h">
       <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Dungeon\VestigeOffer.h">
+      <Filter>Dungeon</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

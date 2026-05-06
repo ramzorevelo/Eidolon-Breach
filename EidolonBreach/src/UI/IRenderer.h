@@ -88,4 +88,23 @@ class IRenderer
         (void)ms;
     }
 
+    /**
+     * @brief Render a full-screen numbered selection menu.
+     *        Called before getMenuChoice blocks for input.
+     * @param title    Header line (e.g. "REST SITE").
+     * @param options  List of selectable option strings.
+     * @param selected Currently highlighted 0-based index.
+     */
+    virtual void renderSelectionMenu(const std::string &title,
+                                     const std::vector<std::string> &options,
+                                     std::size_t selected = 0)
+    {
+        (void)title;
+        (void)options;
+        (void)selected;
+    }
+
+    virtual void clearBattleCache() {}
+
 };
+
