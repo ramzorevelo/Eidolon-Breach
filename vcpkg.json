@@ -1,0 +1,9 @@
+{
+  "name": "eidolonbreach",
+  "dependencies": [
+    "sdl3",
+    "sdl3-ttf",
+    "nlohmann-json",
+    "doctest"
+  ]
+}
