@@ -193,7 +193,7 @@ The practical result: the entire graphics backend was replaced in one commit. Ev
 | `class_battle_events.mmd` | Battle, EventBus, concrete events, AchievementSystem |
 | `class_dungeon_factory.mmd` | EnemyRegistry, CharacterRegistry, AbilityRegistry, DungeonBuilder, MapNode hierarchy |
 | `class_ui.mmd` | IRenderer, IInputHandler, SDL3 implementations |
-| `seq_player_turn.mmd` | Full player turn: Battle through IAction, then EventBus emissions |
+| `seq_player_turn.mmd` | Full player turn: Player selects action and target, Battle dispatches through IAction, EventBus emits events |
 | `seq_enemy_factory.mmd` | EnemyRegistry factory: dungeon requests, registry dispatches, concrete subclass returned |
 | `seq_eventbus.mmd` | Vestige subscribes at battle start, Battle emits, vestige reacts, scope cleared at end |
 | `seq_status_tick.mmd` | Template Method tick: Unit iterates effects, StatusEffectBase delegates to BurnEffect |
