@@ -3,6 +3,7 @@ title: Player Turn Execution
 ---
 sequenceDiagram
     autonumber
+    actor Player
     participant Battle
     participant PC as PC : PlayableCharacter
     participant IInputHandler
@@ -14,8 +15,12 @@ sequenceDiagram
 
     Battle ->> PC: takeTurn(allies, enemies, state)
     PC ->> IInputHandler: getActionChoice(numActions)
+    IInputHandler ->> Player: display action menu
+    Player -->> IInputHandler: action selection
     IInputHandler -->> PC: slotIndex
     PC ->> IInputHandler: getTargetChoice(numTargets)
+    IInputHandler ->> Player: display target list
+    Player -->> IInputHandler: target selection
     IInputHandler -->> PC: targetIndex
 
     PC ->> IAction: execute(user, allies, enemies, target)
