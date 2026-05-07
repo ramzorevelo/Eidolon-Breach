@@ -1,0 +1,40 @@
+---
+title: Enemy Instantiation - Factory Method
+---
+sequenceDiagram
+    autonumber
+    participant main
+    participant EnemyRegistry
+    participant EncounterTable
+    participant Dungeon
+    participant BattleNode
+    participant enemyParty as enemyParty : Party
+
+    main ->> EnemyRegistry: loadFromJson("data/enemies.json")
+    EnemyRegistry ->> EnemyRegistry: parseBlueprint(id, json) for each entry
+
+    main ->> EncounterTable: loadFromJson("data/encounters.json", enemyRegistry)
+    main ->> Dungeon: new Dungeon(enemyRegistry, ...)
+
+    Dungeon ->> EncounterTable: getFactory(Tier::Standard, rng)
+    EncounterTable -->> Dungeon: function~void(Party)~ factory
+
+    Dungeon ->> BattleNode: new BattleNode(factory)
+
+    BattleNode ->> BattleNode: factory(enemyParty)
+    BattleNode ->> EnemyRegistry: create("slime_alpha")
+    EnemyRegistry ->> EnemyRegistry: instantiate(blueprint)
+
+    alt enemyType == "slime"
+        EnemyRegistry ->> Slime: make_unique~Slime~(name, maxHp, maxToughness)
+        Slime -->> EnemyRegistry: unique_ptr~Enemy~
+    else enemyType == "stone_golem"
+        EnemyRegistry ->> StoneGolem: make_unique~StoneGolem~(...)
+        StoneGolem -->> EnemyRegistry: unique_ptr~Enemy~
+    else unknown type
+        EnemyRegistry ->> Enemy: make_unique~Enemy~(id, name, Stats, BasicAIStrategy)
+        Enemy -->> EnemyRegistry: unique_ptr~Enemy~
+    end
+
+    EnemyRegistry -->> BattleNode: unique_ptr~Enemy~
+    BattleNode ->> enemyParty: addUnit(move(enemy))

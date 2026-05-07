@@ -1,0 +1,133 @@
+---
+title: Action and Status Effect Systems
+---
+classDiagram
+    direction TB
+
+    class IAction {
+        <<interface>>
+        +label()* : string
+        +isAvailable(PlayableCharacter, Party)* : bool
+        +execute(PlayableCharacter, Party, Party, TargetInfo)* : ActionResult
+        +getAffinity()* : Affinity
+        +getActionData()* : ActionData
+    }
+
+    class ActionData {
+        + skillPower : float
+        + spCost : int
+        + energyCost : int
+        + energyGain : int
+        + toughnessDamage : int
+        + targetMode : TargetMode
+        + affinity : Affinity
+        + category : ActionCategory
+    }
+
+    class BasicAttackAction {
+        - m_data : ActionData
+        +execute(PlayableCharacter, Party, Party, TargetInfo) : ActionResult
+    }
+
+    class SkillAction {
+        - m_data : ActionData
+        - m_skillPower : float
+        +execute(PlayableCharacter, Party, Party, TargetInfo) : ActionResult
+    }
+
+    class UltimateAction {
+        - m_data : ActionData
+        +isAvailable(PlayableCharacter, Party) : bool
+        +execute(PlayableCharacter, Party, Party, TargetInfo) : ActionResult
+    }
+
+    class VentAction {
+        - m_data : ActionData
+        +isAvailable(PlayableCharacter, Party) : bool
+        +execute(PlayableCharacter, Party, Party, TargetInfo) : ActionResult
+    }
+
+    class LyraUltimateAction {
+        - m_data : ActionData
+        +execute(PlayableCharacter, Party, Party, TargetInfo) : ActionResult
+    }
+
+    class VexBulwarkAction {
+        - m_data : ActionData
+        +execute(PlayableCharacter, Party, Party, TargetInfo) : ActionResult
+    }
+
+    IAction <|.. BasicAttackAction
+    IAction <|.. SkillAction
+    IAction <|.. UltimateAction
+    IAction <|.. VentAction
+    IAction <|.. LyraUltimateAction
+    IAction <|.. VexBulwarkAction
+    IAction ..> ActionData
+
+    class IStatusEffect {
+        <<interface>>
+        +getId()* : string_view
+        +getName()* : string_view
+        +getDuration()* : optional~int~
+        +isBuff()* : bool
+        +isDebuff()* : bool
+        +getTags()* : vector~string~
+        +hasTag(string_view)* : bool
+        +onApply(Unit)* : void
+        +onTick(Unit)* : string
+        +onExpire(Unit)* : void
+        +onRemove(Unit)* : void
+        +modifyStatsFlat(Stats)* : Stats
+        +modifyStatsPct(Stats)* : Stats
+        +absorbDamage(int)* : int
+        +isExhausted()* : bool
+        +extendDuration(int)* : void
+    }
+
+    class StatusEffectBase {
+        <<abstract>>
+        # m_id : string
+        # m_name : string
+        # m_duration : optional~int~
+        # m_tags : vector~string~
+        +onApply(Unit) : void
+        +onTick(Unit) : string
+        +onExpire(Unit) : void
+        +onRemove(Unit) : void
+        +modifyStatsFlat(Stats) : Stats
+        +modifyStatsPct(Stats) : Stats
+        +absorbDamage(int) : int
+        +isExhausted() : bool
+        +extendDuration(int) : void
+    }
+
+    class BurnEffect {
+        - m_damagePerTick : int
+        +isDebuff() : bool
+        +onTick(Unit) : string
+    }
+
+    class SlowEffect {
+        +isDebuff() : bool
+        +modifyStatsPct(Stats) : Stats
+    }
+
+    class ShieldEffect {
+        - m_absorb : int
+        +isBuff() : bool
+        +absorbDamage(int) : int
+        +isExhausted() : bool
+    }
+
+    class RegenEffect {
+        - m_healPerTick : int
+        +isBuff() : bool
+        +onTick(Unit) : string
+    }
+
+    IStatusEffect <|.. StatusEffectBase
+    StatusEffectBase <|-- BurnEffect
+    StatusEffectBase <|-- SlowEffect
+    StatusEffectBase <|-- ShieldEffect
+    StatusEffectBase <|-- RegenEffect

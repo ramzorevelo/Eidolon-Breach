@@ -1,0 +1,116 @@
+---
+title: Battle and Event System
+---
+classDiagram
+    direction TB
+
+    class Battle {
+        - m_playerParty : Party
+        - m_enemyParty : Party
+        - m_turnCalc : unique_ptr~ITurnOrderCalculator~
+        +run(BattleState) : BattleOutcome
+        -processPlayerTurn(PlayableCharacter, BattleState) : void
+        -processEnemyTurn(Enemy, BattleState) : void
+        -applyResonanceTrigger(Affinity, BattleState) : void
+    }
+
+    class BattleState {
+        + playerParty : Party*
+        + enemyParty : Party*
+        + turnNumber : int
+        + resonanceField : ResonanceField
+        + input : IInputHandler
+        + renderer : IRenderer
+        + eventBus : EventBus
+        + runContext : RunContext
+    }
+
+    class EventBus {
+        - m_handlers : unordered_map~type_index, vector~HandlerEntry~~
+        +subscribe(Handler, EventScope) : void
+        +emit(EventT) : void
+        +clearBattleScope() : void
+        +clearRunScope() : void
+    }
+
+    class EventScope {
+        <<enumeration>>
+        Battle
+        Run
+    }
+
+    class UnitDefeatedEvent {
+        + defeated : Unit*
+        + killer : Unit*
+        + state : BattleState*
+    }
+
+    class BreakTriggeredEvent {
+        + broken : Enemy*
+        + affinity : Affinity
+        + state : BattleState*
+    }
+
+    class ResonanceFieldTriggeredEvent {
+        + triggeredAffinity : Affinity
+        + state : BattleState*
+    }
+
+    class ExposureThresholdEvent {
+        + character : PlayableCharacter*
+        + threshold : int
+        + state : BattleState*
+    }
+
+    class AchievementSystem {
+        +AchievementSystem(EventBus)
+    }
+
+    class IVestige {
+        <<interface>>
+        +onBattleStart(Battle, BattleState)* : void
+        +onTurnStart(PlayableCharacter, BattleState)* : void
+        +onAction(PlayableCharacter, ActionResult, BattleState)* : void
+        +onBattleEnd(BattleState)* : void
+    }
+
+    class AttunistGambitVestige {
+        - m_exposureReducedThisBattle : bool
+        +onBattleStart(Battle, BattleState) : void
+    }
+
+    class EchoingStrikeVestige {
+        - m_nextActionFree : bool
+        +onBattleStart(Battle, BattleState) : void
+        +onAction(PlayableCharacter, ActionResult, BattleState) : void
+    }
+
+    class ResonantSurgeVestige {
+        +onBattleStart(Battle, BattleState) : void
+    }
+
+    class ITurnOrderCalculator {
+        <<interface>>
+        +calculate(Party, Party)* : vector~TurnSlot~
+    }
+
+    class SpeedBasedTurnOrderCalculator {
+        +calculate(Party, Party) : vector~TurnSlot~
+    }
+
+    Battle ..> BattleState
+    BattleState --> EventBus
+    EventBus --> EventScope
+    Battle ..> UnitDefeatedEvent
+    Battle ..> BreakTriggeredEvent
+    Battle ..> ResonanceFieldTriggeredEvent
+    Battle ..> ExposureThresholdEvent
+    AchievementSystem --> EventBus
+    IVestige <|.. AttunistGambitVestige
+    IVestige <|.. EchoingStrikeVestige
+    IVestige <|.. ResonantSurgeVestige
+    AttunistGambitVestige --> EventBus
+    EchoingStrikeVestige --> EventBus
+    ResonantSurgeVestige --> EventBus
+    Battle *-- ITurnOrderCalculator
+    ITurnOrderCalculator <|.. SpeedBasedTurnOrderCalculator

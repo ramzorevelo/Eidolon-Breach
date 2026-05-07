@@ -1,0 +1,29 @@
+---
+title: EventBus - Vestige Subscription Lifecycle
+---
+sequenceDiagram
+    autonumber
+    participant Battle
+    participant EventBus
+    participant vestige as vestige : AttunistGambitVestige
+    participant echoing as echoing : EchoingStrikeVestige
+    participant AchievementSystem
+
+    Battle ->> vestige: onBattleStart(battle, state)
+    vestige ->> EventBus: subscribe(UnitDefeatedEvent handler, Battle scope)
+
+    Battle ->> echoing: onBattleStart(battle, state)
+    echoing ->> EventBus: subscribe(ResonanceFieldTriggeredEvent handler, Battle scope)
+
+    AchievementSystem ->> EventBus: subscribe(UnitDefeatedEvent handler, Run scope)
+    AchievementSystem ->> EventBus: subscribe(BreakTriggeredEvent handler, Run scope)
+
+    Battle ->> EventBus: emit(UnitDefeatedEvent)
+    EventBus ->> vestige: handler(UnitDefeatedEvent)
+    EventBus ->> AchievementSystem: handler(UnitDefeatedEvent)
+
+    Battle ->> EventBus: emit(ResonanceFieldTriggeredEvent)
+    EventBus ->> echoing: handler(ResonanceFieldTriggeredEvent)
+
+    Battle ->> EventBus: clearBattleScope()
+    Note over EventBus: Battle-scoped handlers removed. Run-scoped handlers survive.

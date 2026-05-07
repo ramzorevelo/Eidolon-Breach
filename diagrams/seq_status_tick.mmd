@@ -1,0 +1,32 @@
+---
+title: Status Effect Tick Lifecycle
+---
+sequenceDiagram
+    autonumber
+    participant Battle
+    participant target as target : Unit
+    participant base as base : StatusEffectBase
+    participant burn as burn : BurnEffect
+    participant slow as slow : SlowEffect
+
+    Battle ->> target: tickEffects()
+
+    loop for each active effect
+        target ->> base: onTick(owner)
+
+        alt BurnEffect
+            base ->> burn: onTick(owner)
+            burn ->> target: takeTrueDamage(m_damagePerTick)
+            burn -->> target: string message
+        else SlowEffect
+            base ->> slow: onTick(owner)
+            slow -->> target: empty string
+        end
+
+        target ->> base: extendDuration(-1)
+    end
+
+    target ->> target: erase exhausted and zero-duration effects
+    target ->> target: rebuildTagCache()
+    target -->> Battle: vector~string~ tickMessages
+    Battle ->> IRenderer: renderMessage(message)

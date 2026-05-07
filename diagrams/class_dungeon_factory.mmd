@@ -1,0 +1,126 @@
+---
+title: Dungeon and Factory Systems
+---
+classDiagram
+    direction TB
+
+    class EnemyRegistry {
+        - m_blueprints : unordered_map~string, EnemyBlueprint~
+        +loadFromJson(string) : void
+        +create(string_view) : unique_ptr~Enemy~
+        +contains(string_view) : bool
+        -instantiate(EnemyBlueprint) : unique_ptr~Enemy~
+    }
+
+    class EnemyBlueprint {
+        + id : string
+        + name : string
+        + enemyType : string
+        + maxHp : int
+        + maxToughness : int
+        + affinity : string
+    }
+
+    class Enemy {
+        <<abstract>>
+    }
+
+    class Slime
+    class StoneGolem
+    class VampireBat
+
+    class AbilityRegistry {
+        - m_factories : unordered_map~string, Factory~
+        +registerAbility(string, Factory) : void
+        +create(string_view) : unique_ptr~IAction~
+        +contains(string_view) : bool
+    }
+
+    class CharacterRegistry {
+        - m_blueprints : unordered_map~string, CharacterBlueprint~
+        - m_abilityRegistry : AbilityRegistry*
+        +loadFromJson(string, AbilityRegistry) : void
+        +create(string_view, int) : unique_ptr~PlayableCharacter~
+        +getIds() : vector~string~
+    }
+
+    class DungeonBuilder {
+        - m_rng : mt19937
+        - m_seed : int
+        - m_enemyRegistry : EnemyRegistry
+        - m_encounterTable : EncounterTable
+        +buildFloor(int) : vector~unique_ptr~MapNode~~
+    }
+
+    class MapNode {
+        <<abstract>>
+        +enter(Party, MetaProgress, RunContext, EventBus, IRenderer, IInputHandler)* : void
+        +description()* : string
+    }
+
+    class BattleNode {
+        - m_enemyFactory : function~void(Party)~
+        +enter(Party, MetaProgress, RunContext, EventBus, IRenderer, IInputHandler) : void
+    }
+
+    class EliteNode {
+        - m_enemyFactory : function~void(Party)~
+        +enter(Party, MetaProgress, RunContext, EventBus, IRenderer, IInputHandler) : void
+    }
+
+    class BossNode {
+        - m_enemyFactory : function~void(Party)~
+        +enter(Party, MetaProgress, RunContext, EventBus, IRenderer, IInputHandler) : void
+    }
+
+    class RestNode {
+        +enter(Party, MetaProgress, RunContext, EventBus, IRenderer, IInputHandler) : void
+    }
+
+    class TreasureNode {
+        +enter(Party, MetaProgress, RunContext, EventBus, IRenderer, IInputHandler) : void
+    }
+
+    class ShopNode {
+        +enter(Party, MetaProgress, RunContext, EventBus, IRenderer, IInputHandler) : void
+    }
+
+    class EncounterTable {
+        - m_standard : vector~EncounterGroup~
+        - m_elite : vector~EncounterGroup~
+        - m_boss : vector~EncounterGroup~
+        +loadFromJson(string, EnemyRegistry) : void
+        +getFactory(Tier, mt19937) : function~void(Party)~
+    }
+
+    class Dungeon {
+        - m_enemyRegistry : EnemyRegistry
+        - m_characterRegistry : CharacterRegistry
+        - m_encounterTable : EncounterTable
+        - m_eventBus : EventBus
+        +run(Party, MetaProgress) : void
+    }
+
+    EnemyRegistry *-- EnemyBlueprint
+    EnemyRegistry ..> Enemy
+    EnemyRegistry ..> Slime
+    EnemyRegistry ..> StoneGolem
+    EnemyRegistry ..> VampireBat
+    Enemy <|-- Slime
+    Enemy <|-- StoneGolem
+    Enemy <|-- VampireBat
+    AbilityRegistry ..> IAction
+    CharacterRegistry --> AbilityRegistry
+    CharacterRegistry ..> PlayableCharacter
+    DungeonBuilder ..> MapNode
+    DungeonBuilder --> EncounterTable
+    MapNode <|-- BattleNode
+    MapNode <|-- EliteNode
+    MapNode <|-- BossNode
+    MapNode <|-- RestNode
+    MapNode <|-- TreasureNode
+    MapNode <|-- ShopNode
+    Dungeon *-- EnemyRegistry
+    Dungeon *-- CharacterRegistry
+    Dungeon *-- EncounterTable
+    Dungeon ..> DungeonBuilder

@@ -1,0 +1,103 @@
+---
+title: Entity System - Unit Hierarchy
+---
+classDiagram
+    direction TB
+
+    class Unit {
+        <<abstract>>
+        - m_id : string
+        - m_name : string
+        - m_stats : Stats
+        - m_affinity : Affinity
+        - m_effects : vector~unique_ptr~IStatusEffect~~
+        - m_activeTags : uint32_t
+        +getId() : string
+        +getName() : string
+        +getFinalStats() : Stats
+        +isAlive() : bool
+        +takeDamage(int) : void
+        +takeTrueDamage(int) : void
+        +heal(int) : void
+        +addEffect(unique_ptr~IStatusEffect~) : void
+        +tickEffects() : vector~string~
+        +hasEffect(string_view) : bool
+        +hasEffectWithTag(string_view) : bool
+        +takeTurn(Party, Party, BattleState)* : void
+    }
+
+    class Stats {
+        + hp : int
+        + maxHp : int
+        + atk : int
+        + def : int
+        + spd : int
+    }
+
+    class ResourceStats {
+        + energy : int
+        + maxEnergy : int
+    }
+
+    class PlayableCharacter {
+        - m_resources : ResourceStats
+        - m_equippedSkills : EquippedSkillSet
+        - m_exposure : int
+        - m_archetype : string
+        - m_abilities : vector~unique_ptr~IAction~~
+        +getEnergy() : int
+        +getExposure() : int
+        +modifyExposure(int) : void
+        +isUltimateReady() : bool
+        +addAbility(unique_ptr~IAction~) : void
+        +takeTurn(Party, Party, BattleState) : void
+    }
+
+    class Enemy {
+        - m_currentToughness : int
+        - m_maxToughness : int
+        - m_broken : bool
+        - m_affinityModifiers : map~Affinity,float~
+        - m_ai : unique_ptr~IAIStrategy~
+        +applyToughnessHit(float, Affinity) : void
+        +isBroken() : bool
+        +getAffinityModifier(Affinity) : float
+        +takeTurn(Party, Party, BattleState) : void
+    }
+
+    class Summon {
+        - m_summoner_atk : int
+        - m_turnsRemaining : int
+        +isExpired() : bool
+        +takeTurn(Party, Party, BattleState) : void
+    }
+
+    class IAIStrategy {
+        <<interface>>
+        +decide(Unit, Party)* : AIDecision
+    }
+
+    class BasicAIStrategy {
+        +decide(Unit, Party) : AIDecision
+    }
+
+    class Party {
+        - m_units : vector~unique_ptr~Unit~~
+        - m_resources : PartyResources
+        - m_vestiges : vector~unique_ptr~IVestige~~
+        +addUnit(unique_ptr~Unit~) : void
+        +removeUnit(string_view) : void
+        +getUnitAt(size_t) : Unit*
+        +allDefeated() : bool
+        +getSp() : int
+        +gainSp(int) : void
+    }
+
+    Unit <|-- PlayableCharacter
+    Unit <|-- Enemy
+    Unit <|-- Summon
+    Unit *-- Stats
+    PlayableCharacter *-- ResourceStats
+    Enemy *-- IAIStrategy
+    IAIStrategy <|.. BasicAIStrategy
+    Party *-- Unit

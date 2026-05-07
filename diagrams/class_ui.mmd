@@ -1,0 +1,67 @@
+---
+title: UI Abstraction - IRenderer and IInputHandler
+---
+classDiagram
+    direction LR
+
+    class IRenderer {
+        <<interface>>
+        +renderPartyStatus(Party, Party)* : void
+        +renderActionMenu(PlayableCharacter, Party)* : void
+        +renderMessage(string)* : void
+        +renderResonanceField(ResonanceField)* : void
+        +renderTurnOrder(vector~TurnSlot~)* : void
+        +renderActionResult(string, ActionResult)* : void
+        +renderBreak(string)* : void
+        +renderVictory(string, Drop)* : void
+        +renderDefeat(string)* : void
+        +renderSelectionMenu(string, vector~string~, size_t)* : void
+        +updateTargetHighlight(int)* : void
+        +clearTargetHighlight()* : void
+        +presentPause(int)* : void
+    }
+
+    class SDL3Renderer {
+        - m_window : SDL_Window*
+        - m_renderer : SDL_Renderer*
+        - m_font : TTF_Font*
+        - m_log : vector~string~
+        +renderPartyStatus(Party, Party) : void
+        +renderActionMenu(PlayableCharacter, Party) : void
+        +renderMessage(string) : void
+        -redrawAll() : void
+    }
+
+    class NullRenderer {
+        +renderPartyStatus(Party, Party) : void
+        +renderActionMenu(PlayableCharacter, Party) : void
+        +renderMessage(string) : void
+    }
+
+    class IInputHandler {
+        <<interface>>
+        +getActionChoice(size_t)* : size_t
+        +getTargetChoice(size_t)* : size_t
+        +getMenuChoice(size_t)* : size_t
+    }
+
+    class SDL3InputHandler {
+        - m_renderer : IRenderer
+        - m_menuOptions : vector~string~
+        +getActionChoice(size_t) : size_t
+        +getTargetChoice(size_t) : size_t
+        +getMenuChoice(size_t) : size_t
+    }
+
+    class BattleState {
+        + renderer : IRenderer
+        + input : IInputHandler
+        + eventBus : EventBus
+    }
+
+    IRenderer <|.. SDL3Renderer
+    IRenderer <|.. NullRenderer
+    IInputHandler <|.. SDL3InputHandler
+    SDL3InputHandler --> IRenderer
+    BattleState --> IRenderer
+    BattleState --> IInputHandler

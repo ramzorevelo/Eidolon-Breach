@@ -1,0 +1,44 @@
+---
+title: Player Turn Execution
+---
+sequenceDiagram
+    autonumber
+    participant Battle
+    participant PC as PC : PlayableCharacter
+    participant IInputHandler
+    participant IAction
+    participant target as target : Unit
+    participant EventBus
+    participant IRenderer
+    participant vestige as vestige : IVestige
+
+    Battle ->> PC: takeTurn(allies, enemies, state)
+    PC ->> IInputHandler: getActionChoice(numActions)
+    IInputHandler -->> PC: slotIndex
+    PC ->> IInputHandler: getTargetChoice(numTargets)
+    IInputHandler -->> PC: targetIndex
+
+    PC ->> IAction: execute(user, allies, enemies, target)
+    IAction ->> target: takeDamage(amount)
+    IAction ->> target: applyToughnessHit(amount, affinity)
+    IAction -->> PC: ActionResult
+
+    PC ->> PC: gainEnergy(result.energyGained)
+    PC ->> PC: gainSp(result.spGained)
+
+    alt target HP reaches 0
+        Battle ->> EventBus: emit(UnitDefeatedEvent)
+        EventBus ->> vestige: handler(UnitDefeatedEvent)
+    end
+
+    Battle ->> Battle: resonanceField.addContribution(affinity, votes)
+
+    alt resonance gauge hits 100
+        Battle ->> EventBus: emit(ResonanceFieldTriggeredEvent)
+        EventBus ->> vestige: handler(ResonanceFieldTriggeredEvent)
+    end
+
+    Battle ->> IRenderer: renderMessage(result.logMessage)
+    Battle ->> IRenderer: renderPartyStatus(players, enemies)
+    Battle ->> IRenderer: renderTurnOrder(order)
+    Battle ->> vestige: onAction(activePC, result, state)
