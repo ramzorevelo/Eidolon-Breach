@@ -1,0 +1,40 @@
+name: Sync to organization
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4.2.2
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.ORG_SYNC_TOKEN }}
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Prepare org mirror branch
+        run: |
+          git checkout -b org-mirror
+          cp ORG_README.md README.md
+          git add README.md
+          git diff --staged --quiet || git commit -m "chore: use model README for org mirror"
+
+      - name: Push to org
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.ORG_SYNC_TOKEN }}
+          repository: BSCpE-2-Software-Design/Eidolon-Breach
+          branch: master
+          force: true
+          tags: false
