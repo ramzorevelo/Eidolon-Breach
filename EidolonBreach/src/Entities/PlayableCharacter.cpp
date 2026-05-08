@@ -117,6 +117,7 @@ std::optional<TargetInfo> PlayableCharacter::selectTarget(const Party &enemies,
     for (const auto &[idx, unit] : targets)
         names.push_back(unit->getName());
     renderer.renderTargetList(names, false);
+    renderer.renderHintBar("[Up/Down] Cycle  [Enter] Confirm  [Esc] Cancel  / click card");
 
     const std::size_t choice{input.getTargetChoice(targets.size())};
     if (choice == IInputHandler::kCancelChoice)
@@ -144,6 +145,7 @@ std::optional<TargetInfo> PlayableCharacter::selectAllyTarget(const Party &allie
     for (const auto &[idx, unit] : targets)
         names.push_back(unit->getName());
     renderer.renderTargetList(names, true);
+    renderer.renderHintBar("[Up/Down] Cycle  [Enter] Confirm  [Esc] Cancel  / click card");
 
     const std::size_t choice{input.getTargetChoice(targets.size())};
     if (choice == IInputHandler::kCancelChoice)

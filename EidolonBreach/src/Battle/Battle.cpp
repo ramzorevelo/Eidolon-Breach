@@ -23,6 +23,17 @@
 #include "Battle/StanceModifiers.h"
 #include "Characters/Lyra/Lyra.h"
 
+namespace
+{
+std::string buildHintString(const PlayableCharacter &pc)
+{
+    if (pc.isArchSkillUnlocked())
+        return "[Q] Basic  [E] Arch  [1][2] Skills  [R] Ultimate  [V] Vent";
+    return "[Q] Basic  [1][2] Skills  [R] Ultimate  [V] Vent";
+}
+} // namespace
+
+
 Battle::Battle(Party &playerParty,
                Party &enemyParty,
                IRenderer &renderer,
@@ -134,20 +145,7 @@ void Battle::runBattleLoop(BattleState &state)
                 processPlayerTurn(slot.unit, state);
             else
                 processEnemyTurn(slot.unit, state);
-
-            // Include any units summoned during this turn in the round.
-            for (std::size_t i{0}; i < m_playerParty.size(); ++i)
-            {
-                Unit *u{m_playerParty.getUnitAt(i)};
-                if (!u || !u->isAlive())
-                    continue;
-                const bool already{std::any_of(
-                    turnOrder.begin(), turnOrder.end(),
-                    [u](const TurnSlot &s)
-                    { return s.unit == u; })};
-                if (!already)
-                    turnOrder.push_back({u, true, i});
-            }
+            
 
             if (slot.unit->isSummon())
             {
@@ -168,10 +166,25 @@ void Battle::runBattleLoop(BattleState &state)
             if (checkAndHandleBattleEnd(state))
                 return;
 
-            // Update strip to show only remaining units this round.
-            const std::vector<TurnSlot> remaining{
+            // Build remaining strip from turnOrder plus any newly summoned units.
+            std::vector<TurnSlot> remaining{
                 turnOrder.begin() + static_cast<std::ptrdiff_t>(slotIdx) + 1,
                 turnOrder.end()};
+            for (std::size_t pi{0}; pi < m_playerParty.size(); ++pi)
+            {
+                Unit *u{m_playerParty.getUnitAt(pi)};
+                if (!u || !u->isAlive())
+                    continue;
+                const bool inOrder{std::any_of(
+                    turnOrder.begin(), turnOrder.end(),
+                    [u](const TurnSlot &s)
+                    { return s.unit == u; })};
+                if (!inOrder)
+                {
+                    remaining.push_back({u, true, pi});
+                    turnOrder.push_back({u, true, pi});
+                }
+            }
             m_renderer.renderTurnOrder(remaining);
 
             m_renderer.presentPause(slot.isPlayer ? 180 : 350);
@@ -230,7 +243,9 @@ void Battle::processPlayerTurn(Unit *unit, BattleState &state)
     auto enemyAliveBefore{snapshotAliveStates(m_enemyParty)};
     auto enemyBreaksBefore{snapshotBreakStates(m_enemyParty)};
 
-    // result is non-const so vestige onAction hooks can modify it.
+    if (pc)
+        m_renderer.renderHintBar(buildHintString(*pc));
+
     ActionResult result{unit->takeTurn(m_playerParty, m_enemyParty, state)};
     state.renderer.clearTargetHighlight(); 
 
@@ -308,6 +323,7 @@ void Battle::processPlayerTurn(Unit *unit, BattleState &state)
                                  affinityToString(triggered) + " triggered! <<");
     }
     m_renderer.renderResonanceField(state.resonanceField);
+    m_renderer.renderHintBar("");
 }
 
 void Battle::processEnemyTurn(Unit *unit, BattleState &state)
