@@ -18,6 +18,7 @@
 #include "Entities/Party.h"
 #include "Entities/PlayableCharacter.h"
 #include <stdexcept>
+#include <algorithm>
 #include <string>
 
 // Internal helpers 
@@ -169,6 +170,17 @@ void SDL3Renderer::redrawAll()
 
     drawLogPanel();
     drawHintBarPanel();
+    // RF trigger flash overlay.
+    if (SDL_GetTicks() < m_rfTriggerExpiry)
+    {
+        const SDL_Color tc{affinityColor(m_rfTriggerAffinity)};
+        fillRect({0.f, 0.f, static_cast<float>(m_windowWidth), static_cast<float>(m_windowHeight)},
+                 tc.r, tc.g, tc.b, 50);
+        renderTextEx(m_fontLarge, "RESONANCE TRIGGER",
+                     static_cast<float>(m_windowWidth) * 0.3f,
+                     static_cast<float>(m_windowHeight) * 0.45f,
+                     tc.r, tc.g, tc.b);
+    }
 
     SDL_RenderPresent(m_renderer);
 }
@@ -451,8 +463,12 @@ void SDL3Renderer::drawLogPanel()
 
     for (int i = start; i < total && ly + lineH <= m_logPanel.y + m_logPanel.h; ++i)
     {
+        // Distance from the newest entry: 0 = newest, grows toward older.
+        const int age = total - 1 - i;
+        // Newest line: 210. Each step older loses 25, floor at 70.
+        const Uint8 c = static_cast<Uint8>(std::max(70, 210 - age * 25));
         renderText(m_log[static_cast<std::size_t>(i)],
-                   m_logPanel.x + 6.f, ly, 200, 200, 200);
+                   m_logPanel.x + 6.f, ly, c, c, c);
         ly += lineH;
     }
 }
@@ -530,10 +546,19 @@ void SDL3Renderer::renderPartyStatus(const Party &playerParty, const Party &enem
 
 void SDL3Renderer::renderResonanceField(const ResonanceField &field)
 {
+    const int newGauge = field.getGauge();
+
+    // Detect RF trigger: gauge was >= 100 and just reset to 0.
+    if (m_cachedRfGauge >= 100 && newGauge == 0)
+    {
+        m_rfTriggerAffinity = field.getLeadingAffinity();
+        m_rfTriggerExpiry = SDL_GetTicks() + 700;
+    }
+    m_cachedRfGauge = newGauge;
+
     m_cachedResonanceField = &field;
     redrawAll();
 }
-
 void SDL3Renderer::renderActionMenu(const PlayableCharacter &character, const Party &party)
 {
     m_cachedActiveCharacter = &character;
@@ -553,6 +578,8 @@ void SDL3Renderer::renderMessage(const std::string &message)
     if (static_cast<int>(m_log.size()) > kMaxLogLines)
         m_log.erase(m_log.begin());
     m_logScrollOffset = 0;
+    m_logExpanded = false;
+    m_lastLogTime = SDL_GetTicks();
     redrawAll();
 }
 
@@ -692,8 +719,32 @@ void SDL3Renderer::clearBattleCache()
     m_cachedResonanceField = nullptr;
     m_cachedTurnOrder.clear();
     m_highlightedTargetIndex = -1;
+    m_logExpanded = false;
+    m_rfTriggerExpiry = 0;
+    m_cachedRfGauge = 0;
     redrawAll();
 }
+
+void SDL3Renderer::setLogScrollOffset(int delta)
+{
+    m_logScrollOffset = std::max(0,
+                                 std::min(m_logScrollOffset + delta,
+                                          static_cast<int>(m_log.size()) - 1));
+    redrawAll();
+}
+
+void SDL3Renderer::expandLog(bool expand)
+{
+    m_logExpanded = expand;
+    redrawAll();
+}
+
+bool SDL3Renderer::isLogScrollable() const
+{
+    const int visibleLines = static_cast<int>(m_logPanel.h / 18.f);
+    return static_cast<int>(m_log.size()) > visibleLines;
+}
+
 
 void SDL3Renderer::renderTextEx(TTF_Font *font, const std::string &text,
                                 float x, float y, Uint8 r, Uint8 g, Uint8 b)

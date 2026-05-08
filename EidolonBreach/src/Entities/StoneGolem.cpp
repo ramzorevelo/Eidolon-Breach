@@ -59,5 +59,5 @@ std::string StoneGolem::getIntentLabel() const
         return "";
     if ((m_turnCount + 1) % kGolemHeavySlamInterval == 0)
         return "use Heavy Slam";
-    return "Attacks";
+    return "Attack";
 }

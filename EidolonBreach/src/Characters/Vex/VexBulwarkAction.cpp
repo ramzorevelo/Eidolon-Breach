@@ -33,7 +33,7 @@ bool VexBulwarkAction::isAvailable(const PlayableCharacter &user,
     return user.canAffordSp(kSpCost, party);
 }
 
-ActionResult VexBulwarkAction::execute(PlayableCharacter &user,
+ActionResult VexBulwarkAction::execute(PlayableCharacter & /*user*/,
                                        Party &allies,
                                        Party & /*enemies*/,
                                        std::optional<TargetInfo> target)
@@ -52,7 +52,7 @@ ActionResult VexBulwarkAction::execute(PlayableCharacter &user,
     ActionResult result{ActionResult::Type::Skip, 0};
     result.spCost = kSpCost;
     result.actionAffinity = Affinity::Terra;
-    result.flavorText = user.getName() + " raises an earthen shield!";
+    result.flavorText = "raises an earthen shield on " + (t ? t->getName() : "ally");
     return result;
 }
 

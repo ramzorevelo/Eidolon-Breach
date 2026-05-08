@@ -53,6 +53,6 @@ std::string Slime::getIntentLabel() const
         return "";
     // Next turn's turn count will be m_turnCount + 1.
     if ((m_turnCount + 1) % kSlimeRegenInterval == 0)
-        return "regenerate";
-    return "Attacks";
+        return "Regenerate";
+    return "Attack";
 }

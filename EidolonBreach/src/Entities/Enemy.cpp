@@ -165,5 +165,5 @@ std::string Enemy::getIntentLabel() const
 {
     if (m_isBroken)
         return "";
-    return "attack";
+    return "Attack";
 }

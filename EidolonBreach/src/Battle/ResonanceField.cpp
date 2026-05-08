@@ -58,6 +58,11 @@ float ResonanceField::getVotes(Affinity affinity) const
     return (it != m_votes.end()) ? it->second : 0.0f;
 }
 
+Affinity ResonanceField::getLeadingAffinity() const
+{
+    return findDominantAffinity();
+}
+
 std::string ResonanceField::getVoteSummary() const
 {
     std::ostringstream oss{};

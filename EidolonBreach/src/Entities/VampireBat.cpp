@@ -80,5 +80,5 @@ std::string VampireBat::getIntentLabel() const
     if (m_bloodlessActive) return "";  
     if ((m_turnCount + 1) % kBatLifedrainInterval == 0)
         return "use Lifedrain";
-    return "attack";
+    return "Attack";
 }

@@ -97,6 +97,16 @@ void Battle::runBattleLoop(BattleState &state)
         auto turnOrder{m_turnOrderCalc->calculate(m_playerParty, m_enemyParty)};
         m_renderer.renderTurnOrder(turnOrder);
 
+        for (std::size_t i{0}; i < m_enemyParty.size(); ++i)
+        {
+            const Unit *u{m_enemyParty.getUnitAt(i)};
+            if (!u || !u->isAlive())
+                continue;
+            const std::string intent{u->getIntentLabel()};
+            if (!intent.empty())
+                m_renderer.renderMessage(u->getName() + " | " + intent);
+        }
+
         for (std::size_t slotIdx = 0; slotIdx < turnOrder.size(); ++slotIdx)
         {
             const TurnSlot &slot = turnOrder[slotIdx];
@@ -150,9 +160,7 @@ void Battle::runBattleLoop(BattleState &state)
                 turnOrder.end()};
             m_renderer.renderTurnOrder(remaining);
 
-            // Brief pause after non-player turns so actions are readable.
-            if (!slot.isPlayer)
-                m_renderer.presentPause(350);
+            m_renderer.presentPause(slot.isPlayer ? 180 : 350);
         }
     }
 }
@@ -167,27 +175,12 @@ bool Battle::checkAndHandleBattleEnd(BattleState &state)
     if (m_enemyParty.isAllDead())
     {
         collectDrops(state);
-        for (std::size_t i{0}; i < m_enemyParty.size(); ++i)
-        {
-            const Unit *u{m_enemyParty.getUnitAt(i)};
-            if (u && !u->isAlive())
-                m_renderer.renderVictory(u->getName(), std::nullopt);
-        }
         return true;
     }
     if (m_playerParty.isAllDead())
-    {
-        for (std::size_t i{0}; i < m_playerParty.size(); ++i)
-        {
-            const Unit *u{m_playerParty.getUnitAt(i)};
-            if (u && !u->isAlive())
-                m_renderer.renderDefeat(u->getName());
-        }
         return true;
-    }
     return false;
 }
-
 void Battle::processPlayerTurn(Unit *unit, BattleState &state)
 {
     if (!unit)
@@ -308,10 +301,6 @@ void Battle::processPlayerTurn(Unit *unit, BattleState &state)
 void Battle::processEnemyTurn(Unit *unit, BattleState &state)
 {
     auto playerAliveBefore{snapshotAliveStates(m_playerParty)};
-
-    const std::string intent{unit->getIntentLabel()};
-    if (!intent.empty())
-        m_renderer.renderMessage(">> " + unit->getName() + " will " + intent + " <<");
 
     const ActionResult result{unit->takeTurn(m_enemyParty, m_playerParty, state)};
 
@@ -570,6 +559,11 @@ void Battle::checkNewDeaths(const std::vector<bool> &aliveBefore,
         Unit *u{const_cast<Unit *>(party.getUnitAt(i))};
         if (!u || !aliveBefore[i] || u->isAlive())
             continue;
+        if (&party == &m_enemyParty)
+            state.renderer.renderVictory(u->getName(), std::nullopt);
+        else
+            state.renderer.renderDefeat(u->getName());
+        state.renderer.renderPartyStatus(m_playerParty, m_enemyParty);
         state.eventBus.emit(UnitDefeatedEvent{u, attacker, &state});
     }
 }
@@ -585,6 +579,8 @@ void Battle::processNewBreaks(const std::vector<bool> &before,
         if (!u || before[i] || !u->isBroken())
             continue;
 
+        if (!u->isAlive())
+            continue; // death message takes priority; skip break notification
         m_renderer.renderBreak(u->getName());
         state.eventBus.emit(BreakTriggeredEvent{
             dynamic_cast<Enemy *>(u), actionAffinity, &state});

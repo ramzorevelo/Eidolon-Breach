@@ -63,7 +63,8 @@ class ResonanceField
         return m_gauge;
     }
     float getVotes(Affinity affinity) const;
-
+    /** @return The affinity with the most votes. Lowest enum value breaks ties. */
+    [[nodiscard]] Affinity getLeadingAffinity() const;
   private:
     int m_gauge{0};
     std::map<Affinity, float> m_votes{};

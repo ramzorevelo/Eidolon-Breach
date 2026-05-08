@@ -58,6 +58,9 @@ class SDL3Renderer : public IRenderer
                              const std::vector<std::string> &options,
                              std::size_t selected = 0) override;
     void clearBattleCache();
+    void setLogScrollOffset(int delta);
+    void expandLog(bool expand);
+    [[nodiscard]] bool isLogScrollable() const;
   private:
     // SDL handles 
     SDL_Window *m_window{nullptr};
@@ -91,6 +94,13 @@ class SDL3Renderer : public IRenderer
     static constexpr int kMaxLogLines{64};
     std::vector<std::string> m_log{};
     int m_logScrollOffset{0};
+    bool m_logExpanded{false};
+    Uint64 m_lastLogTime{0};
+
+    // RF trigger overlay state.
+    Affinity m_rfTriggerAffinity{};
+    Uint64 m_rfTriggerExpiry{0};
+    int m_cachedRfGauge{0};
 
     // Core render loop 
     /**
