@@ -64,14 +64,14 @@ static AbilityRegistry buildAbilityRegistry()
 }
 
 /**
- * @brief Present a character selection menu and populate the player party.
- *        Auto-selects when available characters <= kMaxPlayerCharacters.
+ * @brief Multi-select character screen. Player toggles characters with Enter,
+ *        confirms the full party with Tab. Auto-selects when roster <= kMaxPlayerCharacters.
  */
 static void selectParty(Party &party,
                         const CharacterRegistry &characterRegistry,
                         const MetaProgress &meta,
-                        IRenderer &renderer,
-                        IInputHandler &input)
+                        SDL3Renderer &renderer,
+                        SDL3InputHandler &input)
 {
     std::vector<std::string> available{};
     for (const std::string &id : characterRegistry.getIds())
@@ -85,8 +85,9 @@ static void selectParty(Party &party,
         return;
     }
 
-    // Auto-select when there is no real choice to make.
-    if (available.size() <= static_cast<std::size_t>(CombatConstants::kMaxPlayerCharacters))
+    const std::size_t maxPick = static_cast<std::size_t>(CombatConstants::kMaxPlayerCharacters);
+
+    if (available.size() <= maxPick)
     {
         for (const std::string &id : available)
         {
@@ -100,7 +101,7 @@ static void selectParty(Party &party,
         return;
     }
 
-    // Build options list for the menu.
+    // Build display options showing stats per character.
     std::vector<std::string> options{};
     for (std::size_t i = 0; i < available.size(); ++i)
     {
@@ -114,17 +115,120 @@ static void selectParty(Party &party,
         options.push_back(pc->getName() + " [" + characterRegistry.getArchetype(available[i]) + "]" + "  Lv." + std::to_string(level) + "  HP:" + std::to_string(s.maxHp) + " ATK:" + std::to_string(s.atk) + " SPD:" + std::to_string(s.spd));
     }
 
-    input.setMenuContext("CHARACTER SELECT", options);
-    renderer.renderSelectionMenu("CHARACTER SELECT", options);
-    const std::size_t pick = input.getMenuChoice(options.size());
+    std::vector<bool> selected(available.size(), false);
+    std::size_t selectedCount{0};
+    std::size_t cursor{0};
 
-    const std::string &chosenId = available[pick];
-    const int level = meta.characterLevels.count(chosenId) > 0
-                          ? meta.characterLevels.at(chosenId)
-                          : 1;
-    auto pc = characterRegistry.create(chosenId, level);
-    if (pc)
-        party.addUnit(std::move(pc));
+    auto buildDisplayOptions = [&]() -> std::vector<std::string>
+    {
+        std::vector<std::string> display{};
+        for (std::size_t i = 0; i < options.size(); ++i)
+        {
+            const std::string prefix = selected[i] ? "[X] " : "[ ] ";
+            display.push_back(prefix + options[i]);
+        }
+        display.push_back("--- Confirm Party (" + std::to_string(selectedCount) + "/" + std::to_string(maxPick) + ") ---");
+        return display;
+    };
+
+    auto display = buildDisplayOptions();
+    input.setMenuContext("SELECT PARTY", display);
+    renderer.renderSelectionMenu("SELECT PARTY", display, cursor);
+
+    SDL_Event event{};
+    while (SDL_WaitEvent(&event))
+    {
+        if (event.type == SDL_EVENT_QUIT)
+            throw QuitException{};
+
+        if (event.type == SDL_EVENT_KEY_DOWN)
+        {
+            if (event.key.key == SDLK_UP && cursor > 0)
+            {
+                --cursor;
+                renderer.renderSelectionMenu("SELECT PARTY", display, cursor);
+            }
+            else if (event.key.key == SDLK_DOWN && cursor + 1 < display.size())
+            {
+                ++cursor;
+                renderer.renderSelectionMenu("SELECT PARTY", display, cursor);
+            }
+            else if (event.key.key == SDLK_RETURN || event.key.key == SDLK_KP_ENTER)
+            {
+                if (cursor < available.size())
+                {
+                    // Toggle character selection.
+                    if (selected[cursor])
+                    {
+                        selected[cursor] = false;
+                        --selectedCount;
+                    }
+                    else if (selectedCount < maxPick)
+                    {
+                        selected[cursor] = true;
+                        ++selectedCount;
+                    }
+                    display = buildDisplayOptions();
+                    input.setMenuContext("SELECT PARTY", display);
+                    renderer.renderSelectionMenu("SELECT PARTY", display, cursor);
+                }
+                else if (cursor == available.size() && selectedCount > 0)
+                {
+                    break; // Confirm selection.
+                }
+            }
+            else if (event.key.key == SDLK_TAB && selectedCount > 0)
+            {
+                break; // Tab confirms from anywhere.
+            }
+        }
+
+        if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN &&
+            event.button.button == SDL_BUTTON_LEFT)
+        {
+            const float firstRowY = static_cast<float>(renderer.getWindowHeight()) * 0.18f + 36.f;
+            const float rowH = 30.f;
+            const float fy = static_cast<float>(event.button.y);
+
+            if (fy >= firstRowY)
+            {
+                const int row = static_cast<int>((fy - firstRowY) / rowH);
+                if (row >= 0 && static_cast<std::size_t>(row) < available.size())
+                {
+                    cursor = static_cast<std::size_t>(row);
+                    if (selected[cursor])
+                    {
+                        selected[cursor] = false;
+                        --selectedCount;
+                    }
+                    else if (selectedCount < maxPick)
+                    {
+                        selected[cursor] = true;
+                        ++selectedCount;
+                    }
+                    display = buildDisplayOptions();
+                    input.setMenuContext("SELECT PARTY", display);
+                    renderer.renderSelectionMenu("SELECT PARTY", display, cursor);
+                }
+                else if (static_cast<std::size_t>(row) == available.size() && selectedCount > 0)
+                {
+                    break;
+                }
+            }
+        }
+    }
+
+    for (std::size_t i = 0; i < available.size(); ++i)
+    {
+        if (!selected[i])
+            continue;
+        const int level{meta.characterLevels.count(available[i]) > 0
+                            ? meta.characterLevels.at(available[i])
+                            : 1};
+        auto pc{characterRegistry.create(available[i], level)};
+        if (pc)
+            party.addUnit(std::move(pc));
+    }
 }
 
 int main()
