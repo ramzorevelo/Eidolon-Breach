@@ -745,6 +745,62 @@ bool SDL3Renderer::isLogScrollable() const
     return static_cast<int>(m_log.size()) > visibleLines;
 }
 
+int SDL3Renderer::getActionRowAt(int x, int y) const
+{
+    const float fx = static_cast<float>(x);
+    const float fy = static_cast<float>(y);
+
+    if (fx < m_actionMenu.x || fx > m_actionMenu.x + m_actionMenu.w)
+        return -1;
+
+    const float firstRowY = m_actionMenu.y + 22.f;
+    const float rowH = 20.f;
+
+    if (fy < firstRowY)
+        return -1;
+
+    const int row = static_cast<int>((fy - firstRowY) / rowH);
+    return (row >= 0 && row < 6) ? row : -1;
+}
+
+int SDL3Renderer::getUnitCardAt(int x, int y, bool isPlayerSide) const
+{
+    const SDL_FRect &panel = isPlayerSide ? m_playerPanel : m_enemyPanel;
+    const float fx = static_cast<float>(x);
+    const float fy = static_cast<float>(y);
+
+    if (fx < panel.x || fx > panel.x + panel.w)
+        return -1;
+    if (fy < panel.y || fy > panel.y + panel.h)
+        return -1;
+
+    // Approximate card height; each alive unit occupies roughly 60px.
+    const float cardH = 60.f;
+    const float firstCardY = panel.y + 8.f;
+
+    if (fy < firstCardY)
+        return -1;
+
+    const int card = static_cast<int>((fy - firstCardY) / cardH);
+    return card;
+}
+
+void SDL3Renderer::renderTooltip(const std::string &name, float hpFraction,
+                                 const std::string &effectSummary,
+                                 int screenX, int screenY)
+{
+    const float tx = static_cast<float>(screenX) + 12.f;
+    const float ty = static_cast<float>(screenY) - 40.f;
+    const float tw = 180.f;
+    const float th = 38.f;
+
+    fillRect({tx, ty, tw, th}, 30, 30, 50, 220);
+    renderText(name + "  HP:" + std::to_string(static_cast<int>(hpFraction * 100)) + "%",
+               tx + 4.f, ty + 2.f, 220, 220, 220);
+    if (!effectSummary.empty())
+        renderText(effectSummary, tx + 4.f, ty + 18.f, 180, 180, 200);
+}
+
 
 void SDL3Renderer::renderTextEx(TTF_Font *font, const std::string &text,
                                 float x, float y, Uint8 r, Uint8 g, Uint8 b)

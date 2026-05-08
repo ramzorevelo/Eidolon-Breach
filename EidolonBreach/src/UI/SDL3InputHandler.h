@@ -1,20 +1,21 @@
 #pragma once
 /**
  * @file SDL3InputHandler.h
- * @brief SDL3 keyboard implementation of IInputHandler.
- *        Blocks on SDL_WaitEvent until a valid key is pressed.
- *        Q/E/1/2/R/V map to action indices 0–5.
- *        Left/Right arrows map to target indices; Enter confirms.
+ * @brief SDL3 keyboard and mouse implementation of IInputHandler.
+ *        Blocks on SDL_WaitEvent until valid input arrives.
+ *        Keyboard: Q/E/1/2/R/V for actions; Up/Down for targets; Enter confirms.
+ *        Mouse: left-click on action rows or unit cards; right-click cancels;
+ *        scroll wheel controls log offset.
  */
 
 #include "UI/IInputHandler.h"
-#include "UI/IRenderer.h"
+#include "UI/SDL3Renderer.h"
 #include <cstddef>
 
 class SDL3InputHandler : public IInputHandler
 {
   public:
-    explicit SDL3InputHandler(IRenderer &renderer) : m_renderer{renderer} {}
+    explicit SDL3InputHandler(SDL3Renderer &renderer) : m_renderer{renderer} {}
 
     /**
      * @brief Block until the player presses a valid action key.
@@ -41,8 +42,9 @@ class SDL3InputHandler : public IInputHandler
         m_menuOptions = options;
     }
   private:
-    IRenderer &m_renderer;
+    SDL3Renderer &m_renderer;
     std::size_t m_bufferedActionIdx{std::numeric_limits<std::size_t>::max()};
+    int m_pendingTargetIdx{-1};
     std::string m_menuTitle{};
     std::vector<std::string> m_menuOptions{};
 };

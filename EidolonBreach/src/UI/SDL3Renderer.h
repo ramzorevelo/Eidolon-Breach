@@ -61,6 +61,18 @@ class SDL3Renderer : public IRenderer
     void setLogScrollOffset(int delta);
     void expandLog(bool expand);
     [[nodiscard]] bool isLogScrollable() const;
+    [[nodiscard]] int getActionRowAt(int x, int y) const;
+    [[nodiscard]] int getUnitCardAt(int x, int y, bool isPlayerSide) const;
+    void renderTooltip(const std::string &name, float hpFraction,
+                       const std::string &effectSummary, int screenX, int screenY);
+    [[nodiscard]] bool isHighlightingEnemies() const
+    {
+        return m_highlightingEnemies;
+    }
+    [[nodiscard]] int getWindowHeight() const
+    {
+        return m_windowHeight;
+    }
   private:
     // SDL handles 
     SDL_Window *m_window{nullptr};
