@@ -111,8 +111,6 @@ std::optional<TargetInfo> PlayableCharacter::selectTarget(const Party &enemies,
 
     if (targets.empty())
         return std::nullopt;
-    if (targets.size() == 1)
-        return TargetInfo{TargetInfo::Type::Enemy, targets[0].first};
 
     std::vector<std::string> names{};
     names.reserve(targets.size());
@@ -140,8 +138,6 @@ std::optional<TargetInfo> PlayableCharacter::selectAllyTarget(const Party &allie
 
     if (targets.empty())
         return std::nullopt;
-    if (targets.size() == 1)
-        return TargetInfo{TargetInfo::Type::Ally, targets[0].first};
 
     std::vector<std::string> names{};
     names.reserve(targets.size());

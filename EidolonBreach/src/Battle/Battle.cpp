@@ -135,6 +135,20 @@ void Battle::runBattleLoop(BattleState &state)
             else
                 processEnemyTurn(slot.unit, state);
 
+            // Include any units summoned during this turn in the round.
+            for (std::size_t i{0}; i < m_playerParty.size(); ++i)
+            {
+                Unit *u{m_playerParty.getUnitAt(i)};
+                if (!u || !u->isAlive())
+                    continue;
+                const bool already{std::any_of(
+                    turnOrder.begin(), turnOrder.end(),
+                    [u](const TurnSlot &s)
+                    { return s.unit == u; })};
+                if (!already)
+                    turnOrder.push_back({u, true, i});
+            }
+
             if (slot.unit->isSummon())
             {
                 auto *s{dynamic_cast<Summon *>(slot.unit)};
@@ -228,8 +242,6 @@ void Battle::processPlayerTurn(Unit *unit, BattleState &state)
             result.targetName = t->getName();
     }
 
-    // onAction fires after execute() but before result is processed.
-    // Vestiges may apply bonus toughness, refund SP, or modify exposureDelta here.
     if (pc)
     {
         for (auto &v : m_playerParty.getVestiges())

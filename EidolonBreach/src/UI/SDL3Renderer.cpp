@@ -455,7 +455,7 @@ void SDL3Renderer::drawLogPanel()
         return;
 
     const float lineH = 18.f;
-    const int visibleLines = static_cast<int>(m_logPanel.h / lineH);
+    const int visibleLines = static_cast<int>((m_logPanel.h - 4.f) / lineH);
     const int total = static_cast<int>(m_log.size());
     const int start = std::max(0, total - visibleLines - m_logScrollOffset);
 
@@ -741,7 +741,7 @@ void SDL3Renderer::expandLog(bool expand)
 
 bool SDL3Renderer::isLogScrollable() const
 {
-    const int visibleLines = static_cast<int>(m_logPanel.h / 18.f);
+    const int visibleLines = static_cast<int>((m_logPanel.h - 4.f) / 18.f);
     return static_cast<int>(m_log.size()) > visibleLines;
 }
 

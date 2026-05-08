@@ -30,6 +30,8 @@ std::size_t SDL3InputHandler::getActionChoice(std::size_t numActions)
 
         if (event.type == SDL_EVENT_KEY_DOWN)
         {
+            if (event.key.repeat)
+                continue;
             for (std::size_t i = 0; i < kNumActionKeys && i < numActions; ++i)
                 if (event.key.key == kActionKeys[i])
                     return i;
@@ -90,6 +92,8 @@ std::size_t SDL3InputHandler::getTargetChoice(std::size_t numTargets)
 
         if (event.type == SDL_EVENT_KEY_DOWN)
         {
+            if (event.key.repeat)
+                continue;
             if (event.key.key == SDLK_ESCAPE)
             {
                 m_renderer.clearTargetHighlight();
@@ -193,6 +197,8 @@ std::size_t SDL3InputHandler::getMenuChoice(std::size_t numOptions)
 
         if (event.type == SDL_EVENT_KEY_DOWN)
         {
+            if (event.key.repeat)
+                continue;
             switch (event.key.key)
             {
             case SDLK_UP:
