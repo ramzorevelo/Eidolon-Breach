@@ -774,15 +774,54 @@ int SDL3Renderer::getUnitCardAt(int x, int y, bool isPlayerSide) const
     if (fy < panel.y || fy > panel.y + panel.h)
         return -1;
 
-    // Approximate card height; each alive unit occupies roughly 60px.
-    const float cardH = 60.f;
-    const float firstCardY = panel.y + 8.f;
+    const float nameH = 18.f;
+    const float barH = 6.f;
+    const float thinH = 4.f;
+    const float gapH = 4.f;
 
-    if (fy < firstCardY)
+    const Party *party = isPlayerSide ? m_cachedPlayerParty : m_cachedEnemyParty;
+    if (!party)
         return -1;
 
-    const int card = static_cast<int>((fy - firstCardY) / cardH);
-    return card;
+    float cardY = panel.y + 8.f;
+    int aliveIdx = 0;
+
+    for (std::size_t i = 0; i < party->size(); ++i)
+    {
+        const Unit *u = party->getUnitAt(i);
+        if (!u)
+            continue;
+
+        if (!u->isAlive())
+        {
+            cardY += nameH + 10.f;
+            continue;
+        }
+
+        float cardBottom = cardY + nameH + barH + gapH;
+
+        if (isPlayerSide)
+        {
+            const bool isActive = (m_cachedActiveCharacter && u == m_cachedActiveCharacter);
+            const auto *pc = dynamic_cast<const PlayableCharacter *>(u);
+            if (pc && isActive)
+                cardBottom += thinH + gapH + thinH;
+            else if (pc)
+                cardBottom += thinH;
+        }
+        else
+        {
+            cardBottom += thinH;
+        }
+        cardBottom += 10.f;
+
+        if (fy >= cardY && fy < cardBottom)
+            return aliveIdx;
+
+        cardY = cardBottom;
+        ++aliveIdx;
+    }
+    return -1;
 }
 
 void SDL3Renderer::renderTooltip(const std::string &name, float hpFraction,

@@ -199,6 +199,8 @@ std::size_t SDL3InputHandler::getMenuChoice(std::size_t numOptions)
         {
             if (event.key.repeat)
                 continue;
+            if (event.key.key == SDLK_ESCAPE)
+                return IInputHandler::kCancelChoice;
             switch (event.key.key)
             {
             case SDLK_UP:

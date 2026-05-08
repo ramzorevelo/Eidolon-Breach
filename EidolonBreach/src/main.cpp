@@ -87,20 +87,6 @@ static void selectParty(Party &party,
 
     const std::size_t maxPick = static_cast<std::size_t>(CombatConstants::kMaxPlayerCharacters);
 
-    if (available.size() <= maxPick)
-    {
-        for (const std::string &id : available)
-        {
-            const int level{meta.characterLevels.count(id) > 0
-                                ? meta.characterLevels.at(id)
-                                : 1};
-            auto pc{characterRegistry.create(id, level)};
-            if (pc)
-                party.addUnit(std::move(pc));
-        }
-        return;
-    }
-
     // Build display options showing stats per character.
     std::vector<std::string> options{};
     for (std::size_t i = 0; i < available.size(); ++i)
@@ -181,6 +167,12 @@ static void selectParty(Party &party,
             {
                 break; // Tab confirms from anywhere.
             }
+            else if (event.key.key == SDLK_ESCAPE)
+            {
+                // Clear party to signal back navigation.
+                party = Party{};
+                return;
+            }
         }
 
         if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN &&
@@ -252,87 +244,115 @@ int main()
     for (const std::string &id : characterRegistry.getIds())
         std::ignore = meta.unlockCharacter(id);
 
-    // Party
-    Party playerParty{};
-    playerParty.gainSp(50);
-
     try
     {
-    selectParty(playerParty, characterRegistry, meta, renderer, input);
-
-    if (playerParty.size() == 0)
-    {
-        renderer.renderMessage("No characters selected. Exiting.");
-        renderer.presentPause(1000);
-        return 0;
-    }
-
-    renderer.renderMessage("Starting run with " + std::to_string(playerParty.size()) + " character(s).");
-
-    // Run seed
-    const std::uint32_t seed{static_cast<std::uint32_t>(std::random_device{}())};
-    renderer.renderMessage("Run seed: " + std::to_string(seed));
-    renderer.presentPause(600);
-
-    // Mode selection
-    const std::vector<std::string> modeOptions{
-        "Classic",
-        "Eidolon Labyrinth"};
-    input.setMenuContext("SELECT MODE", modeOptions);
-    renderer.renderSelectionMenu("SELECT MODE", modeOptions);
-    const std::size_t modeChoice = input.getMenuChoice(modeOptions.size());
-    const RunMode runMode{modeChoice == 1
-                              ? RunMode::EidolonLabyrinth
-                              : RunMode::Classic};
-
-    Dungeon dungeon{};
-    const DungeonDefinition *selectedDungeon{nullptr};
-
-    if (runMode == RunMode::Classic)
-    {
-        // Build list of available dungeons.
-        const auto &classicDungeons{DungeonTable::getClassicDungeons()};
-
-        std::vector<const DungeonDefinition *> available{};
-        bool previousCleared{true};
-        for (const auto &def : classicDungeons)
+        enum class MenuStage
         {
-            const bool levelMet{meta.playerLevel >= def.unlockPlayerLevel};
-            if (levelMet && previousCleared)
-                available.push_back(&def);
-            previousCleared = meta.clearedDungeonIds.count(def.id) > 0;
-        }
-        if (available.empty())
-            available.push_back(&classicDungeons.front());
+            Mode,
+            Dungeon,
+            Party,
+            Ready
+        };
+        MenuStage stage{MenuStage::Mode};
+        MenuStage partyBackStage{MenuStage::Mode};
+        RunMode runMode{RunMode::Classic};
+        const DungeonDefinition *selectedDungeon{nullptr};
+        Party playerParty{};
 
-        // Build options for dungeon select menu.
-        std::vector<std::string> dungeonOptions{};
-        for (const auto *def : available)
+        while (stage != MenuStage::Ready)
         {
-            const bool cleared{meta.clearedDungeonIds.count(def->id) > 0};
-            const int displayFloors{def->fixedLayout.empty()
-                                        ? def->numFloors
-                                        : static_cast<int>(def->fixedLayout.size())};
-            dungeonOptions.push_back(
-                def->name + "  Rec.Lv." + std::to_string(def->recommendedPlayerLevel) + " | EnemyLv." + std::to_string(def->enemyLevel) + " | " + std::to_string(displayFloors) + " floors" + (cleared ? " [CLEARED]" : ""));
+            switch (stage)
+            {
+            case MenuStage::Mode:
+            {
+                const std::vector<std::string> modeOptions{"Classic", "Eidolon Labyrinth"};
+                input.setMenuContext("SELECT MODE", modeOptions);
+                renderer.renderSelectionMenu("SELECT MODE", modeOptions);
+                const std::size_t modeChoice = input.getMenuChoice(modeOptions.size());
+                if (modeChoice == IInputHandler::kCancelChoice)
+                    break;
+                runMode = (modeChoice == 1) ? RunMode::EidolonLabyrinth : RunMode::Classic;
+                stage = MenuStage::Dungeon;
+                break;
+            }
+            case MenuStage::Dungeon:
+            {
+                if (runMode == RunMode::Classic)
+                {
+                    const auto &classicDungeons{DungeonTable::getClassicDungeons()};
+                    std::vector<const DungeonDefinition *> available{};
+                    bool previousCleared{true};
+                    for (const auto &def : classicDungeons)
+                    {
+                        const bool levelMet{meta.playerLevel >= def.unlockPlayerLevel};
+                        if (levelMet && previousCleared)
+                            available.push_back(&def);
+                        previousCleared = meta.clearedDungeonIds.count(def.id) > 0;
+                    }
+                    if (available.empty())
+                        available.push_back(&classicDungeons.front());
+
+                    std::vector<std::string> dungeonOptions{};
+                    for (const auto *def : available)
+                    {
+                        const int displayFloors{def->fixedLayout.empty()
+                                                    ? def->numFloors
+                                                    : static_cast<int>(def->fixedLayout.size())};
+                        dungeonOptions.push_back(
+                            def->name + "  Rec.Lv." + std::to_string(def->recommendedPlayerLevel) + " | EnemyLv." + std::to_string(def->enemyLevel) + " | " + std::to_string(displayFloors) + " floors" + (meta.clearedDungeonIds.count(def->id) > 0 ? " [CLEARED]" : ""));
+                    }
+                    dungeonOptions.push_back("<< Back");
+
+                    const std::string dungeonTitle =
+                        "DUNGEON SELECT  Player Lv." + std::to_string(meta.playerLevel);
+                    input.setMenuContext(dungeonTitle, dungeonOptions);
+                    renderer.renderSelectionMenu(dungeonTitle, dungeonOptions);
+                    const std::size_t dungeonPick = input.getMenuChoice(dungeonOptions.size());
+
+                    if (dungeonPick == IInputHandler::kCancelChoice ||
+                        dungeonPick == dungeonOptions.size() - 1)
+                    {
+                        stage = MenuStage::Mode;
+                        break;
+                    }
+                    selectedDungeon = available[dungeonPick];
+                    partyBackStage = MenuStage::Dungeon;
+                }
+                else
+                {
+                    selectedDungeon = &DungeonTable::getClassicDungeons().front();
+                    renderer.renderMessage(
+                        "Eidolon Labyrinth: no XP earned. Attune available at Rest sites.");
+                    renderer.presentPause(600);
+                    partyBackStage = MenuStage::Mode;
+                }
+                stage = MenuStage::Party;
+                break;
+            }
+            case MenuStage::Party:
+            {
+                playerParty = Party{};
+                playerParty.gainSp(50);
+                selectParty(playerParty, characterRegistry, meta, renderer, input);
+                if (playerParty.size() == 0)
+                {
+                    stage = partyBackStage;
+                    break;
+                }
+                stage = MenuStage::Ready;
+                break;
+            }
+            default:
+                break;
+            }
         }
 
-        const std::string dungeonTitle = "DUNGEON SELECT  Player Lv." + std::to_string(meta.playerLevel);
-        input.setMenuContext(dungeonTitle, dungeonOptions);
-        renderer.renderSelectionMenu(dungeonTitle, dungeonOptions);
-        const std::size_t dungeonPick = input.getMenuChoice(dungeonOptions.size());
-
-        selectedDungeon = available[dungeonPick];
-    }
-    else
-    {
-        selectedDungeon = &DungeonTable::getClassicDungeons().front();
-        renderer.renderMessage(
-            "Eidolon Labyrinth: no XP earned. Attune available at Rest sites.");
+        renderer.renderMessage("Starting run with " + std::to_string(playerParty.size()) + " character(s).");
+        const std::uint32_t seed{static_cast<std::uint32_t>(std::random_device{}())};
+        renderer.renderMessage("Run seed: " + std::to_string(seed));
         renderer.presentPause(600);
-    }
 
-   
+        Dungeon dungeon{};
         dungeon.generate(seed, *selectedDungeon, &summonRegistry, runMode);
         const bool won{dungeon.run(playerParty, meta, renderer, input)};
 
