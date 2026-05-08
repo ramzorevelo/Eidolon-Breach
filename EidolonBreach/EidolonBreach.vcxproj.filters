@@ -96,9 +96,6 @@
     <ClCompile Include="src\Entities\VampireBat.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
-    <ClCompile Include="src\UI\ConsoleRenderer.cpp">
-      <Filter>UI</Filter>
-    </ClCompile>
     <ClCompile Include="src\Battle\SpeedBasedTurnOrderCalculator.cpp">
       <Filter>Battle</Filter>
     </ClCompile>
@@ -119,9 +116,6 @@
     </ClCompile>
     <ClCompile Include="src\Battle\ResonanceField.cpp">
       <Filter>Battle</Filter>
-    </ClCompile>
-    <ClCompile Include="src\UI\ConsoleInputHandler.cpp">
-      <Filter>UI</Filter>
     </ClCompile>
     <ClCompile Include="src\Items\Inventory.cpp">
       <Filter>Items</Filter>
@@ -311,9 +305,6 @@
     <ClInclude Include="src\Entities\VampireBat.h">
       <Filter>Entities</Filter>
     </ClInclude>
-    <ClInclude Include="src\UI\ConsoleRenderer.h">
-      <Filter>UI</Filter>
-    </ClInclude>
     <ClInclude Include="src\Core\PartyResources.h">
       <Filter>Core</Filter>
     </ClInclude>
@@ -364,9 +355,6 @@
     </ClInclude>
     <ClInclude Include="src\Battle\ResonanceField.h">
       <Filter>Battle</Filter>
-    </ClInclude>
-    <ClInclude Include="src\UI\ConsoleInputHandler.h">
-      <Filter>UI</Filter>
     </ClInclude>
     <ClInclude Include="src\UI\IInputHandler.h">
       <Filter>UI</Filter>

@@ -497,8 +497,7 @@ void SDL3Renderer::renderText(const std::string &text, float x, float y,
     SDL_DestroyTexture(texture);
 }
 
-// ---- IRenderer implementation ----------------------------------------------
-// Each method: (1) update cached state, (2) call redrawAll().
+// Each render*() method updates cached state, then calls redrawAll().
 
 void SDL3Renderer::renderTurnOrder(const std::vector<TurnSlot> &order)
 {
