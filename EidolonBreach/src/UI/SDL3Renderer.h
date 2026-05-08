@@ -20,6 +20,7 @@ struct TurnSlot;
 class Party;
 class PlayableCharacter;
 class ResonanceField;
+enum class Affinity;
 
 class SDL3Renderer : public IRenderer
 {
@@ -123,6 +124,7 @@ class SDL3Renderer : public IRenderer
 
     int m_highlightedTargetIndex{-1}; // -1 = no active targeting
     bool m_highlightingEnemies{true}; // true = enemy panel, false = player panel
+    static SDL_Color affinityColor(Affinity a);
     TTF_Font *m_fontLarge{nullptr};   // used for full-screen selection menus
     void renderTextEx(TTF_Font *font, const std::string &text,
                       float x, float y, Uint8 r, Uint8 g, Uint8 b);

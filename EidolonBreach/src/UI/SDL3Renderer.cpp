@@ -24,29 +24,6 @@
 
 namespace
 {
-struct RGB
-{
-    Uint8 r, g, b;
-};
-
-RGB affinityColor(Affinity a)
-{
-    switch (a)
-    {
-    case Affinity::Blaze:
-        return {204, 85, 0};
-    case Affinity::Frost:
-        return {80, 180, 220};
-    case Affinity::Tempest:
-        return {160, 100, 220};
-    case Affinity::Terra:
-        return {80, 160, 60};
-    case Affinity::Aether:
-        return {200, 180, 255};
-    default:
-        return {180, 180, 180};
-    }
-}
 
 /// Truncate a string to maxChars, appending '~' if cut.
 std::string truncate(const std::string &s, std::size_t maxChars)
@@ -56,6 +33,25 @@ std::string truncate(const std::string &s, std::size_t maxChars)
     return s.substr(0, maxChars - 1) + "~";
 }
 } // namespace
+
+SDL_Color SDL3Renderer::affinityColor(Affinity a)
+{
+    switch (a)
+    {
+    case Affinity::Blaze:
+        return {232, 83, 26, 255};
+    case Affinity::Frost:
+        return {79, 195, 232, 255};
+    case Affinity::Tempest:
+        return {168, 232, 50, 255};
+    case Affinity::Terra:
+        return {200, 160, 50, 255};
+    case Affinity::Aether:
+        return {192, 150, 232, 255};
+    default:
+        return {180, 180, 180, 255};
+    }
+}
 
 // Construction / destruction 
 
@@ -199,13 +195,13 @@ void SDL3Renderer::drawTurnOrderStrip()
         const float badgeX = m_turnOrderPanel.x + static_cast<float>(i) * slotW + slotW * 0.05f;
         const float badgeW = slotW * 0.90f;
         const SDL_FRect badge{badgeX, badgeY, badgeW, badgeH};
-        const auto [r, g, b] = affinityColor(slot.unit->getAffinity());
+        const SDL_Color ac{affinityColor(slot.unit->getAffinity())};
 
         // Player units: full color. Enemies: dimmed to 40%.
         if (slot.isPlayer)
-            fillRect(badge, r, g, b);
+            fillRect(badge, ac.r, ac.g, ac.b);
         else
-            fillRect(badge, r * 2 / 5, g * 2 / 5, b * 2 / 5);
+            fillRect(badge, ac.r * 2 / 5, ac.g * 2 / 5, ac.b * 2 / 5);
 
         // Name initial(s) centered in badge.
         const std::string label = slot.unit->getName().substr(0, 1);
@@ -223,12 +219,12 @@ void SDL3Renderer::drawPlayerPanel()
     if (!m_cachedPlayerParty || !m_font)
         return;
 
+    const float barW = m_playerPanel.w - 12.f;
+    const float barX = m_playerPanel.x + 6.f;
     const float nameH = 18.f;
     const float barH = 6.f;
     const float thinH = 4.f;
     const float gapH = 4.f;
-    const float barW = m_playerPanel.w - 12.f;
-    const float barX = m_playerPanel.x + 6.f;
 
     float py = m_playerPanel.y + 8.f;
     int aliveIdx = 0;
@@ -241,41 +237,47 @@ void SDL3Renderer::drawPlayerPanel()
 
         const auto *pc = dynamic_cast<const PlayableCharacter *>(u);
         const bool highlighted = (!m_highlightingEnemies && m_highlightedTargetIndex == aliveIdx);
-        const auto [r, g, b] = affinityColor(u->getAffinity());
+        const bool isActive = (m_cachedActiveCharacter && u == m_cachedActiveCharacter);
+        const SDL_Color ac{affinityColor(u->getAffinity())};
 
         if (highlighted)
             fillRect({m_playerPanel.x, py, m_playerPanel.w, nameH}, 60, 80, 60, 255);
 
+        if (isActive)
+        {
+            // Left-edge accent strip for the active card.
+            fillRect({m_playerPanel.x, py, 3.f, nameH}, ac.r, ac.g, ac.b);
+        }
+
         if (u->isAlive())
         {
             const std::string nameStr = (highlighted ? "> " : "  ") + u->getName();
-            renderText(nameStr, barX, py, r, g, b);
+            renderText(nameStr, barX, py, ac.r, ac.g, ac.b);
             ++aliveIdx;
         }
         else
         {
             renderText("  " + u->getName() + " [KO]", barX, py, 80, 80, 80);
+            py += nameH + 10.f;
+            continue;
         }
         py += nameH;
 
-        if (!u->isAlive())
-            continue;
-
-        // HP bar.
+        // HP bar (always shown).
         const float hpFrac = (u->getMaxHp() > 0)
                                  ? static_cast<float>(u->getHp()) / static_cast<float>(u->getMaxHp())
                                  : 0.f;
         renderBar({barX, py, barW, barH}, hpFrac, 60, 190, 60, 70, 25, 25);
         py += barH + gapH;
 
-        if (pc)
+        if (pc && isActive)
         {
-            // Energy bar.
+            // Full detail: Energy bar.
             const float enFrac = static_cast<float>(pc->getEnergy()) / static_cast<float>(PlayableCharacter::kMaxEnergy);
             renderBar({barX, py, barW, thinH}, enFrac, 220, 180, 0, 45, 35, 0);
             py += thinH + gapH;
 
-            // Exposure bar.
+            // Full detail: Exposure bar.
             const float expFrac = static_cast<float>(pc->getExposure()) / static_cast<float>(PlayableCharacter::kMaxExposure);
             renderBar({barX, py, barW, thinH}, expFrac, 220, 75, 0, 35, 18, 0);
             py += thinH;
@@ -285,6 +287,13 @@ void SDL3Renderer::drawPlayerPanel()
                 renderText("[FRAC]", barX, py, 200, 40, 40);
                 py += 14.f;
             }
+        }
+        else if (pc)
+        {
+            // Compact: Exposure bar only.
+            const float expFrac = static_cast<float>(pc->getExposure()) / static_cast<float>(PlayableCharacter::kMaxExposure);
+            renderBar({barX, py, barW, thinH}, expFrac, 220, 75, 0, 35, 18, 0);
+            py += thinH;
         }
         py += 10.f;
     }
@@ -314,14 +323,14 @@ void SDL3Renderer::drawEnemyPanel()
             continue;
 
         const bool highlighted = (m_highlightingEnemies && m_highlightedTargetIndex == aliveIdx);
-        const auto [r, g, b] = affinityColor(u->getAffinity());
+        const SDL_Color ac{affinityColor(u->getAffinity())};
 
         // Draw highlight bar behind name
         if (highlighted)
             fillRect({m_enemyPanel.x, ey, m_enemyPanel.w, nameH}, 60, 60, 80, 255);
 
         const std::string nameStr = (highlighted ? "> " : "  ") + u->getName();
-        renderText(nameStr, barX, ey, r, g, b);
+        renderText(nameStr, barX, ey, ac.r, ac.g, ac.b);
         ey += nameH;
 
         // HP bar: red fill.
@@ -371,9 +380,9 @@ void SDL3Renderer::drawCenterPanel()
     {
         const float votes = static_cast<float>(m_cachedResonanceField->getVotes(a));
         const float maxVotes = 5.f;
-        const auto [r, g, b] = affinityColor(a);
+        const SDL_Color ac{affinityColor(a)};
         renderBar({m_centerPanel.x + 4.f, barY, barW, 5.f},
-                  votes / maxVotes, r, g, b, 28, 28, 38);
+                  votes / maxVotes, ac.r, ac.g, ac.b, 28, 28, 38);
         barY += 9.f;
     }
 }
@@ -410,10 +419,17 @@ void SDL3Renderer::drawActionMenuPanel()
 
         const bool available = action->isAvailable(*m_cachedActiveCharacter,
                                                    *m_cachedActiveParty);
-        const Uint8 brightness = available ? 220 : 70;
         const std::string row = "[" + kKeys[keyIdx] + "] " + action->label();
 
-        renderText(row, m_actionMenu.x + 6.f, rowY, brightness, brightness, brightness);
+        if (available)
+        {
+            const SDL_Color ac{affinityColor(m_cachedActiveCharacter->getAffinity())};
+            renderText(row, m_actionMenu.x + 6.f, rowY, ac.r, ac.g, ac.b);
+        }
+        else
+        {
+            renderText(row, m_actionMenu.x + 6.f, rowY, 70, 70, 70);
+        }
         rowY += rowH;
         ++keyIdx;
     }
