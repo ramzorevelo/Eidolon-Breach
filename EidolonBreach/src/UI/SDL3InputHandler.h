@@ -9,13 +9,17 @@
  */
 
 #include "UI/IInputHandler.h"
-#include "UI/SDL3Renderer.h"
+#include "UI/IRenderer.h"
+#include "UI/ILayoutQuery.h"
+#include <SDL3/SDL.h>
 #include <cstddef>
+#include <optional>
 
 class SDL3InputHandler : public IInputHandler
 {
   public:
-    explicit SDL3InputHandler(SDL3Renderer &renderer) : m_renderer{renderer} {}
+    explicit SDL3InputHandler(IRenderer &renderer, ILayoutQuery &layout)
+        : m_renderer{renderer}, m_layout{layout} {}
 
     /**
      * @brief Block until the player presses a valid action key.
@@ -42,9 +46,17 @@ class SDL3InputHandler : public IInputHandler
         m_menuOptions = options;
     }
   private:
-    SDL3Renderer &m_renderer;
+    IRenderer &m_renderer;
+    ILayoutQuery &m_layout;
     std::size_t m_bufferedActionIdx{std::numeric_limits<std::size_t>::max()};
     int m_pendingTargetIdx{-1};
     std::string m_menuTitle{};
     std::vector<std::string> m_menuOptions{};
+    void handleLogScroll(SDL_Keycode key);
+    [[nodiscard]] std::optional<std::size_t> handleTargetKey(
+        SDL_Keycode key, std::size_t &current, std::size_t numTargets);
+    [[nodiscard]] std::optional<std::size_t> handleTargetMouse(
+        const SDL_Event &e, std::size_t &current, std::size_t numTargets);
+    [[nodiscard]] std::optional<std::size_t> handleMenuKey(
+        SDL_Keycode key, std::size_t &current, std::size_t numOptions);
 };

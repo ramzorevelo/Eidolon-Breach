@@ -223,20 +223,114 @@ void SDL3Renderer::drawTurnOrderStrip()
                    255, 255, 255);
     }
 }
+void SDL3Renderer::drawPlayerCardBars(const PlayableCharacter *pc,
+                                      float barX, float barW, float &py, bool isActive)
+{
+    static constexpr float kThinH = 4.f;
+    static constexpr float kGapH = 4.f;
 
+    const float expFrac = static_cast<float>(pc->getExposure()) / static_cast<float>(PlayableCharacter::kMaxExposure);
+    if (isActive)
+    {
+        const float enFrac = static_cast<float>(pc->getEnergy()) / static_cast<float>(PlayableCharacter::kMaxEnergy);
+        renderBar({barX, py, barW, kThinH}, enFrac, 220, 180, 0, 45, 35, 0);
+        py += kThinH + kGapH;
+        renderBar({barX, py, barW, kThinH}, expFrac, 220, 75, 0, 35, 18, 0);
+        py += kThinH;
+        if (pc->isFractured())
+        {
+            renderText("[FRAC]", barX, py, 200, 40, 40);
+            py += 14.f;
+        }
+    }
+    else
+    {
+        renderBar({barX, py, barW, kThinH}, expFrac, 220, 75, 0, 35, 18, 0);
+        py += kThinH;
+    }
+}
+
+void SDL3Renderer::drawPlayerCard(const Unit *u, float &py, bool isActive, bool highlighted)
+{
+    static constexpr float kNameH = 18.f;
+    static constexpr float kBarH = 6.f;
+    static constexpr float kGapH = 4.f;
+    const float barW = m_playerPanel.w - 12.f;
+    const float barX = m_playerPanel.x + 6.f;
+    const SDL_Color ac{affinityColor(u->getAffinity())};
+
+    if (highlighted)
+        fillRect({m_playerPanel.x, py, m_playerPanel.w, kNameH}, 60, 80, 60, 255);
+    if (isActive)
+        fillRect({m_playerPanel.x, py, 3.f, kNameH}, ac.r, ac.g, ac.b);
+
+    if (!u->isAlive())
+    {
+        renderText("  " + u->getName() + " [KO]", barX, py, 80, 80, 80);
+        py += kNameH + 10.f;
+        return;
+    }
+
+    renderText((highlighted ? "> " : "  ") + u->getName(), barX, py, ac.r, ac.g, ac.b);
+    py += kNameH;
+
+    const float hpFrac = (u->getMaxHp() > 0)
+                             ? static_cast<float>(u->getHp()) / static_cast<float>(u->getMaxHp())
+                             : 0.f;
+    renderBar({barX, py, barW, kBarH}, hpFrac, 60, 190, 60, 70, 25, 25);
+    py += kBarH + kGapH;
+
+    if (const auto *pc = dynamic_cast<const PlayableCharacter *>(u))
+        drawPlayerCardBars(pc, barX, barW, py, isActive);
+
+    py += 10.f;
+}
+
+void SDL3Renderer::drawEnemyCard(const Unit *u, float &ey, bool highlighted)
+{
+    static constexpr float kNameH = 18.f;
+    static constexpr float kBarH = 6.f;
+    static constexpr float kThinH = 4.f;
+    static constexpr float kGapH = 4.f;
+    const float barW = m_enemyPanel.w - 12.f;
+    const float barX = m_enemyPanel.x + 6.f;
+    const SDL_Color ac{affinityColor(u->getAffinity())};
+
+    if (highlighted)
+        fillRect({m_enemyPanel.x, ey, m_enemyPanel.w, kNameH}, 60, 60, 80, 255);
+    renderText((highlighted ? "> " : "  ") + u->getName(), barX, ey, ac.r, ac.g, ac.b);
+    ey += kNameH;
+
+    const float hpFrac = (u->getMaxHp() > 0)
+                             ? static_cast<float>(u->getHp()) / static_cast<float>(u->getMaxHp())
+                             : 0.f;
+    renderBar({barX, ey, barW, kBarH}, hpFrac, 200, 55, 55, 70, 25, 25);
+    ey += kBarH + kGapH;
+
+    if (const auto *e = dynamic_cast<const Enemy *>(u))
+    {
+        const float tf = (e->getMaxToughness() > 0)
+                             ? static_cast<float>(e->getToughness()) / static_cast<float>(e->getMaxToughness())
+                             : 0.f;
+        const bool broken = e->isBroken();
+        renderBar({barX, ey, barW, kThinH}, tf,
+                  broken ? 255 : 210, broken ? 80 : 210, broken ? 0 : 210, 50, 50, 50);
+    }
+    ey += kThinH + 4.f;
+
+    const std::string intent{u->getIntentLabel()};
+    if (!intent.empty())
+    {
+        renderText(truncate(intent, 22), barX, ey, 190, 175, 100);
+        ey += 14.f;
+    }
+    ey += 6.f;
+}
 void SDL3Renderer::drawPlayerPanel()
 {
     fillRect(m_playerPanel, 22, 22, 32, 255);
-
     if (!m_cachedPlayerParty || !m_font)
         return;
-
-    const float barW = m_playerPanel.w - 12.f;
-    const float barX = m_playerPanel.x + 6.f;
-    const float nameH = 18.f;
-    const float barH = 6.f;
-    const float thinH = 4.f;
-    const float gapH = 4.f;
 
     float py = m_playerPanel.y + 8.f;
     int aliveIdx = 0;
@@ -246,128 +340,30 @@ void SDL3Renderer::drawPlayerPanel()
         const Unit *u = m_cachedPlayerParty->getUnitAt(i);
         if (!u)
             continue;
-
-        const auto *pc = dynamic_cast<const PlayableCharacter *>(u);
         const bool highlighted = (!m_highlightingEnemies && m_highlightedTargetIndex == aliveIdx);
         const bool isActive = (m_cachedActiveCharacter && u == m_cachedActiveCharacter);
-        const SDL_Color ac{affinityColor(u->getAffinity())};
-
-        if (highlighted)
-            fillRect({m_playerPanel.x, py, m_playerPanel.w, nameH}, 60, 80, 60, 255);
-
-        if (isActive)
-        {
-            // Left-edge accent strip for the active card.
-            fillRect({m_playerPanel.x, py, 3.f, nameH}, ac.r, ac.g, ac.b);
-        }
-
+        drawPlayerCard(u, py, isActive, highlighted);
         if (u->isAlive())
-        {
-            const std::string nameStr = (highlighted ? "> " : "  ") + u->getName();
-            renderText(nameStr, barX, py, ac.r, ac.g, ac.b);
             ++aliveIdx;
-        }
-        else
-        {
-            renderText("  " + u->getName() + " [KO]", barX, py, 80, 80, 80);
-            py += nameH + 10.f;
-            continue;
-        }
-        py += nameH;
-
-        // HP bar (always shown).
-        const float hpFrac = (u->getMaxHp() > 0)
-                                 ? static_cast<float>(u->getHp()) / static_cast<float>(u->getMaxHp())
-                                 : 0.f;
-        renderBar({barX, py, barW, barH}, hpFrac, 60, 190, 60, 70, 25, 25);
-        py += barH + gapH;
-
-        if (pc && isActive)
-        {
-            // Full detail: Energy bar.
-            const float enFrac = static_cast<float>(pc->getEnergy()) / static_cast<float>(PlayableCharacter::kMaxEnergy);
-            renderBar({barX, py, barW, thinH}, enFrac, 220, 180, 0, 45, 35, 0);
-            py += thinH + gapH;
-
-            // Full detail: Exposure bar.
-            const float expFrac = static_cast<float>(pc->getExposure()) / static_cast<float>(PlayableCharacter::kMaxExposure);
-            renderBar({barX, py, barW, thinH}, expFrac, 220, 75, 0, 35, 18, 0);
-            py += thinH;
-
-            if (pc->isFractured())
-            {
-                renderText("[FRAC]", barX, py, 200, 40, 40);
-                py += 14.f;
-            }
-        }
-        else if (pc)
-        {
-            // Compact: Exposure bar only.
-            const float expFrac = static_cast<float>(pc->getExposure()) / static_cast<float>(PlayableCharacter::kMaxExposure);
-            renderBar({barX, py, barW, thinH}, expFrac, 220, 75, 0, 35, 18, 0);
-            py += thinH;
-        }
-        py += 10.f;
     }
 }
 
 void SDL3Renderer::drawEnemyPanel()
 {
     fillRect(m_enemyPanel, 22, 22, 32, 255);
-
     if (!m_cachedEnemyParty || !m_font)
         return;
 
-    const float nameH = 18.f;
-    const float barH = 6.f;
-    const float thinH = 4.f;
-    const float gapH = 4.f;
-    const float barW = m_enemyPanel.w - 12.f;
-    const float barX = m_enemyPanel.x + 6.f;
-
     float ey = m_enemyPanel.y + 8.f;
-
     int aliveIdx = 0;
+
     for (std::size_t i = 0; i < m_cachedEnemyParty->size(); ++i)
     {
         const Unit *u = m_cachedEnemyParty->getUnitAt(i);
         if (!u || !u->isAlive())
             continue;
-
         const bool highlighted = (m_highlightingEnemies && m_highlightedTargetIndex == aliveIdx);
-        const SDL_Color ac{affinityColor(u->getAffinity())};
-
-        // Draw highlight bar behind name
-        if (highlighted)
-            fillRect({m_enemyPanel.x, ey, m_enemyPanel.w, nameH}, 60, 60, 80, 255);
-
-        const std::string nameStr = (highlighted ? "> " : "  ") + u->getName();
-        renderText(nameStr, barX, ey, ac.r, ac.g, ac.b);
-        ey += nameH;
-
-        // HP bar: red fill.
-        const float hpFrac = (u->getMaxHp() > 0)
-                                 ? static_cast<float>(u->getHp()) / static_cast<float>(u->getMaxHp())
-                                 : 0.f;
-        renderBar({barX, ey, barW, barH}, hpFrac, 200, 55, 55, 70, 25, 25);
-        ey += barH + gapH;
-
-        // Toughness bar: white fill (Enemy only).
-        const auto *e = dynamic_cast<const Enemy *>(u);
-        if (e)
-        {
-            const float toughFrac = (e->getMaxToughness() > 0)
-                                        ? static_cast<float>(e->getToughness()) / static_cast<float>(e->getMaxToughness())
-                                        : 0.f;
-            const bool broken = e->isBroken();
-            renderBar({barX, ey, barW, thinH},
-                      toughFrac,
-                      broken ? 255 : 210,
-                      broken ? 80 : 210,
-                      broken ? 0 : 210,
-                      50, 50, 50);
-        }
-        ey += thinH + 10.f;
+        drawEnemyCard(u, ey, highlighted);
         ++aliveIdx;
     }
 }
@@ -811,9 +807,12 @@ int SDL3Renderer::getUnitCardAt(int x, int y, bool isPlayerSide) const
         }
         else
         {
-            cardBottom += thinH;
+            cardBottom += thinH + 4.f;
+            const std::string intent{u->getIntentLabel()};
+            if (!intent.empty())
+                cardBottom += 14.f;
+            cardBottom += 6.f;
         }
-        cardBottom += 10.f;
 
         if (fy >= cardY && fy < cardBottom)
             return aliveIdx;

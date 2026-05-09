@@ -11,6 +11,7 @@
  */
 
 #include "UI/IRenderer.h"
+#include "UI/ILayoutQuery.h"
 #include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
 #include <string>
@@ -22,7 +23,8 @@ class PlayableCharacter;
 class ResonanceField;
 enum class Affinity;
 
-class SDL3Renderer : public IRenderer
+
+class SDL3Renderer : public IRenderer, public ILayoutQuery
 {
   public:
     SDL3Renderer(const char *windowTitle, int width, int height);
@@ -58,21 +60,23 @@ class SDL3Renderer : public IRenderer
                              const std::vector<std::string> &options,
                              std::size_t selected = 0) override;
     void clearBattleCache();
-    void setLogScrollOffset(int delta);
-    void expandLog(bool expand);
-    [[nodiscard]] bool isLogScrollable() const;
-    [[nodiscard]] int getActionRowAt(int x, int y) const;
-    [[nodiscard]] int getUnitCardAt(int x, int y, bool isPlayerSide) const;
-    void renderTooltip(const std::string &name, float hpFraction,
-                       const std::string &effectSummary, int screenX, int screenY);
-    [[nodiscard]] bool isHighlightingEnemies() const
+    // ILayoutQuery
+    [[nodiscard]] int getActionRowAt(int x, int y) const override;
+    [[nodiscard]] int getUnitCardAt(int x, int y, bool isPlayerSide) const override;
+    void setLogScrollOffset(int delta) override;
+    void expandLog(bool expand) override;
+    [[nodiscard]] bool isLogScrollable() const override;
+    [[nodiscard]] bool isHighlightingEnemies() const override
     {
         return m_highlightingEnemies;
     }
-    [[nodiscard]] int getWindowHeight() const
+    [[nodiscard]] int getWindowHeight() const override
     {
         return m_windowHeight;
     }
+
+    void renderTooltip(const std::string &name, float hpFraction,
+                       const std::string &effectSummary, int screenX, int screenY);
   private:
     // SDL handles 
     SDL_Window *m_window{nullptr};
@@ -129,7 +133,10 @@ class SDL3Renderer : public IRenderer
     void drawActionMenuPanel();
     void drawLogPanel();
     void drawHintBarPanel();
-
+    void drawPlayerCard(const Unit *u, float &py, bool isActive, bool highlighted);
+    void drawPlayerCardBars(const PlayableCharacter *pc, float barX, float barW,
+                            float &py, bool isActive);
+    void drawEnemyCard(const Unit *u, float &ey, bool highlighted);
     // Layout 
     void computePanelLayout(int w, int h);
 
