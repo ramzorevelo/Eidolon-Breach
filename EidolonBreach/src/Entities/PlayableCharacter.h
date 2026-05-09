@@ -10,6 +10,7 @@
 #include "Entities/Unit.h"
 #include "Items/Item.h"
 #include "UI/IInputHandler.h"
+#include "Core/CombatConstants.h"
 #include <memory>
 #include <optional>
 #include <vector>
@@ -159,7 +160,7 @@ class PlayableCharacter : public Unit
     void activateBreachborn()
     {
         setFlag(CharFlag::BreachbornActive);
-        m_breachbornTurnsRemaining = 3;
+        m_breachbornTurnsRemaining = CombatConstants::kBreachbornDurationTurns;
     }
 
     /**

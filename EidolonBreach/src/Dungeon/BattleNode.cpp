@@ -18,6 +18,11 @@
 #include <cmath>
 #include <limits>
 
+namespace
+{
+constexpr int kBattleEntryPauseMs{400};
+} // namespace
+
 BattleNode::BattleNode(std::function<void(Party &)> populateEnemies,
                        Affinity floorAffinity,
                        int dungeonEnemyLevel,
@@ -34,7 +39,7 @@ void BattleNode::enter(Party &party, MetaProgress &meta,
                        IRenderer &renderer, IInputHandler &input)
 {
     renderer.renderMessage("Entering battle...");
-    renderer.presentPause(400);
+    renderer.presentPause(kBattleEntryPauseMs);
     runBattle(party, meta, runCtx, eventBus, renderer, input);
 }
 

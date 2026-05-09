@@ -61,7 +61,6 @@
     <ClCompile Include="..\EidolonBreach\src\Items\Inventory.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Items\ItemRegistry.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Summons\SummonRegistry.cpp" />
-    <ClCompile Include="..\EidolonBreach\src\UI\ConsoleRenderer.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Vestiges\AttunistGambitVestige.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Vestiges\EchoingStrikeVestige.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Vestiges\FlameResonanceVestige.cpp" />
@@ -134,7 +133,7 @@
     <ProjectGuid>{ae2df5fe-e5d6-404a-85ec-49c59afdcff8}</ProjectGuid>
     <RootNamespace>EidolonBreachTests</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-	<VcpkgEnableManifest>true</VcpkgEnableManifest>
+    <VcpkgEnableManifest>true</VcpkgEnableManifest>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

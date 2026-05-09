@@ -25,6 +25,9 @@
 
 namespace
 {
+constexpr int kPlayerTurnPauseMs{250};
+constexpr int kEnemyTurnPauseMs{500};
+
 std::string buildHintString(const PlayableCharacter &pc)
 {
     if (pc.isArchSkillUnlocked())
@@ -187,7 +190,7 @@ void Battle::runBattleLoop(BattleState &state)
             }
             m_renderer.renderTurnOrder(remaining);
 
-            m_renderer.presentPause(slot.isPlayer ? 180 : 350);
+            m_renderer.presentPause(slot.isPlayer ? kPlayerTurnPauseMs : kEnemyTurnPauseMs);
         }
     }
 }
@@ -381,12 +384,16 @@ void Battle::applyResonanceTrigger(Affinity affinity, BattleState &state)
     {
     case Affinity::Blaze:
         for (Unit *u : m_enemyParty.getAliveUnits())
-            u->applyEffect(std::make_unique<BurnEffect>(10, 2));
+            u->applyEffect(std::make_unique<BurnEffect>(
+                CombatConstants::kRFBlazeBurnDamage,
+                CombatConstants::kRFBlazeBurnDuration));
         // Molten Lattice: also shield all allies.
         if (discoveries.count(std::string{FieldDiscoveryIds::kMoltenLattice}))
         {
             for (Unit *u : m_playerParty.getAliveUnits())
-                u->applyEffect(std::make_unique<ShieldEffect>(15, 1));
+                u->applyEffect(std::make_unique<ShieldEffect>(
+                    CombatConstants::kRFMoltenLatticeShield,
+                    CombatConstants::kRFMoltenLatticeDuration));
             m_renderer.renderMessage(">> Molten Lattice: allies shielded! <<");
         }
         break;
@@ -395,9 +402,12 @@ void Battle::applyResonanceTrigger(Affinity affinity, BattleState &state)
     {
         // Arctic Surge: apply Slow for 3 turns instead of 2.
         const int slowDuration{
-            discoveries.count(std::string{FieldDiscoveryIds::kArcticSurge}) ? 3 : 2};
+            discoveries.count(std::string{FieldDiscoveryIds::kArcticSurge})
+                ? CombatConstants::kRFArcticSurgeSlowDuration
+                : CombatConstants::kRFFrostSlowDuration};
         for (Unit *u : m_enemyParty.getAliveUnits())
-            u->applyEffect(std::make_unique<SlowEffect>(0.30f, slowDuration));
+            u->applyEffect(std::make_unique<SlowEffect>(
+                CombatConstants::kRFFrostSlowPct, slowDuration));
         if (slowDuration == 3)
             m_renderer.renderMessage(">> Arctic Surge: extended Slow! <<");
         break;
@@ -406,12 +416,14 @@ void Battle::applyResonanceTrigger(Affinity affinity, BattleState &state)
     case Affinity::Tempest:
         for (Unit *u : m_playerParty.getAliveUnits())
             if (auto *pc = dynamic_cast<PlayableCharacter *>(u))
-                pc->gainEnergy(20);
+                pc->gainEnergy(CombatConstants::kRFTempestEnergy);
         break;
 
     case Affinity::Terra:
         for (Unit *u : m_playerParty.getAliveUnits())
-            u->applyEffect(std::make_unique<ShieldEffect>(30, 2));
+            u->applyEffect(std::make_unique<ShieldEffect>(
+                CombatConstants::kRFTerraShieldAmount,
+                CombatConstants::kRFTerraShieldDuration));
         break;
 
     case Affinity::Aether:
@@ -505,16 +517,18 @@ void Battle::applyContextualSignals(PlayableCharacter &pc)
 {
     RunCharacterState &cs{m_runContext.getCharacterState(pc.getId())};
     const bool highExposure{pc.getExposure() >= CombatConstants::kExposureThreshold50};
-    const int thirtyPctHp{pc.getFinalStats().maxHp * 30 / 100};
+    const int thirtyPctHp{pc.getFinalStats().maxHp *
+                          CombatConstants::kLowHpPctNumerator /
+                          CombatConstants::kLowHpPctDenominator};
     const bool lowHp{pc.getHp() <= thirtyPctHp};
 
     if (highExposure || lowHp)
         ++cs.signalCounts[BehaviorSignal::Sacrificial];
 
-    if (pc.getExposure() < 40)
+    if (pc.getExposure() < CombatConstants::kLowExposureThreshold)
     {
         ++cs.consecutiveLowExposureTurns;
-        if (cs.consecutiveLowExposureTurns >= 3)
+        if (cs.consecutiveLowExposureTurns >= CombatConstants::kConsecutiveLowExposureTurns)
             ++cs.signalCounts[BehaviorSignal::Reactive];
     }
     else
@@ -729,7 +743,9 @@ void Battle::applyResonatingProc(PlayableCharacter &pc,
             Unit *t{state.enemyParty->getUnitAt(
                 static_cast<std::size_t>(result.targetEnemyIndex))};
             if (t && t->isAlive())
-                t->applyEffect(std::make_unique<BurnEffect>(5, 2));
+                t->applyEffect(std::make_unique<BurnEffect>(
+                    CombatConstants::kResonatingBurnDamage,
+                    CombatConstants::kResonatingBurnDuration));
         }
         break;
 
@@ -739,20 +755,24 @@ void Battle::applyResonatingProc(PlayableCharacter &pc,
             Unit *t{state.enemyParty->getUnitAt(
                 static_cast<std::size_t>(result.targetEnemyIndex))};
             if (t && t->isAlive())
-                t->applyEffect(std::make_unique<SlowEffect>(0.20f, 2));
+                t->applyEffect(std::make_unique<SlowEffect>(
+                    CombatConstants::kResonatingSlowPct,
+                    CombatConstants::kResonatingSlowDuration));
         }
         break;
 
     case Affinity::Tempest:
-        pc.gainEnergy(15);
+        pc.gainEnergy(CombatConstants::kResonatingTempestEnergy);
         break;
 
     case Affinity::Terra:
     {
         const int shield{
             std::max(1, static_cast<int>(
-                            static_cast<float>(pc.getFinalStats().maxHp) * 0.10f))};
-        pc.applyEffect(std::make_unique<ShieldEffect>(shield, 2));
+                            static_cast<float>(pc.getFinalStats().maxHp) *
+                            CombatConstants::kResonatingTerraShieldPct))};
+        pc.applyEffect(std::make_unique<ShieldEffect>(
+            shield, CombatConstants::kResonatingTerraShieldDuration));
         break;
     }
 
@@ -783,7 +803,7 @@ void Battle::applySurgingProc(PlayableCharacter &pc,
                 static_cast<std::size_t>(result.targetEnemyIndex))};
             if (t && t->isAlive())
             {
-                const int bonus{std::max(1, result.value / 4)};
+                const int bonus{std::max(1, result.value / CombatConstants::kSurgingStrikerDivisor)};
                 t->takeTrueDamage(bonus);
                 state.renderer.renderMessage(
                     pc.getName() + " — Surging: +" + std::to_string(bonus) +
@@ -794,7 +814,7 @@ void Battle::applySurgingProc(PlayableCharacter &pc,
     else if (arch == "Conduit")
     {
         if (state.playerParty != nullptr)
-            state.playerParty->gainSp(20);
+            state.playerParty->gainSp(CombatConstants::kSurgingConduitSp);
         state.renderer.renderMessage(pc.getName() + " — Surging: +20 SP!");
     }
     else if (arch == "Weaver")
@@ -802,7 +822,8 @@ void Battle::applySurgingProc(PlayableCharacter &pc,
         if (state.enemyParty != nullptr)
         {
             for (Unit *u : state.enemyParty->getAliveUnits())
-                u->extendEffectsByTag(EffectTags::kDebuff, 1);
+                u->extendEffectsByTag(EffectTags::kDebuff,
+                                      CombatConstants::kSurgingDebuffExtendTurns);
         }
         state.renderer.renderMessage(
             pc.getName() + " — Surging: enemy debuffs extended by 1 turn!");
@@ -811,8 +832,10 @@ void Battle::applySurgingProc(PlayableCharacter &pc,
     {
         const int shield{
             std::max(1, static_cast<int>(
-                            static_cast<float>(pc.getFinalStats().maxHp) * 0.15f))};
-        pc.applyEffect(std::make_unique<ShieldEffect>(shield, 2));
+                            static_cast<float>(pc.getFinalStats().maxHp) *
+                            CombatConstants::kSurgingAnchorShieldPct))};
+        pc.applyEffect(std::make_unique<ShieldEffect>(
+            shield, CombatConstants::kSurgingAnchorShieldDuration));
         state.renderer.renderMessage(
             pc.getName() + " — Surging: shield +" + std::to_string(shield) + "!");
     }
@@ -829,7 +852,9 @@ void Battle::applyBreachbornEffect(PlayableCharacter &pc, BattleState &state)
     case Affinity::Blaze:
         if (state.enemyParty != nullptr)
             for (Unit *u : state.enemyParty->getAliveUnits())
-                u->applyEffect(std::make_unique<BurnEffect>(10, 3));
+                u->applyEffect(std::make_unique<BurnEffect>(
+                    CombatConstants::kBreachbornBlazeBurnDamage,
+                    CombatConstants::kBreachbornBlazeBurnDuration));
         state.renderer.renderMessage(
             pc.getName() + " — Breachborn: Burn descends on all enemies!");
         break;
@@ -837,7 +862,9 @@ void Battle::applyBreachbornEffect(PlayableCharacter &pc, BattleState &state)
     case Affinity::Frost:
         if (state.enemyParty != nullptr)
             for (Unit *u : state.enemyParty->getAliveUnits())
-                u->applyEffect(std::make_unique<SlowEffect>(0.50f, 3));
+                u->applyEffect(std::make_unique<SlowEffect>(
+                    CombatConstants::kBreachbornFrostSlowPct,
+                    CombatConstants::kBreachbornFrostSlowDuration));
         state.renderer.renderMessage(
             pc.getName() + " — Breachborn: Arctic storm slows all enemies!");
         break;
@@ -846,7 +873,7 @@ void Battle::applyBreachbornEffect(PlayableCharacter &pc, BattleState &state)
         if (state.playerParty != nullptr)
             for (Unit *u : state.playerParty->getAliveUnits())
                 if (auto *ally = dynamic_cast<PlayableCharacter *>(u))
-                    ally->gainEnergy(20);
+                    ally->gainEnergy(CombatConstants::kBreachbornTempestEnergy);
         state.renderer.renderMessage(
             pc.getName() + " — Breachborn: Tempest surges through the party (+20 Energy)!");
         break;
@@ -854,13 +881,16 @@ void Battle::applyBreachbornEffect(PlayableCharacter &pc, BattleState &state)
     case Affinity::Terra:
         if (state.playerParty != nullptr)
             for (Unit *u : state.playerParty->getAliveUnits())
-                u->applyEffect(std::make_unique<ShieldEffect>(25, 3));
+                u->applyEffect(std::make_unique<ShieldEffect>(
+                    CombatConstants::kBreachbornTerraShieldAmount,
+                    CombatConstants::kBreachbornTerraShieldDuration));
         state.renderer.renderMessage(
             pc.getName() + " — Breachborn: Terra fortress shields the party!");
         break;
 
     case Affinity::Aether:
-        state.resonanceField.addContribution(Affinity::Aether, 30);
+        state.resonanceField.addContribution(
+            Affinity::Aether, CombatConstants::kBreachbornAetherContribution);
         state.renderer.renderMessage(
             pc.getName() + " — Breachborn: Aether floods the Resonance Field!");
         break;
@@ -874,7 +904,8 @@ void Battle::applyFractureStartOfTurn(PlayableCharacter &pc, BattleState &state)
         // Lyra Fracture: 5% maxHP self-DoT per her turn.
         const int selfDamage{
             std::max(1, static_cast<int>(
-                            static_cast<float>(pc.getFinalStats().maxHp) * 0.05f))};
+                            static_cast<float>(pc.getFinalStats().maxHp) *
+                            LyraConstants::kFractureSelfDotPct))};
         pc.takeTrueDamage(selfDamage);
         state.renderer.renderMessage(
             pc.getName() + " — Fracture: -" + std::to_string(selfDamage) +
@@ -902,10 +933,12 @@ void Battle::applyBreachbornActionBonus(PlayableCharacter &pc,
             static_cast<std::size_t>(result.targetEnemyIndex))};
         if (t && t->isAlive())
         {
-            const int bonus{result.value / 2};
+            const int bonus{result.value / LyraConstants::kBreachbornActionBonusDivisor};
             t->takeTrueDamage(bonus);
             // Also re-apply Burn on every Breachborn action.
-            t->applyEffect(std::make_unique<BurnEffect>(5, 1));
+            t->applyEffect(std::make_unique<BurnEffect>(
+                LyraConstants::kBreachbornActionBurnDamage,
+                LyraConstants::kBreachbornActionBurnDuration));
             state.renderer.renderMessage(
                 pc.getName() + " — Breachborn Blaze: +" +
                 std::to_string(bonus) + " bonus damage + Burn!");

@@ -10,7 +10,6 @@
 #include "Items/Item.h"
 #include <variant>
 #include "UI/IInputHandler.h"
-#include "Core/CombatConstants.h"
 #include "UI/IRenderer.h"
 #include <algorithm>
 #include <utility>

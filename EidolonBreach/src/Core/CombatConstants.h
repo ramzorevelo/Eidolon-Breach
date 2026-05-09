@@ -59,4 +59,51 @@ inline constexpr float kPlayerXpLevelExponent{1.8f};
 inline constexpr float kCharBattleXpMultiplier{5.0f};
 inline constexpr float kCharBattleXpLevelScale{0.2f};
 inline constexpr float kPlayerXpLevelScale{0.1f};
+
+// Resonating proc effects — fires for any character at Exposure >= 50
+inline constexpr int kResonatingBurnDamage{5};
+inline constexpr int kResonatingBurnDuration{2};
+inline constexpr float kResonatingSlowPct{0.20f};
+inline constexpr int kResonatingSlowDuration{2};
+inline constexpr int kResonatingTempestEnergy{15};
+inline constexpr float kResonatingTerraShieldPct{0.10f};
+inline constexpr int kResonatingTerraShieldDuration{2};
+
+// Surging proc effects — fires for any archetype at Exposure >= 75
+inline constexpr int kSurgingStrikerDivisor{4};
+inline constexpr int kSurgingConduitSp{20};
+inline constexpr int kSurgingDebuffExtendTurns{1};
+inline constexpr float kSurgingAnchorShieldPct{0.15f};
+inline constexpr int kSurgingAnchorShieldDuration{2};
+
+// Resonance Field trigger effects — fires on any RF trigger by affinity
+inline constexpr int kRFBlazeBurnDamage{10};
+inline constexpr int kRFBlazeBurnDuration{2};
+inline constexpr float kRFFrostSlowPct{0.30f};
+inline constexpr int kRFFrostSlowDuration{2};
+inline constexpr int kRFTempestEnergy{20};
+inline constexpr int kRFTerraShieldAmount{30};
+inline constexpr int kRFTerraShieldDuration{2};
+inline constexpr int kRFMoltenLatticeShield{15};
+inline constexpr int kRFMoltenLatticeDuration{1};
+inline constexpr int kRFArcticSurgeSlowDuration{3};
+
+// Breachborn burst effects — fires for any character that enters Breachborn
+inline constexpr int kBreachbornBlazeBurnDamage{10};
+inline constexpr int kBreachbornBlazeBurnDuration{3};
+inline constexpr float kBreachbornFrostSlowPct{0.50f};
+inline constexpr int kBreachbornFrostSlowDuration{3};
+inline constexpr int kBreachbornTempestEnergy{20};
+inline constexpr int kBreachbornTerraShieldAmount{25};
+inline constexpr int kBreachbornTerraShieldDuration{3};
+inline constexpr int kBreachbornAetherContribution{30};
+
+// Breachborn window duration — applies to all characters
+inline constexpr int kBreachbornDurationTurns{3};
+
+// Contextual signal thresholds — used by Battle::applyContextualSignals
+inline constexpr int kLowHpPctNumerator{30};
+inline constexpr int kLowHpPctDenominator{100};
+inline constexpr int kLowExposureThreshold{40};
+inline constexpr int kConsecutiveLowExposureTurns{3};
 } // namespace CombatConstants

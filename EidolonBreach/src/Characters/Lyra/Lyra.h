@@ -20,3 +20,14 @@ namespace LyraIds
 {
 constexpr std::string_view kId = "lyra"; 
 } // namespace LyraIds
+
+namespace LyraConstants
+{
+/// Fracture state: self-DoT as a fraction of max HP each turn.
+constexpr float kFractureSelfDotPct{0.05f};
+
+/// Breachborn per-action bonus: true damage = result.value / kBreachbornActionBonusDivisor.
+constexpr int kBreachbornActionBonusDivisor{2};
+constexpr int kBreachbornActionBurnDamage{5};
+constexpr int kBreachbornActionBurnDuration{1};
+} // namespace LyraConstants

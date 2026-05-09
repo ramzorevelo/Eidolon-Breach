@@ -614,7 +614,7 @@ void SDL3Renderer::renderBreak(const std::string &enemyName)
 
 void SDL3Renderer::renderStunned(const std::string &enemyName)
 {
-    renderMessage(enemyName + " stunned - turn skipped");
+    renderMessage(enemyName + " stunned. Turn skipped");
 }
 
 void SDL3Renderer::renderVictory(const std::string &enemyName, std::optional<Drop> drop)

@@ -105,9 +105,6 @@
       <Filter>Battle</Filter>
     </ClCompile>
     <ClCompile Include="tests\EidolonBreach_Tests.cpp" />
-    <ClCompile Include="..\EidolonBreach\src\UI\ConsoleRenderer.cpp">
-      <Filter>UI</Filter>
-    </ClCompile>
     <ClCompile Include="tests\Battle\test_SpeedBasedTurnOrderCalculator.cpp">
       <Filter>Battle</Filter>
     </ClCompile>
