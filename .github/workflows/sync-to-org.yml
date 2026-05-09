@@ -28,7 +28,7 @@ jobs:
           git checkout -b org-mirror
           cp ORG_README.md README.md
           git add README.md
-          git diff --staged --quiet || git commit -m "chore: use model README for org mirror"
+          git diff --staged --quiet || git commit --amend --no-edit
 
       - name: Push to org
         uses: ad-m/github-push-action@master
