@@ -418,6 +418,31 @@ void SDL3Renderer::drawCenterPanel()
                   votes / maxVotes, ac.r, ac.g, ac.b, 28, 28, 38);
         barY += 9.f;
     }
+    // RF fill bar: vertical, fills upward, leading affinity colour.
+    const float gaugeH = m_centerPanel.h - (barY - m_centerPanel.y) - 8.f;
+    if (gaugeH > 4.f)
+    {
+        const float fraction = static_cast<float>(m_cachedRfGauge) / 100.0f;
+        const Affinity leading = m_cachedResonanceField->getLeadingAffinity();
+        const SDL_Color lc = affinityColor(leading);
+        const SDL_FRect gaugeBg{m_centerPanel.x + 4.f, barY + 4.f, barW, gaugeH};
+        // Draw background
+        fillRect(gaugeBg, 28, 28, 38);
+        // Draw filled portion (bottom-to-top)
+        if (fraction > 0.f)
+        {
+            const float fillH = gaugeH * fraction;
+            const SDL_FRect filled{gaugeBg.x, gaugeBg.y + gaugeH - fillH,
+                                   gaugeBg.w, fillH};
+            fillRect(filled, lc.r, lc.g, lc.b);
+        }
+        // Draw percentage text near the top of the bar
+        const std::string gaugeLabel = std::to_string(m_cachedRfGauge) + "%";
+        renderText(gaugeLabel,
+                   m_centerPanel.x + 4.f,
+                   barY + 4.f + gaugeH * 0.05f,
+                   200, 200, 255);
+    }   
 }
 
 void SDL3Renderer::drawActionMenuPanel()

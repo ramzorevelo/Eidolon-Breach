@@ -14,9 +14,12 @@
 BossNode::BossNode(std::function<void(Party &)> populateEnemies,
                    Affinity floorAffinity,
                    int dungeonEnemyLevel,
-                   const SummonRegistry *summonRegistry)
+                   const SummonRegistry *summonRegistry,
+                   int floorIndex,
+                   const ItemRegistry *itemRegistry)
     : EliteNode{
-          std::move(populateEnemies), floorAffinity, dungeonEnemyLevel, summonRegistry}
+          std::move(populateEnemies), floorAffinity, dungeonEnemyLevel,
+          summonRegistry, floorIndex, itemRegistry}
 {
 }
 void BossNode::enter(Party &party, MetaProgress &meta,
@@ -27,6 +30,8 @@ void BossNode::enter(Party &party, MetaProgress &meta,
     renderer.renderMessage("The final guardian of the breach awaits.");
     renderer.renderMessage("Exposure spikes by " + std::to_string(CombatConstants::kEliteExposureSpike) + " for all party members!");
     renderer.presentPause(800);
+
+    applyFloorExposureModifier(party);
 
     for (std::size_t i = 0; i < party.size(); ++i)
     {

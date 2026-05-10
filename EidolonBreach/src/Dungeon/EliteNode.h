@@ -16,7 +16,9 @@ class EliteNode : public BattleNode
     explicit EliteNode(std::function<void(Party &)> populateEnemies,
                        Affinity floorAffinity = Affinity::Aether,
                        int dungeonEnemyLevel = 1,
-                       const SummonRegistry *summonRegistry = nullptr);
+                       const SummonRegistry *summonRegistry = nullptr,
+                       int floorIndex = 0,
+                       const ItemRegistry *itemRegistry = nullptr);
 
     void enter(Party &party, MetaProgress &meta,
                RunContext &runCtx, EventBus &eventBus,

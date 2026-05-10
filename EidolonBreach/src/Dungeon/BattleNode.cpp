@@ -12,6 +12,7 @@
 #include "Core/MetaProgress.h"
 #include "Entities/Enemy.h"
 #include "Entities/Party.h"
+#include "Items/ItemRegistry.h"
 #include "Entities/PlayableCharacter.h"
 #include "Entities/Unit.h"
 #include "Summons/SummonRegistry.h"
@@ -26,11 +27,15 @@ constexpr int kBattleEntryPauseMs{400};
 BattleNode::BattleNode(std::function<void(Party &)> populateEnemies,
                        Affinity floorAffinity,
                        int dungeonEnemyLevel,
-                       const SummonRegistry *summonRegistry)
+                       const SummonRegistry *summonRegistry,
+                       int floorIndex,
+                       const ItemRegistry *itemRegistry)
     : m_populateEnemies{std::move(populateEnemies)},
       m_floorAffinity{floorAffinity},
       m_dungeonEnemyLevel{dungeonEnemyLevel},
-      m_summonRegistry{summonRegistry}
+      m_summonRegistry{summonRegistry},
+    m_floorIndex{floorIndex},
+    m_itemRegistry{itemRegistry}
 {
 }
 
@@ -40,6 +45,7 @@ void BattleNode::enter(Party &party, MetaProgress &meta,
 {
     renderer.renderMessage("Entering battle...");
     renderer.presentPause(kBattleEntryPauseMs);
+    applyFloorExposureModifier(party);
     runBattle(party, meta, runCtx, eventBus, renderer, input);
 }
 
@@ -124,5 +130,16 @@ void BattleNode::awardBattleXp(Party &party, MetaProgress &meta,
         auto *pc{u->asPlayableCharacter()};
         if (pc)
             pc->applyUnlocks(newLevel);
+    }
+}
+
+void BattleNode::applyFloorExposureModifier(Party &party) const
+{
+    for (std::size_t i{0}; i < party.size(); ++i)
+    {
+        Unit *u{party.getUnitAt(i)};
+        auto *pc{u ? u->asPlayableCharacter() : nullptr};
+        if (pc && pc->isAlive())
+            pc->modifyExposure(m_floorIndex * CombatConstants::kFloorDepthExposureModifier);
     }
 }

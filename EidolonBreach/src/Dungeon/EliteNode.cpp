@@ -19,9 +19,12 @@
 EliteNode::EliteNode(std::function<void(Party &)> populateEnemies,
                      Affinity floorAffinity,
                      int dungeonEnemyLevel,
-                     const SummonRegistry *summonRegistry)
+                     const SummonRegistry *summonRegistry,
+                     int floorIndex,
+                     const ItemRegistry *itemRegistry)
     : BattleNode{
-          std::move(populateEnemies), floorAffinity, dungeonEnemyLevel, summonRegistry}
+          std::move(populateEnemies), floorAffinity, dungeonEnemyLevel,
+          summonRegistry, floorIndex, itemRegistry}
 {
 }
 
@@ -33,6 +36,8 @@ void EliteNode::enter(Party &party, MetaProgress &meta,
     renderer.renderMessage("Exposure spikes by " + std::to_string(CombatConstants::kEliteExposureSpike) + " for all party members!");
     renderer.presentPause(600);
 
+    applyFloorExposureModifier(party);
+
     for (std::size_t i = 0; i < party.size(); ++i)
     {
         Unit *u = party.getUnitAt(i);
@@ -41,7 +46,7 @@ void EliteNode::enter(Party &party, MetaProgress &meta,
             pc->modifyExposure(CombatConstants::kEliteExposureSpike);
     }
 
-    BattleNode::enter(party, meta, runCtx, eventBus, renderer, input);
+    runBattle(party, meta, runCtx, eventBus, renderer, input);
 
     // Award Corrupted vestige after defeating elite
     if (!party.isAllDead())

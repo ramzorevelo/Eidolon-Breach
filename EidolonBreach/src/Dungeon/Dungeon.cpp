@@ -126,11 +126,13 @@ std::unique_ptr<MapNode> Dungeon::makeNode(int layer,
     if (roll < eW)
         return std::make_unique<EliteNode>(
             m_encounterTable.getFactory(EncounterTable::Tier::Elite, rng),
-            floorAffinity, m_currentDungeon.enemyLevel, m_summonRegistry);
+            floorAffinity, m_currentDungeon.enemyLevel, m_summonRegistry,
+            layer, &m_itemRegistry);
     if (roll < eW + battleW)
         return std::make_unique<BattleNode>(
             m_encounterTable.getFactory(EncounterTable::Tier::Standard, rng),
-            floorAffinity, m_currentDungeon.enemyLevel, m_summonRegistry);
+            floorAffinity, m_currentDungeon.enemyLevel, m_summonRegistry,
+            layer, &m_itemRegistry);
     if (roll < eW + battleW + restW)
         return std::make_unique<RestNode>();
     if (roll < eW + battleW + restW + shopW)
@@ -171,7 +173,8 @@ void Dungeon::buildGraph(std::uint32_t seed,
         {
             layerNodes.push_back({std::make_unique<BossNode>(
                                       m_encounterTable.getFactory(EncounterTable::Tier::Boss, rng),
-                                      floorAffinity, m_currentDungeon.enemyLevel, m_summonRegistry),
+                                      floorAffinity, m_currentDungeon.enemyLevel, m_summonRegistry,
+                                      layer, &m_itemRegistry),
                                   {}});
             prevLayerHadElite = false;
             prevLayerHadRest = false;
@@ -190,7 +193,8 @@ void Dungeon::buildGraph(std::uint32_t seed,
         {
             layerNodes.push_back({std::make_unique<EliteNode>(
                                       m_encounterTable.getFactory(EncounterTable::Tier::Elite, rng),
-                                      floorAffinity, m_currentDungeon.enemyLevel, m_summonRegistry),
+                                      floorAffinity, m_currentDungeon.enemyLevel, m_summonRegistry,
+                                      layer, &m_itemRegistry),
                                   {}});
             prevLayerHadElite = true;
             prevLayerHadRest = false;
@@ -346,19 +350,22 @@ void Dungeon::buildFixedGraph(std::uint32_t seed,
         {
             node = std::make_unique<BattleNode>(
                 m_encounterTable.getFactory(EncounterTable::Tier::Standard, rng),
-                floorAffinity, m_currentDungeon.enemyLevel, m_summonRegistry);
+                floorAffinity, m_currentDungeon.enemyLevel, m_summonRegistry,
+                static_cast<int>(i), &m_itemRegistry);
         }
         else if (nodeType == "elite")
         {
             node = std::make_unique<EliteNode>(
                 m_encounterTable.getFactory(EncounterTable::Tier::Elite, rng),
-                floorAffinity, m_currentDungeon.enemyLevel, m_summonRegistry);
+                floorAffinity, m_currentDungeon.enemyLevel, m_summonRegistry,
+                static_cast<int>(i), &m_itemRegistry);
         }
         else if (nodeType == "boss")
         {
             node = std::make_unique<BossNode>(
                 m_encounterTable.getFactory(EncounterTable::Tier::Boss, rng),
-                floorAffinity, m_currentDungeon.enemyLevel, m_summonRegistry);
+                floorAffinity, m_currentDungeon.enemyLevel, m_summonRegistry,
+                static_cast<int>(i), &m_itemRegistry);
         }
         else if (nodeType == "rest")
         {

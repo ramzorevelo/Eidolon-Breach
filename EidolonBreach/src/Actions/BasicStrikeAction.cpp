@@ -8,7 +8,7 @@
 #include "Core/CombatUtils.h"
 #include "Entities/Party.h"
 #include "Entities/PlayableCharacter.h"
-#include <iostream>
+
 BasicStrikeAction::BasicStrikeAction()
     : m_data{ActionData{
           .skillPower = 1.0f,
@@ -60,7 +60,6 @@ ActionResult BasicStrikeAction::execute(PlayableCharacter &user,
         }
     }
     result.actionAffinity = user.getAffinity();
-    std::cout << "Basic attack affinity: " << static_cast<int>(result.actionAffinity) << std::endl;
     return result;
 }
 
