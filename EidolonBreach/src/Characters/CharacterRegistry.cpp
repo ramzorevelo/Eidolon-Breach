@@ -9,6 +9,8 @@
 #include "Core/DataLoader.h"
 #include "Actions/VentAction.h"
 #include "Entities/PlayableCharacter.h"
+#include "Core/MetaProgress.h"
+#include "Meta/AspectTree.h"
 #include <stdexcept>
 
 void CharacterRegistry::loadFromJson(const std::string &jsonPath,
@@ -25,7 +27,9 @@ void CharacterRegistry::loadFromJson(const std::string &jsonPath,
 }
 
 std::unique_ptr<PlayableCharacter>
-CharacterRegistry::create(std::string_view characterId, int characterLevel) const
+CharacterRegistry::create(std::string_view characterId,
+                          int characterLevel,
+                          const MetaProgress *meta) const
 {
     auto it = m_blueprints.find(std::string{characterId});
     if (it == m_blueprints.end())
@@ -43,8 +47,6 @@ CharacterRegistry::create(std::string_view characterId, int characterLevel) cons
                                  bp.breachbornActionBurnDamage,
                                  bp.breachbornActionBurnDuration);
 
-    // Resolve abilities; log warning for unregistered IDs but do not throw,
-    // so partial configurations can still be tested.
     if (m_abilityRegistry)
     {
         if (auto basic{m_abilityRegistry->create(bp.basicId)})
@@ -72,9 +74,75 @@ CharacterRegistry::create(std::string_view characterId, int characterLevel) cons
 
     pc->addAbility(std::make_unique<VentAction>());
 
+    // Apply Aspect Tree node effects and Echo effects before unlock resolution,
+    // so SlotUnlockEarly mods take effect when applyUnlocks is called below.
+    if (meta)
+    {
+        applyProgressionMods(characterId, *meta, *pc);
+        applyEchoEffects(characterId,
+                         meta->characterInsight.count(std::string{characterId})
+                             ? meta->characterInsight.at(std::string{characterId}).echoCount
+                             : 0,
+                         *pc);
+    }
+
     pc->applyUnlocks(characterLevel);
 
     return pc;
+}
+
+void CharacterRegistry::applyProgressionMods(std::string_view characterId,
+                                             const MetaProgress &meta,
+                                             PlayableCharacter &pc)
+{
+    const auto it{meta.characterInsight.find(std::string{characterId})};
+    if (it == meta.characterInsight.end())
+        return;
+
+    const AspectTree tree{AspectTree::loadForCharacter(characterId)};
+    for (const auto &nodeId : it->second.chosenAspects)
+    {
+        const AspectTreeNode *node{tree.findNode(nodeId)};
+        if (node)
+            pc.applyCharacterMod(node->effect);
+    }
+}
+
+void CharacterRegistry::applyEchoEffects(std::string_view characterId,
+                                         int echoCount,
+                                         PlayableCharacter &pc)
+{
+    if (echoCount <= 0)
+        return;
+
+    // Echo 1: Basic attack strengthened: small ATK bonus.
+    if (echoCount >= 1)
+        pc.applyCharacterMod(StatBonus{0, 2, 0, 0});
+
+    // Echo 2: Slot skill enhanced: proc effects are stronger.
+    if (echoCount >= 2)
+        pc.applyCharacterMod(ProcEnhancement{1.10f});
+
+    // Echo 3: Always-active passive: stat bonus independent of stance/aspect.
+    if (echoCount >= 3)
+    {
+        if (characterId == "lyra")
+            pc.applyCharacterMod(StatBonus{0, 2, 0, 1});
+        else if (characterId == "vex")
+            pc.applyCharacterMod(StatBonus{5, 0, 2, 0});
+        else if (characterId == "zara")
+            pc.applyCharacterMod(StatBonus{0, 1, 1, 2});
+        else
+            pc.applyCharacterMod(StatBonus{3, 1, 1, 0});
+    }
+
+    // Echo 4: Fracture state modified: reduced AV penalty.
+    if (echoCount >= 4)
+        pc.applyCharacterMod(AVModifierBonus{ExposureState::Fractured, -0.05f});
+
+    // Echo 5: Ultimate augmented: set flag so Battle applies enhanced output.
+    if (echoCount >= 5)
+        pc.applyCharacterMod(ProcEnhancement{1.15f});
 }
 
 const std::vector<std::string> &CharacterRegistry::getIds() const

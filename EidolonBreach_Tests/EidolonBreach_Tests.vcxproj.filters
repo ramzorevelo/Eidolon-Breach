@@ -54,6 +54,9 @@
     <Filter Include="Characters\Zara">
       <UniqueIdentifier>{743398d4-6ed3-4a86-997d-094e2ea91485}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Meta">
+      <UniqueIdentifier>{fefe2bbf-8e56-4502-b4fb-a5813832a091}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="tests\Battle\test_TurnOrder.cpp">
@@ -359,6 +362,9 @@
     </ClCompile>
     <ClCompile Include="tests\Battle\test_AVTurnOrderCalculator.cpp">
       <Filter>Battle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Meta\AspectTree.cpp">
+      <Filter>Meta</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

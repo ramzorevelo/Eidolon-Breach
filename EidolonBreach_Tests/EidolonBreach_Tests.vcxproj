@@ -61,6 +61,7 @@
     <ClCompile Include="..\EidolonBreach\src\Entities\VampireBat.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Items\Inventory.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Items\ItemRegistry.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Meta\AspectTree.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Summons\SummonRegistry.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Vestiges\AttunistGambitVestige.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Vestiges\EchoingStrikeVestige.cpp" />

@@ -460,6 +460,9 @@ bool Dungeon::run(Party &party, MetaProgress &meta,
             + "  (Player Level: " + std::to_string(newPlayerLevel) + ")");
     }
 
+    if (m_runContext.runMode == RunMode::Classic)
+        meta.gainRunSignals(m_runContext, party);
+
     m_eventBus.emit(RunCompletedEvent{playerWon, floorsCleared});
     m_eventBus.clearRunScope();
     return playerWon;

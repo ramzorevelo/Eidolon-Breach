@@ -4,10 +4,47 @@
  */
 
 #include "Core/MetaProgress.h"
+#include "Core/RunContext.h"
+#include "Entities/Party.h"
+#include "Entities/Unit.h"
+#include "Meta/AspectTree.h"
 #include <algorithm>
 #include <fstream>
 #include <cmath>
 
+namespace
+{
+BehaviorSignal behaviorSignalFromString(const std::string &s)
+{
+    if (s == "Aggressive")
+        return BehaviorSignal::Aggressive;
+    if (s == "Methodical")
+        return BehaviorSignal::Methodical;
+    if (s == "Sacrificial")
+        return BehaviorSignal::Sacrificial;
+    if (s == "Supportive")
+        return BehaviorSignal::Supportive;
+    return BehaviorSignal::Reactive;
+}
+
+std::string behaviorSignalToString(BehaviorSignal s)
+{
+    switch (s)
+    {
+    case BehaviorSignal::Aggressive:
+        return "Aggressive";
+    case BehaviorSignal::Methodical:
+        return "Methodical";
+    case BehaviorSignal::Sacrificial:
+        return "Sacrificial";
+    case BehaviorSignal::Supportive:
+        return "Supportive";
+    case BehaviorSignal::Reactive:
+        return "Reactive";
+    }
+    return "Reactive";
+}
+} // namespace
 
 int MetaProgress::levelFromXP(int totalXP)
 {
@@ -92,6 +129,10 @@ MetaProgress MetaProgress::loadFromFile(const std::filesystem::path &path)
         const nlohmann::json aspects{insight.value("chosenAspects", nlohmann::json::array())};
         for (const auto &aspect : aspects)
             data.chosenAspects.push_back(aspect.get<std::string>());
+        data.insightBalance = insight.value("insightBalance", 0);
+        const nlohmann::json tallies{insight.value("signalTallies", nlohmann::json::object())};
+        for (const auto &[sigStr, count] : tallies.items())
+            data.signalTallies[behaviorSignalFromString(sigStr)] = count.get<int>();
         meta.characterInsight[id] = std::move(data);
     }
 
@@ -132,6 +173,11 @@ void MetaProgress::saveToFile(const std::filesystem::path &path) const
         j["characterInsight"][id]["echoCount"] = data.echoCount;
         j["characterInsight"][id]["bondTrialComplete"] = data.bondTrialComplete;
         j["characterInsight"][id]["chosenAspects"] = data.chosenAspects;
+        j["characterInsight"][id]["insightBalance"] = data.insightBalance;
+        nlohmann::json talliesJson{nlohmann::json::object()};
+        for (const auto &[signal, count] : data.signalTallies)
+            talliesJson[behaviorSignalToString(signal)] = count;
+        j["characterInsight"][id]["signalTallies"] = talliesJson;
     }
 
     j["masteryEventLog"] = nlohmann::json::object();
@@ -177,4 +223,53 @@ int MetaProgress::gainPlayerXp(int amount)
     playerXp += amount;
     playerLevel = playerLevelFromXp(playerXp);
     return playerLevel;
+}
+
+void MetaProgress::gainRunSignals(const RunContext &ctx, const Party &party)
+{
+    for (std::size_t i{0}; i < party.size(); ++i)
+    {
+        const Unit *u{party.getUnitAt(i)};
+        if (!u)
+            continue;
+        const RunCharacterState *cs{ctx.findCharacterState(u->getId())};
+        if (!cs)
+            continue;
+
+        auto &insight{characterInsight[std::string{u->getId()}]};
+        int totalSignals{0};
+        for (const auto &[signal, count] : cs->signalCounts)
+        {
+            insight.signalTallies[signal] += count;
+            totalSignals += count;
+        }
+        insight.insightBalance += totalSignals / CombatConstants::kInsightPerSignalPoints;
+    }
+}
+
+bool MetaProgress::spendInsight(std::string_view characterId,
+                                std::string_view nodeId,
+                                const AspectTree &tree)
+{
+    const AspectTreeNode *node{tree.findNode(nodeId)};
+    if (!node)
+        return false;
+
+    auto &insight{characterInsight[std::string{characterId}]};
+
+    const auto tallyIt{insight.signalTallies.find(node->branch)};
+    const int tally{(tallyIt != insight.signalTallies.end()) ? tallyIt->second : 0};
+    if (tally < node->unlockThreshold)
+        return false;
+
+    for (const auto &chosen : insight.chosenAspects)
+        if (chosen == node->id)
+            return false;
+
+    if (insight.insightBalance < node->insightCost)
+        return false;
+
+    insight.insightBalance -= node->insightCost;
+    insight.chosenAspects.push_back(std::string{node->id});
+    return true;
 }

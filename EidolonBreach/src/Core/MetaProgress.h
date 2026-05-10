@@ -7,6 +7,8 @@
  */
 
 #include "Core/CombatConstants.h"
+#include "Core/BehaviorSignal.h"
+#include "Meta/AspectTree.h"
 #include "nlohmann/json.hpp"
 #include <filesystem>
 #include <map>
@@ -15,14 +17,19 @@
 #include <string_view>
 #include <vector>
 
+class RunContext;
+class Party;
+
+/** Per-character insight data stored in MetaProgress. */
 /** Per-character insight data stored in MetaProgress. */
 struct CharacterInsightData
 {
-    int echoCount{0};                          
-    bool bondTrialComplete{false};            
-    std::vector<std::string> chosenAspects{}; 
+    int echoCount{0};
+    bool bondTrialComplete{false};
+    std::vector<std::string> chosenAspects{};
+    std::map<BehaviorSignal, int> signalTallies{}; ///< Cumulative across all runs.
+    int insightBalance{0};                         ///< Spendable Insight currency.
 };
-
 class MetaProgress
 {
   public:
@@ -65,6 +72,30 @@ class MetaProgress
      * @return New player level.
      */
     int gainPlayerXp(int amount);
+
+    /**
+     * @brief Accumulate per-character signal counts from the just-finished run
+     *        into persistent tallies, and award Insight at the rate of
+     *        1 Insight per kInsightPerSignalPoints signal points earned.
+     *        Only characters present in `party` are updated.
+     *        No-op for Draft mode (caller must check runMode before calling).
+     * @param ctx  RunContext from the completed run.
+     * @param party The player party that completed the run.
+     */
+    void gainRunSignals(const RunContext &ctx, const Party &party);
+
+    /**
+     * @brief Attempt to spend Insight to activate an Aspect Tree node.
+     * @param characterId  Character whose tree and balance are used.
+     * @param nodeId       Node ID to activate.
+     * @param tree         Loaded AspectTree for this character.
+     * @return true if the node was successfully activated.
+     *         false if: node not found, branch tally below threshold, node
+     *         already active, or Insight balance insufficient.
+     */
+    bool spendInsight(std::string_view characterId,
+                      std::string_view nodeId,
+                      const AspectTree &tree);
 
     /**
      * @brief Compute account level from total player XP.
