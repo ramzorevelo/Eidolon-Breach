@@ -184,6 +184,17 @@ public:
     {
         return nullptr;
     }
+
+    /**
+     * @brief Clears the broken flag if set. Called by Battle at the start of
+     *        an enemy's turn slot. Returns true if broken state was cleared.
+     *        Default: no-op (PCs and Summons are never broken).
+     */
+    virtual bool checkAndClearBroken()
+    {
+        return false;
+    }
+
     /**
      * @return The unit's Resonance Field contribution value.
      *         Base implementation returns 0 (enemies never contribute).

@@ -106,4 +106,15 @@ inline constexpr int kLowHpPctNumerator{30};
 inline constexpr int kLowHpPctDenominator{100};
 inline constexpr int kLowExposureThreshold{40};
 inline constexpr int kConsecutiveLowExposureTurns{3};
+
+// AV-based turn order — all values are placeholders tuned in v0.9.5.
+inline constexpr float kBaseAG{10000.0f};        // base action gauge
+inline constexpr float kBreakSuppressPct{1.0f};  // approx. one full turn skip
+inline constexpr float kTempestHastenPct{0.20f}; // RF Tempest hasten
+inline constexpr float kAvModBaseline{1.0f};
+inline constexpr float kAvModResonating{0.95f};
+inline constexpr float kAvModSurging{0.90f};
+inline constexpr float kAvModBreachborn{0.75f};
+inline constexpr float kAvModFractured{1.10f};
+
 } // namespace CombatConstants

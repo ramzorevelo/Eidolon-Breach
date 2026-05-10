@@ -258,6 +258,9 @@
     <ClCompile Include="src\Dungeon\VestigeOffer.cpp">
       <Filter>Dungeon</Filter>
     </ClCompile>
+    <ClCompile Include="src\Battle\AVTurnOrderCalculator.cpp">
+      <Filter>Battle</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Battle\Battle.h">
@@ -556,6 +559,9 @@
     </ClInclude>
     <ClInclude Include="src\Dungeon\VestigeOffer.h">
       <Filter>Dungeon</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Battle\AVTurnOrderCalculator.h">
+      <Filter>Battle</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -164,6 +164,14 @@ class PlayableCharacter : public Unit
     void modifyExposure(int delta);
     [[nodiscard]] bool canVent() const; // 0 < exposure < 100
 
+    /**
+     * @brief AV reset multiplier based on current Exposure state.
+     *        Applied by AVTurnOrderCalculator when resetting this PC's AV.
+     *        Summons and enemies always return kAvModBaseline from exposureModifier().
+     */
+    [[nodiscard]] float getExposureAVModifier() const;
+
+
     [[nodiscard]] bool isBreachbornActive() const
     {
         return hasFlag(CharFlag::BreachbornActive);

@@ -73,6 +73,19 @@ bool PlayableCharacter::canVent() const
     return m_exposure > 0 && m_exposure < kMaxExposure && !hasFlag(CharFlag::Fractured);
 }
 
+float PlayableCharacter::getExposureAVModifier() const
+{
+    if (isBreachbornActive())
+        return CombatConstants::kAvModBreachborn;
+    if (isFractured())
+        return CombatConstants::kAvModFractured;
+    if (m_exposure >= CombatConstants::kExposureThreshold75)
+        return CombatConstants::kAvModSurging;
+    if (m_exposure >= CombatConstants::kExposureThreshold50)
+        return CombatConstants::kAvModResonating;
+    return CombatConstants::kAvModBaseline;
+}
+
 std::size_t PlayableCharacter::selectActionIndex(const Party &allies,
                                                  IInputHandler &input)
 {

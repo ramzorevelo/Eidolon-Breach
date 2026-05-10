@@ -14,6 +14,8 @@
 #include "Core/Affinity.h"
 #include <optional>
 
+class Unit;
+
 /**
  * @brief Signals that the executing action spawned a Manifestation.
  *        Set by summoner skill actions; processed by Battle::processSummonEffect().
@@ -23,6 +25,17 @@ struct SummonEffect
     std::string summonId{};
     int preferredPosition{3};
     int summonerAtk{0}; ///< Attacker ATK at spawn time, used by scaling actions
+};
+
+/**
+ * @brief AV manipulation applied by Battle after each action.
+ *        Set by vestige onAction hooks or BreakEffect callbacks.
+ *        Battle dispatches to ITurnOrderCalculator::applyHasten / applySuppress.
+ */
+struct AVEffect
+{
+    Unit *target{nullptr};
+    float pct{0.0f}; // fraction of target's base AV
 };
 
 struct ActionResult
@@ -66,5 +79,10 @@ struct ActionResult
      *        Processed by Battle after execute() returns; never set by the action itself.
      */
     std::optional<SummonEffect> summonEffect{};
+
+    // AV manipulation. Dispatched by Battle after processActionResult.
+    std::optional<AVEffect> hasten{};   // reduce target's current AV
+    std::optional<AVEffect> suppress{}; // increase target's current AV 
+
     std::string targetName{}; // display name of primary target; empty if none/AoE
 };

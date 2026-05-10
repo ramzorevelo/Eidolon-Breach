@@ -17,10 +17,10 @@
         }
     },
     "characterXP": {
-        "ignis": 2679,
-        "lyra": 1882,
-        "vex": 1882,
-        "zara": 1882
+        "ignis": 2739,
+        "lyra": 1932,
+        "vex": 1932,
+        "zara": 1932
     },
     "clearedDungeonIds": [
         "dungeon_01",
@@ -34,10 +34,13 @@
     "masteryEventLog": {
         "lyra": [
             "lyra_predator"
+        ],
+        "zara": [
+            "zara_glacial"
         ]
     },
     "playerLevel": 4,
-    "playerXp": 1786,
+    "playerXp": 1840,
     "unlockedCharacterIds": [
         "lyra",
         "vex",
