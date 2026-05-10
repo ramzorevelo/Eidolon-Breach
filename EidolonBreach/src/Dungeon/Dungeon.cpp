@@ -26,9 +26,6 @@
 #include "Dungeon/DungeonDefinition.h"
 #include "Dungeon/DungeonTable.h"
 #include <cmath>
-#include "Entities/Slime.h"
-#include "Entities/StoneGolem.h"
-#include "Entities/VampireBat.h"
 #include "Summons/SummonRegistry.h"
 #include <algorithm>
 #include <limits>

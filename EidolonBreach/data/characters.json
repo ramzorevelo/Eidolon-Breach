@@ -15,7 +15,11 @@
       "archSkill": "arch_skill_default",
       "ultimate": "lyra_ultimate",
       "slotSkills": [ "lyra_ember_call" ]
-    }
+    },
+    "fractureSelfDotPct": 0.05,
+    "breachbornActionBonusDivisor": 2.0,
+    "breachbornActionBurnDamage": 5,
+    "breachbornActionBurnDuration": 1
   },
   {
     "id": "vex",

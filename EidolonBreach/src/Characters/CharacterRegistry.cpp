@@ -38,6 +38,10 @@ CharacterRegistry::create(std::string_view characterId, int characterLevel) cons
         bp.resonanceContribution, bp.passiveTrait)};
 
     pc->setArchetype(bp.archetype);
+    pc->setFractureSelfDotPct(bp.fractureSelfDotPct);
+    pc->setBreachbornActionBonus(bp.breachbornActionBonusDivisor,
+                                 bp.breachbornActionBurnDamage,
+                                 bp.breachbornActionBurnDuration);
 
     // Resolve abilities; log warning for unregistered IDs but do not throw,
     // so partial configurations can still be tested.
@@ -103,6 +107,10 @@ CharacterRegistry::parseBlueprint(const std::string &id, const nlohmann::json &j
     bp.resonanceContribution = j.value("resonanceContribution", 10);
     bp.passiveTrait = j.value("passiveTrait", "");
     bp.archetype = j.value("archetype", "");
+    bp.fractureSelfDotPct = j.value("fractureSelfDotPct", 0.0f);
+    bp.breachbornActionBonusDivisor = j.value("breachbornActionBonusDivisor", 0.0f);
+    bp.breachbornActionBurnDamage = j.value("breachbornActionBurnDamage", 0);
+    bp.breachbornActionBurnDuration = j.value("breachbornActionBurnDuration", 0);
 
     const auto &abilities = j.at("abilities");
     bp.basicId = abilities.value("basic", "basic_strike");

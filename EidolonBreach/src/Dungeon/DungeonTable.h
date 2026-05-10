@@ -14,7 +14,6 @@ namespace DungeonTable
 [[nodiscard]] inline const std::vector<DungeonDefinition> &getClassicDungeons()
 {
     static const std::vector<DungeonDefinition> kDungeons{
-        // ── Dungeon 1: Basic combat ───────────────────────────────────────────
         // One battle. No other mechanics in play yet.
         // Player learns: HP bars, basic attack, turn order, winning a fight.
         {
@@ -28,7 +27,6 @@ namespace DungeonTable
             DungeonDifficulty::Normal,
             /*fixedLayout*/ {"battle"},
         },
-        // ── Dungeon 2: Toughness break ────────────────────────────────────────
         // Two battles. Enemies have notable toughness bars.
         // Player learns: toughness gauge, break, broken damage bonus.
         {
@@ -42,7 +40,6 @@ namespace DungeonTable
             DungeonDifficulty::Normal,
             /*fixedLayout*/ {"battle", "battle"},
         },
-        // ── Dungeon 3: Rest node + SP / Slot Skills ───────────────────────────
         // Battle → Rest → Battle. First Rest node in the game.
         // Player learns: SP generation (basic attack), Slot Skill SP cost, rest options.
         {
@@ -56,7 +53,6 @@ namespace DungeonTable
             DungeonDifficulty::Normal,
             /*fixedLayout*/ {"battle", "rest", "battle"},
         },
-        // ── Dungeon 4: Resonance Field ────────────────────────────────────────
         // Five floors. By floor 4 the field has plausibly triggered at least once.
         // Player learns: affinity voting, gauge fill, trigger effects, floor affinity.
         {
@@ -70,7 +66,6 @@ namespace DungeonTable
             DungeonDifficulty::Normal,
             /*fixedLayout*/ {"battle", "battle", "rest", "battle", "battle"},
         },
-        // ── Dungeon 5: Exposure + Vent + Vestiges ─────────────────────────────
         // Six floors. Depth modifier adds Exposure each battle.
         // First Treasure node awards a vestige.
         // Player learns: Exposure gauge, Vent action, Purge at Rest, vestiges.
@@ -92,7 +87,6 @@ namespace DungeonTable
                 "battle",
             },
         },
-        // ── Dungeon 6: Elite encounters + deeper vestiges ─────────────────────
         // Seven floors. First Elite node. Post-elite vestige reward.
         // Player learns: elite node spike, Corrupted vestiges, vestige discard.
         {
@@ -114,7 +108,6 @@ namespace DungeonTable
                 "battle",
             },
         },
-        // ── Dungeon 7: First boss ─────────────────────────────────────────────
         // Nine floors. Guaranteed Rest before boss.
         // Player has seen every core mechanic before this fight.
         {

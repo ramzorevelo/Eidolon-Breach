@@ -111,7 +111,6 @@ TEST_CASE("applyResonanceModifier: unrecognised stanceId returns baseAmount")
         "invalid_stance", *hero, Affinity::Blaze, 10, state)};
     CHECK(result == 10);
 }
-// ── Zara stances ─────────────────────────────────────────────────────────
 
 TEST_CASE("resolveStanceId: Zara Methodical → Glacial")
 {

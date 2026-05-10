@@ -64,8 +64,8 @@ class Battle
     const SummonRegistry *m_summonRegistry{nullptr};
 
     void runBattleLoop(BattleState &state);
-    bool isBattleOver() const;
-    bool checkAndHandleBattleEnd(BattleState &state);
+    [[nodiscard]] bool isBattleOver() const;
+    [[nodiscard]] bool checkAndHandleBattleEnd(BattleState &state); 
 
     void processPlayerTurn(Unit *unit, BattleState &state);
     void processEnemyTurn(Unit *unit, BattleState &state);
@@ -129,13 +129,13 @@ class Battle
     void checkCrystallization(PlayableCharacter &pc, BattleState &state);
 
     void checkNewDeaths(const std::vector<bool> &aliveBefore,
-                        const Party &party,
+                        Party &party,
                         Unit *attacker,
                         BattleState &state);
     std::vector<bool> snapshotAliveStates(const Party &party) const;
     std::vector<bool> snapshotBreakStates(const Party &party) const;
     void processNewBreaks(const std::vector<bool> &before,
-                          const Party &party,
+                          Party &party,
                           Affinity actionAffinity,
                           BattleState &state);
 

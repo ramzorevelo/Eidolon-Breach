@@ -8,7 +8,6 @@
 #include "doctest.h"
 #include <filesystem>
 
-// ── levelFromXP (non‑linear) ─────────────────────────────────────────────────
 
 TEST_CASE("MetaProgress::levelFromXP: level 1 at 0 XP")
 {
@@ -37,7 +36,6 @@ TEST_CASE("MetaProgress::levelFromXP: 200 XP is still level 3 (not enough for le
     CHECK(MetaProgress::levelFromXP(200) == 3);
 }
 
-// ── playerLevelFromXp ────────────────────────────────────────────────────────
 
 TEST_CASE("MetaProgress::playerLevelFromXp: level 1 at 0 XP")
 {
@@ -58,7 +56,6 @@ TEST_CASE("MetaProgress::gainPlayerXp: updates playerLevel correctly")
     CHECK(meta.playerLevel == 2);
 }
 
-// ── gainXP (character XP, non‑linear) ────────────────────────────────────────
 
 TEST_CASE("MetaProgress::gainXP: returns new level after 50 XP")
 {
@@ -91,7 +88,6 @@ TEST_CASE("MetaProgress::gainXP: level stays at 1 below 50 XP")
     CHECK(meta.characterLevels["hero"] == 1);
 }
 
-// ── unlockCharacter ──────────────────────────────────────────────────────────
 
 TEST_CASE("MetaProgress::unlockCharacter: returns true for new character")
 {
@@ -123,8 +119,6 @@ TEST_CASE("MetaProgress::unlockCharacter: echo count capped at kMaxEchoes")
         meta.unlockCharacter("hero");
     CHECK(meta.characterInsight["hero"].echoCount == CombatConstants::kMaxEchoes);
 }
-
-// ── save / load round‑trip ───────────────────────────────────────────────────
 
 TEST_CASE("MetaProgress: save/load round-trip preserves all fields")
 {

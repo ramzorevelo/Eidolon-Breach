@@ -23,7 +23,6 @@
 #include <memory>
 #include <map>
 
-// ── helpers ──────────────────────────────────────────────────────────────────
 
 namespace
 {
@@ -60,7 +59,6 @@ BattleState makeBattleState(ResonanceField &field,
 }
 } // namespace
 
-// ── affinity scaling ─────────────────────────────────────────────────────────
 
 TEST_CASE("applyToughnessHit: neutral affinity (no modifier) applies 1.0x")
 {
@@ -91,7 +89,6 @@ TEST_CASE("applyToughnessHit: toughness cannot go below zero")
     CHECK(e->isBroken());
 }
 
-// ── break trigger ─────────────────────────────────────────────────────────────
 
 TEST_CASE("applyToughnessHit: sets isBroken when toughness reaches 0")
 {
@@ -132,7 +129,6 @@ TEST_CASE("applyToughnessHit: resistance affinity keeps enemy unbroken")
     CHECK(e->getToughness() == 5);
 }
 
-// ── broken damage bonus ───────────────────────────────────────────────────────
 
 TEST_CASE("Enemy::takeDamage: applies 1.5x bonus while broken")
 {
@@ -202,7 +198,6 @@ TEST_CASE("Enemy::takeDamage: bonus applies to ALL player actions during window,
     CHECK(e->getHp() == 55);
 }
 
-// ── break recovery ────────────────────────────────────────────────────────────
 
 TEST_CASE("Enemy::takeTurn: returns Skip and clears broken state after 1 skipped turn")
 {
@@ -234,7 +229,6 @@ TEST_CASE("recoverFromBreak: manually clears broken flag")
     CHECK(!e->isBroken());
 }
 
-// ── BreakEffect callback ──────────────────────────────────────────────────────
 
 TEST_CASE("BreakEffect::onBreak is called by Battle when enemy breaks")
 {
@@ -318,7 +312,6 @@ TEST_CASE("BreakEffect: empty callback is a safe no-op")
         effect.onBreak(*e, state); // only fires if set — skipped here ✓
 }
 
-// ── Slime Split (stub) ────────────────────────────────────────────────────────
 
 TEST_CASE("Slime Split break effect: deals impact damage to all player allies")
 {
@@ -348,7 +341,6 @@ TEST_CASE("Slime Split break effect: deals impact damage to all player allies")
     CHECK(h2->getHp() == 112);
 }
 
-// ── StoneGolem Crumble ────────────────────────────────────────────────────────
 
 TEST_CASE("StoneGolem Crumble break effect: applies ShieldEffect to all player allies")
 {
@@ -378,7 +370,6 @@ TEST_CASE("StoneGolem Crumble break effect: applies ShieldEffect to all player a
     CHECK(h->getHp() == 120); // shield absorbs 10, HP unchanged
 }
 
-// ── VampireBat Bloodless ─────────────────────────────────────────────────────
 
 TEST_CASE("VampireBat Bloodless break effect: heals player allies and activates bloodless")
 {

@@ -4,8 +4,8 @@
 #include <algorithm>
 
 std::vector<TurnSlot> SpeedBasedTurnOrderCalculator::calculate(
-    const Party &playerParty,
-    const Party &enemyParty) const
+    Party &playerParty,
+    Party &enemyParty) const
 {
 
     std::vector<TurnSlot> slots{};
@@ -13,7 +13,7 @@ std::vector<TurnSlot> SpeedBasedTurnOrderCalculator::calculate(
     // Collect alive player units
     for (std::size_t i{0}; i < playerParty.size(); ++i)
     {
-        Unit *u = const_cast<Unit *>(playerParty.getUnitAt(i));
+        Unit *u{playerParty.getUnitAt(i)};
         if (u && u->isAlive())
         {
             slots.push_back({u, true, i});
@@ -23,7 +23,7 @@ std::vector<TurnSlot> SpeedBasedTurnOrderCalculator::calculate(
     // Collect alive enemy units
     for (std::size_t i{0}; i < enemyParty.size(); ++i)
     {
-        Unit *u = const_cast<Unit *>(enemyParty.getUnitAt(i));
+        Unit *u{enemyParty.getUnitAt(i)};
         if (u && u->isAlive())
         {
             slots.push_back({u, false, i});

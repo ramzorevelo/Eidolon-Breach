@@ -11,7 +11,6 @@
 #include "test_helpers.h"
 #include <memory>
 
-// ── LyraUltimateAction ────────────────────────────────────────────────────────
 
 TEST_CASE("LyraUltimateAction: requires full Energy")
 {
@@ -51,7 +50,6 @@ TEST_CASE("LyraUltimateAction: affinity is Blaze")
     CHECK(ult.getAffinity() == Affinity::Blaze);
 }
 
-// ── VexUltimateAction ─────────────────────────────────────────────────────────
 
 TEST_CASE("VexUltimateAction: shields all allies")
 {
@@ -93,7 +91,6 @@ TEST_CASE("VexUltimateAction: affinity is Terra")
     CHECK(ult.getAffinity() == Affinity::Terra);
 }
 
-// ── ZaraUltimateAction ────────────────────────────────────────────────────────
 
 TEST_CASE("ZaraUltimateAction: slows all enemies and deals damage")
 {

@@ -21,7 +21,6 @@
 #include "Entities/Summon.h"
 #include "Summons/SummonRegistry.h"
 #include "Battle/StanceModifiers.h"
-#include "Characters/Lyra/Lyra.h"
 
 namespace
 {
@@ -490,13 +489,13 @@ std::vector<bool> Battle::snapshotBreakStates(const Party &party) const
 }
 
 void Battle::checkNewDeaths(const std::vector<bool> &aliveBefore,
-                            const Party &party,
+                            Party &party,
                             Unit *attacker,
                             BattleState &state)
 {
     for (std::size_t i{0}; i < party.size() && i < aliveBefore.size(); ++i)
     {
-        Unit *u{const_cast<Unit *>(party.getUnitAt(i))};
+        Unit *u{party.getUnitAt(i)};
         if (!u || !aliveBefore[i] || u->isAlive())
             continue;
         if (&party == &m_enemyParty)
@@ -509,13 +508,13 @@ void Battle::checkNewDeaths(const std::vector<bool> &aliveBefore,
 }
 
 void Battle::processNewBreaks(const std::vector<bool> &before,
-                              const Party &party,
+                              Party &party,
                               Affinity actionAffinity,
                               BattleState &state)
 {
     for (std::size_t i{0}; i < party.size() && i < before.size(); ++i)
     {
-        Unit *u{const_cast<Unit *>(party.getUnitAt(i))};
+        Unit *u{party.getUnitAt(i)};
         if (!u || before[i] || !u->isBroken())
             continue;
 
@@ -785,13 +784,12 @@ void Battle::applyBreachbornEffect(PlayableCharacter &pc, BattleState &state)
 
 void Battle::applyFractureStartOfTurn(PlayableCharacter &pc, BattleState &state)
 {
-    if (pc.getAffinity() == Affinity::Blaze)
+    const float dotPct{pc.fractureSelfDotPct()};
+    if (dotPct > 0.0f)
     {
-        // Lyra Fracture: 5% maxHP self-DoT per her turn.
         const int selfDamage{
             std::max(1, static_cast<int>(
-                            static_cast<float>(pc.getFinalStats().maxHp) *
-                            LyraConstants::kFractureSelfDotPct))};
+                            static_cast<float>(pc.getFinalStats().maxHp) * dotPct))};
         pc.takeTrueDamage(selfDamage);
         state.renderer.renderMessage(
             pc.getName() + " — Fracture: -" + std::to_string(selfDamage) +
@@ -799,7 +797,6 @@ void Battle::applyFractureStartOfTurn(PlayableCharacter &pc, BattleState &state)
     }
     else
     {
-        // Other Fracture effects deferred to IPassiveTrait (v0.9.x).
         state.renderer.renderMessage(pc.getName() + " — [Fractured]");
     }
 }
@@ -808,10 +805,10 @@ void Battle::applyBreachbornActionBonus(PlayableCharacter &pc,
                                         const ActionResult &result,
                                         BattleState &state)
 {
-    if (pc.getAffinity() != Affinity::Blaze)
-        return; // Placeholder: only Blaze has per-action Breachborn bonus for now.
+    const float divisor{pc.breachbornActionBonusDivisor()};
+    if (divisor <= 0.0f)
+        return;
 
-    // +50% bonus damage as true damage to primary target.
     if (result.value > 0 && result.targetEnemyIndex >= 0 &&
         state.enemyParty != nullptr)
     {
@@ -819,18 +816,22 @@ void Battle::applyBreachbornActionBonus(PlayableCharacter &pc,
             static_cast<std::size_t>(result.targetEnemyIndex))};
         if (t && t->isAlive())
         {
-            const int bonus{result.value / LyraConstants::kBreachbornActionBonusDivisor};
+            const int bonus{static_cast<int>(
+                static_cast<float>(result.value) / divisor)};
             t->takeTrueDamage(bonus);
-            // Also re-apply Burn on every Breachborn action.
-            t->applyEffect(std::make_unique<BurnEffect>(
-                LyraConstants::kBreachbornActionBurnDamage,
-                LyraConstants::kBreachbornActionBurnDuration));
+
+            const int burnDmg{pc.breachbornActionBurnDamage()};
+            const int burnDur{pc.breachbornActionBurnDuration()};
+            if (burnDmg > 0 && burnDur > 0)
+                t->applyEffect(std::make_unique<BurnEffect>(burnDmg, burnDur));
+
             state.renderer.renderMessage(
-                pc.getName() + " — Breachborn Blaze: +" +
-                std::to_string(bonus) + " bonus damage + Burn!");
+                pc.getName() + " — Breachborn: +" +
+                std::to_string(bonus) + " bonus damage!");
         }
     }
 }
+
 void Battle::handlePcTurnStart(PlayableCharacter &pc, BattleState &state)
 {
     pc.tickArchSkillCooldown();

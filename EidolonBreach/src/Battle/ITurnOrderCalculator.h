@@ -28,6 +28,6 @@ class ITurnOrderCalculator
      * @param enemyParty The enemy party.
      * @return A vector of TurnSlot in the order units will act.
      */
-    virtual std::vector<TurnSlot> calculate(const Party &playerParty,
-                                            const Party &enemyParty) const = 0;
+    [[nodiscard]] virtual std::vector<TurnSlot> calculate(Party &playerParty,
+                                                          Party &enemyParty) const = 0;
 };

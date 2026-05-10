@@ -41,7 +41,6 @@ SummonDefinition makeTestDef(std::optional<int> duration = std::nullopt)
 }
 } // namespace
 
-// ── SummonRegistry ─────────────────────────────────────────────────────────
 
 TEST_CASE("SummonRegistry: find returns nullptr for missing id")
 {
@@ -73,7 +72,6 @@ TEST_CASE("SummonRegistry: re-register overwrites existing entry")
     CHECK(reg.find("test_summon")->baseStats.spd == 20);
 }
 
-// ── Summon entity ──────────────────────────────────────────────────────────
 
 TEST_CASE("Summon: isSummon returns true")
 {

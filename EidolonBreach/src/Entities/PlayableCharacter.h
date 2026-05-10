@@ -39,6 +39,34 @@ class PlayableCharacter : public Unit
     {
         m_archetype = std::string{arch};
     }
+    void setFractureSelfDotPct(float pct)
+    {
+        m_fractureSelfDotPct = pct;
+    }
+    [[nodiscard]] float fractureSelfDotPct() const
+    {
+        return m_fractureSelfDotPct;
+    }
+
+    void setBreachbornActionBonus(float divisor, int burnDamage, int burnDuration)
+    {
+        m_breachbornActionBonusDivisor = divisor;
+        m_breachbornActionBurnDamage = burnDamage;
+        m_breachbornActionBurnDuration = burnDuration;
+    }
+    [[nodiscard]] float breachbornActionBonusDivisor() const
+    {
+        return m_breachbornActionBonusDivisor;
+    }
+    [[nodiscard]] int breachbornActionBurnDamage() const
+    {
+        return m_breachbornActionBurnDamage;
+    }
+    [[nodiscard]] int breachbornActionBurnDuration() const
+    {
+        return m_breachbornActionBurnDuration;
+    }
+
     const std::vector<std::unique_ptr<IAction>> &getAbilities() const;
 
     /**
@@ -61,15 +89,15 @@ class PlayableCharacter : public Unit
         return m_equipped;
     }
 
-    // Energy (individual resource)
-    int getEnergy() const
+    [[nodiscard]] int getEnergy() const
     {
         return m_resources.energy;
     }
-    bool isUltimateReady() const
+    [[nodiscard]] bool isUltimateReady() const
     {
         return m_resources.energy >= kMaxEnergy;
     }
+
     void gainEnergy(int amount);
     void resetEnergy();
     void consumeEnergy(int amount);
@@ -115,7 +143,7 @@ class PlayableCharacter : public Unit
     {
         return m_resonanceContribution;
     }
-    const std::string &getPassiveTrait() const
+    [[nodiscard]] const std::string &getPassiveTrait() const
     {
         return m_passiveTrait;
     }
@@ -134,7 +162,7 @@ class PlayableCharacter : public Unit
         return m_exposure;
     }
     void modifyExposure(int delta);
-    bool canVent() const; // 0 < exposure < 100
+    [[nodiscard]] bool canVent() const; // 0 < exposure < 100
 
     [[nodiscard]] bool isBreachbornActive() const
     {
@@ -365,4 +393,8 @@ class PlayableCharacter : public Unit
     {
         return (m_flags & static_cast<uint16_t>(f)) != 0;
     }
+    float m_fractureSelfDotPct{0.0f};
+    float m_breachbornActionBonusDivisor{0.0f};
+    int m_breachbornActionBurnDamage{0};
+    int m_breachbornActionBurnDuration{0};
 };

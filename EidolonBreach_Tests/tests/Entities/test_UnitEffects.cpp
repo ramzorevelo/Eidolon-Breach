@@ -74,7 +74,6 @@ class CountingEffect : public StatusEffectBase
 };
 } // namespace
 
-// ── takeTrueDamage ────────────────────────────────────────────────────────────
 
 TEST_CASE("Unit::takeTrueDamage: reduces HP directly, ignoring shields")
 {
@@ -93,7 +92,6 @@ TEST_CASE("Unit::takeTrueDamage: clamps HP to 0, does not go negative")
     CHECK(!hero->isAlive());
 }
 
-// ── takeDamage: shield absorption ────────────────────────────────────────────
 
 TEST_CASE("Unit::takeDamage: shield absorbs damage fully when pool is sufficient")
 {
@@ -119,7 +117,6 @@ TEST_CASE("Unit::takeDamage: no shield applies full damage to HP")
     CHECK(hero->getHp() == 80);
 }
 
-// ── applyEffect: refresh semantics ───────────────────────────────────────────
 
 TEST_CASE("Unit::applyEffect: adds a new effect")
 {
@@ -155,7 +152,6 @@ TEST_CASE("Unit::applyEffect: different IDs coexist")
     CHECK(hero->hasEffect(EffectIds::kBurn));
 }
 
-// ── removeEffect / removeEffectsByTag ────────────────────────────────────────
 
 TEST_CASE("Unit::removeEffect: removes effect by ID")
 {
@@ -192,7 +188,6 @@ TEST_CASE("Unit::removeEffectsByTag: no-op when no effects match")
     CHECK(hero->hasEffect(EffectIds::kShield));
 }
 
-// ── hasEffectWithTag ─────────────────────────────────────────────────────────
 
 TEST_CASE("Unit::hasEffectWithTag: returns true when a matching tag is active")
 {
@@ -202,7 +197,6 @@ TEST_CASE("Unit::hasEffectWithTag: returns true when a matching tag is active")
     CHECK(hero->hasEffectWithTag(EffectTags::kDoT));
 }
 
-// ── tickEffects ──────────────────────────────────────────────────────────────
 
 TEST_CASE("Unit::tickEffects: calls onTick and returns non-empty messages")
 {
@@ -286,7 +280,6 @@ TEST_CASE("Unit::tickEffects: permanent effect never expires")
     CHECK(hero->hasEffect(EffectIds::kShield));
 }
 
-// ── extendEffectsByTag ───────────────────────────────────────────────────────
 
 TEST_CASE("Unit::extendEffectsByTag: extends duration of matching effects")
 {

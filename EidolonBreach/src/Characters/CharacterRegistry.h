@@ -49,6 +49,10 @@ class CharacterRegistry
         std::string basicId{};
         std::string archSkillId{};
         std::string ultimateId{};
+        float fractureSelfDotPct{0.0f};
+        float breachbornActionBonusDivisor{0.0f};
+        int breachbornActionBurnDamage{0};
+        int breachbornActionBurnDuration{0};
     };
 
     std::vector<std::string> m_orderedIds{};

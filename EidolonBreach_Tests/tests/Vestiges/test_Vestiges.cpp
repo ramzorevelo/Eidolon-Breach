@@ -24,8 +24,6 @@
 #include <memory>
 #include <ostream>
 
-// ── helpers ──────────────────────────────────────────────────────────────────
-
 namespace
 {
 // Constructs a minimal BattleState pointing at real field/input/renderer stubs.
@@ -49,7 +47,6 @@ BattleState makeState(Party *playerParty = nullptr, Party *enemyParty = nullptr)
 }
 } // namespace
 
-// ── FlameResonanceVestige ────────────────────────────────────────────────────
 
 TEST_CASE("FlameResonanceVestige: Blaze action adds kBlazeBonus to Resonance Field")
 {
@@ -77,7 +74,6 @@ TEST_CASE("FlameResonanceVestige: non-Blaze action does not modify Resonance Fie
     CHECK(state.resonanceField.getGauge() == 0);
 }
 
-// ── ToughnessBreakerVestige ──────────────────────────────────────────────────
 
 TEST_CASE("ToughnessBreakerVestige: applies bonus toughness against weakness affinity")
 {
@@ -161,7 +157,6 @@ TEST_CASE("ToughnessBreakerVestige: no-op when toughnessDamage is 0")
     CHECK(e->getToughness() == 50); // unchanged
 }
 
-// ── EchoingStrikeVestige ─────────────────────────────────────────────────────
 
 TEST_CASE("EchoingStrikeVestige: flag is armed after ResonanceFieldTriggeredEvent")
 {
@@ -235,7 +230,6 @@ TEST_CASE("EchoingStrikeVestige: flag resets on new battle start")
     CHECK(!vestige.isNextActionFree());
 }
 
-// ── VestigeOfTheUnbound ──────────────────────────────────────────────────────
 
 TEST_CASE("VestigeOfTheUnbound: adds kExposurePerTurn to bearer each turn start")
 {
@@ -262,7 +256,6 @@ TEST_CASE("VestigeOfTheUnbound: exposure still accumulates at high values")
     CHECK(hero->getExposure() == 100); // clamped to max, not above
 }
 
-// ── AttunistGambitVestige ────────────────────────────────────────────────────
 
 TEST_CASE("AttunistGambitVestige: reduces killer Exposure by kExposureOnKill on kill")
 {
@@ -387,7 +380,6 @@ TEST_CASE("AttunistGambitVestige: per-battle reduction counter resets on battle 
     CHECK(hero->getExposure() == 72);
 }
 
-// ── Party vestige limit ───────────────────────────────────────────────────────
 
 TEST_CASE("Party::addVestige: accepts vestiges up to kMaxVestiges")
 {
@@ -411,7 +403,6 @@ TEST_CASE("Party::addVestige: returns false and does not add when at cap")
     CHECK(party.getVestiges().size() == static_cast<std::size_t>(Party::kMaxVestiges));
 }
 
-// ── SwiftStrikeVestige ───────────────────────────────────────────────────────
 
 TEST_CASE("SwiftStrikeVestige: grants +5 Energy when HP is full")
 {
@@ -437,7 +428,6 @@ TEST_CASE("SwiftStrikeVestige: no Energy gain when HP is below max")
     CHECK(hero->getEnergy() == energyBefore);
 }
 
-// ── ResonantSurgeVestige ─────────────────────────────────────────────────────
 
 TEST_CASE("ResonantSurgeVestige: grants +20 SP after Resonance Field trigger")
 {
@@ -464,7 +454,6 @@ TEST_CASE("ResonantSurgeVestige: no SP gain before trigger fires")
     CHECK(playerParty.getSp() == 30);
 }
 
-// ── VoidHungerVestige ────────────────────────────────────────────────────────
 
 TEST_CASE("VoidHungerVestige: adds kExposurePerTurn Exposure on turn start")
 {

@@ -18,6 +18,6 @@
 class SpeedBasedTurnOrderCalculator : public ITurnOrderCalculator
 {
   public:
-    std::vector<TurnSlot> calculate(const Party &playerParty,
-                                    const Party &enemyParty) const override;
+    [[nodiscard]] std::vector<TurnSlot> calculate(Party &playerParty,
+                                                  Party &enemyParty) const override;
 };
