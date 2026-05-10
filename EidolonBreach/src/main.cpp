@@ -64,22 +64,26 @@ static AbilityRegistry buildAbilityRegistry()
 }
 
 static void togglePartyMember(std::size_t idx, std::vector<bool> &selected,
+                              std::vector<std::size_t> &selectionOrder,
                               std::size_t &count, std::size_t maxPick)
 {
     if (selected[idx])
     {
         selected[idx] = false;
+        selectionOrder.erase(std::find(selectionOrder.begin(), selectionOrder.end(), idx));
         --count;
     }
     else if (count < maxPick)
     {
         selected[idx] = true;
+        selectionOrder.push_back(idx);
         ++count;
     }
 }
 
 // Returns: 1=confirmed, -1=back/cancel, 0=state changed (re-render needed)
 static int processPartyKey(SDL_Keycode key, std::vector<bool> &selected,
+                           std::vector<std::size_t> &selectionOrder,
                            std::size_t &count, std::size_t &cursor,
                            std::size_t maxPick, std::size_t numAvailable,
                            std::size_t displaySize)
@@ -104,7 +108,7 @@ static int processPartyKey(SDL_Keycode key, std::vector<bool> &selected,
         return 1;
     if (cursor < numAvailable)
     {
-        togglePartyMember(cursor, selected, count, maxPick);
+        togglePartyMember(cursor, selected, selectionOrder, count, maxPick);
         return 0;
     }
     return -2;
@@ -150,6 +154,7 @@ static void selectParty(Party &party,
 
     std::vector<bool> selected(available.size(), false);
     std::size_t selectedCount{0};
+    std::vector<std::size_t> selectionOrder{};
     std::size_t cursor{0};
 
     auto buildDisplayOptions = [&]() -> std::vector<std::string>
@@ -157,7 +162,17 @@ static void selectParty(Party &party,
         std::vector<std::string> display{};
         for (std::size_t i = 0; i < options.size(); ++i)
         {
-            const std::string prefix = selected[i] ? "[X] " : "[ ] ";
+            std::string prefix{};
+            if (!selected[i])
+            {
+                prefix = "[ ] ";
+            }
+            else
+            {
+                const auto it = std::find(selectionOrder.begin(), selectionOrder.end(), i);
+                const std::size_t pos = static_cast<std::size_t>(it - selectionOrder.begin()) + 1;
+                prefix = "[" + std::to_string(pos) + "] ";
+            }
             display.push_back(prefix + options[i]);
         }
         display.push_back("--- Confirm Party (" + std::to_string(selectedCount) + "/" + std::to_string(maxPick) + ") ---");
@@ -179,7 +194,7 @@ static void selectParty(Party &party,
 
         if (event.type == SDL_EVENT_KEY_DOWN && !event.key.repeat)
         {
-            const int r = processPartyKey(event.key.key, selected, selectedCount, cursor,
+            const int r = processPartyKey(event.key.key, selected, selectionOrder, selectedCount, cursor,
                                           maxPick, available.size(), display.size());
             if (r == -1)
             {
@@ -201,7 +216,7 @@ static void selectParty(Party &party,
             if (row >= 0 && static_cast<std::size_t>(row) < available.size())
             {
                 cursor = static_cast<std::size_t>(row);
-                togglePartyMember(cursor, selected, selectedCount, maxPick);
+                togglePartyMember(cursor, selected, selectionOrder, selectedCount, maxPick);
                 needsRender = true;
             }
             else if (static_cast<std::size_t>(row) == available.size() && selectedCount > 0)
@@ -219,10 +234,8 @@ static void selectParty(Party &party,
             break;
     }
 
-    for (std::size_t i = 0; i < available.size(); ++i)
+    for (const std::size_t i : selectionOrder)
     {
-        if (!selected[i])
-            continue;
         const int level{meta.characterLevels.count(available[i]) > 0
                             ? meta.characterLevels.at(available[i])
                             : 1};
