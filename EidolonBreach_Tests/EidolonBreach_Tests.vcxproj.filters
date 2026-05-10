@@ -354,6 +354,12 @@
     <ClCompile Include="..\EidolonBreach\src\Actions\VentAction.cpp">
       <Filter>Actions</Filter>
     </ClCompile>
+    <ClCompile Include="..\EidolonBreach\src\Battle\AVTurnOrderCalculator.cpp">
+      <Filter>Battle</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Battle\test_AVTurnOrderCalculator.cpp">
+      <Filter>Battle</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="external\doctest.h">

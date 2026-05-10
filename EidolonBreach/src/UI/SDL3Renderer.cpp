@@ -221,7 +221,28 @@ void SDL3Renderer::drawTurnOrderStrip()
                    badgeX + badgeW * 0.30f,
                    badgeY + badgeH * 0.15f,
                    255, 255, 255);
+        // Repeat indicator: count how many earlier slots in this projection
+        // show the same unit, then draw a small count badge if > 0.
+        int repeatCount{0};
+        for (std::size_t j{0}; j < i; ++j)
+        {
+            if (m_cachedTurnOrder[j].unit == slot.unit)
+                ++repeatCount;
+        }
+        if (repeatCount > 0 && m_font)
+        {
+            const std::string countStr{std::to_string(repeatCount + 1)};
+            const float badgeSize{badgeH * 0.35f};
+            const float bx{badgeX + badgeW - badgeSize};
+            const float by{badgeY};
+            fillRect({bx, by, badgeSize, badgeSize}, 255, 220, 60);
+            renderTextEx(m_font, countStr,
+                         bx + badgeSize * 0.15f,
+                         by + badgeSize * 0.05f,
+                         10, 10, 10);
+        }
     }
+
 }
 void SDL3Renderer::drawPlayerCardBars(const PlayableCharacter *pc,
                                       float barX, float barW, float &py, bool isActive)

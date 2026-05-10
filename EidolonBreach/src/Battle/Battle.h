@@ -170,6 +170,4 @@ class Battle
                                        const ActionResult &result,
                                        BattleState &state);
     void handleSummonExpiry(Unit *unit);
-    void buildAndRenderRemainingStrip(std::vector<TurnSlot> &turnOrder,
-                                      std::size_t currentSlotIdx);
 };

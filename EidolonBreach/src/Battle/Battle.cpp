@@ -5,7 +5,7 @@
 #include <set>
 #include "Core/FieldDiscovery.h"
 #include "Battle/Battle.h"
-#include "Battle/SpeedBasedTurnOrderCalculator.h"
+#include "Battle/AVTurnOrderCalculator.h"
 #include "Core/BattleEvents.h"
 #include "Core/CombatConstants.h"
 #include "Core/EffectIds.h"
@@ -49,7 +49,7 @@ Battle::Battle(Party &playerParty,
       m_runContext{runContext},
       m_eventBus{eventBus},
       m_turnOrderCalc{turnOrderCalc ? std::move(turnOrderCalc)
-                                    : std::make_unique<SpeedBasedTurnOrderCalculator>()},
+                                    : std::make_unique<AVTurnOrderCalculator>()},
       m_renderer{renderer},
       m_inputHandler{inputHandler},
       m_summonRegistry{summonRegistry}
@@ -107,57 +107,55 @@ void Battle::runBattleLoop(BattleState &state)
 {
     while (!isBattleOver())
     {
-        auto turnOrder{m_turnOrderCalc->calculate(m_playerParty, m_enemyParty)};
-        m_renderer.renderTurnOrder(turnOrder);
+        // Project and display the next 10 upcoming slots.
+        const auto projected{m_turnOrderCalc->calculate(m_playerParty, m_enemyParty)};
+        m_renderer.renderTurnOrder(projected);
 
-        for (std::size_t i{0}; i < m_enemyParty.size(); ++i)
+        if (projected.empty())
+            break;
+
+        // Execute only the first slot, the soonest-acting unit.
+        const TurnSlot slot{projected[0]};
+
+        if (!slot.unit || !slot.unit->isAlive() || isBattleOver())
         {
-            const Unit *u{m_enemyParty.getUnitAt(i)};
-            if (!u || !u->isAlive())
-                continue;
-            const std::string intent{u->getIntentLabel()};
-            if (!intent.empty())
-                m_renderer.renderMessage(u->getName() + " | " + intent);
+            m_turnOrderCalc->onUnitActed(slot.unit);
+            continue;
         }
 
-        for (std::size_t slotIdx = 0; slotIdx < turnOrder.size(); ++slotIdx)
+        m_renderer.renderPartyStatus(m_playerParty, m_enemyParty);
+
+        const auto enemyAliveBefore{snapshotAliveStates(m_enemyParty)};
+        const auto playerAliveBefore{snapshotAliveStates(m_playerParty)};
+
+        for (const std::string &msg : slot.unit->tickEffects())
+            m_renderer.renderMessage(msg);
+
+        if (!slot.unit->isAlive())
         {
-            const TurnSlot &slot = turnOrder[slotIdx];
-            if (!slot.unit || !slot.unit->isAlive() || isBattleOver())
-                continue;
-
-            m_renderer.renderPartyStatus(m_playerParty, m_enemyParty);
-
-            const auto enemyAliveBefore{snapshotAliveStates(m_enemyParty)};
-            const auto playerAliveBefore{snapshotAliveStates(m_playerParty)};
-
-            for (const std::string &msg : slot.unit->tickEffects())
-                m_renderer.renderMessage(msg);
-
-            if (!slot.unit->isAlive())
-            {
-                checkNewDeaths(enemyAliveBefore, m_enemyParty, nullptr, state);
-                checkNewDeaths(playerAliveBefore, m_playerParty, nullptr, state);
-                if (checkAndHandleBattleEnd(state))
-                    return;
-                continue;
-            }
-
-            if (slot.isPlayer)
-                processPlayerTurn(slot.unit, state);
-            else
-                processEnemyTurn(slot.unit, state);
-            
-
-            handleSummonExpiry(slot.unit);
-
+            m_turnOrderCalc->onUnitActed(slot.unit);
+            checkNewDeaths(enemyAliveBefore, m_enemyParty, nullptr, state);
+            checkNewDeaths(playerAliveBefore, m_playerParty, nullptr, state);
             if (checkAndHandleBattleEnd(state))
                 return;
-
-            buildAndRenderRemainingStrip(turnOrder, slotIdx);
-
-            m_renderer.presentPause(slot.isPlayer ? kPlayerTurnPauseMs : kEnemyTurnPauseMs);
+            continue;
         }
+
+        // Advance live AV state before the unit acts so Hasten/Suppress applied
+        // during the turn are relative to the already-reset base AV.
+        m_turnOrderCalc->onUnitActed(slot.unit);
+
+        if (slot.isPlayer)
+            processPlayerTurn(slot.unit, state);
+        else
+            processEnemyTurn(slot.unit, state);
+
+        handleSummonExpiry(slot.unit);
+
+        if (checkAndHandleBattleEnd(state))
+            return;
+
+        m_renderer.presentPause(slot.isPlayer ? kPlayerTurnPauseMs : kEnemyTurnPauseMs);
     }
 }
 
@@ -229,6 +227,9 @@ void Battle::processPlayerTurn(Unit *unit, BattleState &state)
 
 void Battle::processEnemyTurn(Unit *unit, BattleState &state)
 {
+    // Break window ends when this suppressed slot is consumed.
+    unit->checkAndClearBroken();
+
     auto playerAliveBefore{snapshotAliveStates(m_playerParty)};
 
     const ActionResult result{unit->takeTurn(m_enemyParty, m_playerParty, state)};
@@ -313,7 +314,11 @@ void Battle::applyResonanceTrigger(Affinity affinity, BattleState &state)
 
     case Affinity::Tempest:
         for (Unit *u : m_playerParty.getAliveUnits())
+        {
             u->gainEnergyIfApplicable(CombatConstants::kRFTempestEnergy);
+            m_turnOrderCalc->applyHasten(u, CombatConstants::kTempestHastenPct);
+        }
+        m_renderer.renderMessage(">> RF Tempest: party hastened!");
         break;
 
     case Affinity::Terra:
@@ -521,6 +526,9 @@ void Battle::processNewBreaks(const std::vector<bool> &before,
         if (!u->isAlive())
             continue; // death message takes priority; skip break notification
         m_renderer.renderBreak(u->getName());
+
+        m_turnOrderCalc->applySuppress(u, CombatConstants::kBreakSuppressPct);
+
         state.eventBus.emit(BreakTriggeredEvent{u, actionAffinity, &state});
         u->triggerBreakEffect(state);
     }
@@ -908,6 +916,12 @@ void Battle::handlePostAction(Unit *unit, PlayableCharacter *pc,
     if (result.summonEffect.has_value())
         processSummonEffect(*result.summonEffect, pc->getResonanceContribution(), state);
 
+    if (result.hasten.has_value() && result.hasten->target)
+        m_turnOrderCalc->applyHasten(result.hasten->target, result.hasten->pct);
+
+    if (result.suppress.has_value() && result.suppress->target)
+        m_turnOrderCalc->applySuppress(result.suppress->target, result.suppress->pct);
+
     matchActionToAbilityAndSignal(*pc, result, state);
 }
 
@@ -921,29 +935,4 @@ void Battle::handleSummonExpiry(Unit *unit)
     const std::string id{unit->getId()};
     m_renderer.renderMessage(name + " fades away.");
     m_playerParty.removeUnit(id);
-}
-
-void Battle::buildAndRenderRemainingStrip(std::vector<TurnSlot> &turnOrder,
-                                          std::size_t currentSlotIdx)
-{
-    std::vector<TurnSlot> remaining{
-        turnOrder.begin() + static_cast<std::ptrdiff_t>(currentSlotIdx) + 1,
-        turnOrder.end()};
-
-    for (std::size_t pi{0}; pi < m_playerParty.size(); ++pi)
-    {
-        Unit *u{m_playerParty.getUnitAt(pi)};
-        if (!u || !u->isAlive())
-            continue;
-        const bool inOrder{std::any_of(
-            turnOrder.begin(), turnOrder.end(),
-            [u](const TurnSlot &s)
-            { return s.unit == u; })};
-        if (!inOrder)
-        {
-            remaining.push_back({u, true, pi});
-            turnOrder.push_back({u, true, pi});
-        }
-    }
-    m_renderer.renderTurnOrder(remaining);
 }

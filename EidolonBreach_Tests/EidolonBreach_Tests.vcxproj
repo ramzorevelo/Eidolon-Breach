@@ -24,6 +24,7 @@
     <ClCompile Include="..\EidolonBreach\src\Actions\UltimateAction.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Actions\UseConsumableAction.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Actions\VentAction.cpp" />
+    <ClCompile Include="..\EidolonBreach\src\Battle\AVTurnOrderCalculator.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Battle\Battle.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Battle\FormationManager.cpp" />
     <ClCompile Include="..\EidolonBreach\src\Battle\ResonanceField.cpp" />
@@ -76,6 +77,7 @@
     <ClCompile Include="tests\Actions\test_UltimateAction.cpp" />
     <ClCompile Include="tests\Actions\test_UseConsumableAction.cpp" />
     <ClCompile Include="tests\Actions\test_VentActions.cpp" />
+    <ClCompile Include="tests\Battle\test_AVTurnOrderCalculator.cpp" />
     <ClCompile Include="tests\Battle\test_FixedDungeon.cpp" />
     <ClCompile Include="tests\Battle\test_FormationManager.cpp" />
     <ClCompile Include="tests\Battle\test_ResonanceField.cpp" />

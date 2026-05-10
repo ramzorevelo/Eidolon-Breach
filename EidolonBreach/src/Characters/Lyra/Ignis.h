@@ -17,7 +17,7 @@ inline void registerIgnis(SummonRegistry &registry)
     SummonDefinition def{};
     def.id = std::string{kId};
     def.displayName = "Ignis";
-    def.baseStats = Stats{40, 40, 0, 0, 90};
+    def.baseStats = Stats{40, 40, 0, 0, 15};
     def.duration = std::nullopt;
 
     def.actions.push_back(SummonAction{
