@@ -366,6 +366,15 @@
     <ClCompile Include="..\EidolonBreach\src\Meta\AspectTree.cpp">
       <Filter>Meta</Filter>
     </ClCompile>
+    <ClCompile Include="tests\Core\test_CharacterMod.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Core\test_FieldDiscovery.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\Meta\test_AspectTree.cpp">
+      <Filter>Meta</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="external\doctest.h">

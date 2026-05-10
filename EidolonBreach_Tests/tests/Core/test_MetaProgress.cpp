@@ -5,6 +5,12 @@
  */
 #include "Core/CombatConstants.h"
 #include "Core/MetaProgress.h"
+#include "Entities/PlayableCharacter.h"
+#include "Meta/AspectTree.h"
+#include "Characters/AbilityRegistry.h"
+#include "Characters/CharacterRegistry.h"
+#include "Core/RunContext.h"
+#include "Entities/Party.h"
 #include "doctest.h"
 #include <filesystem>
 
@@ -174,6 +180,115 @@ TEST_CASE("MetaProgress: multiple save/load cycles preserve XP correctly")
     CHECK(reloaded.characterXP.at("hero") == 150);
     // 150 XP = level 2 (50 for level 2, remaining 100 < 141 for level 3)
     CHECK(reloaded.characterLevels.at("hero") == 2);
+
+    std::filesystem::remove(testPath);
+}
+
+TEST_CASE("MetaProgress::gainRunSignals: accumulates signal tallies")
+{
+    MetaProgress meta{};
+    meta.unlockCharacter("lyra");
+
+    RunContext ctx{};
+    RunCharacterState &cs{ctx.getCharacterState("lyra")};
+    cs.signalCounts[BehaviorSignal::Aggressive] = 6;
+    cs.signalCounts[BehaviorSignal::Methodical] = 3;
+
+    Party party{};
+    // Minimal stub — gainRunSignals iterates party.size() and calls getUnitAt.
+    // Use a real PlayableCharacter to satisfy the Party contract.
+    AbilityRegistry abilities{};
+    CharacterRegistry chars{};
+    chars.loadFromJson("data/characters.json", abilities);
+    party.addUnit(chars.create("lyra"));
+
+    meta.gainRunSignals(ctx, party);
+
+    const auto &tallies{meta.characterInsight.at("lyra").signalTallies};
+    CHECK(tallies.at(BehaviorSignal::Aggressive) == 6);
+    CHECK(tallies.at(BehaviorSignal::Methodical) == 3);
+}
+
+TEST_CASE("MetaProgress::gainRunSignals: awards Insight at kInsightPerSignalPoints rate")
+{
+    MetaProgress meta{};
+    meta.unlockCharacter("lyra");
+
+    RunContext ctx{};
+    ctx.getCharacterState("lyra").signalCounts[BehaviorSignal::Aggressive] = 9;
+
+    AbilityRegistry abilities{};
+    CharacterRegistry chars{};
+    chars.loadFromJson("data/characters.json", abilities);
+    Party party{};
+    party.addUnit(chars.create("lyra"));
+
+    meta.gainRunSignals(ctx, party);
+
+    // 9 signals / 3 = 3 Insight
+    CHECK(meta.characterInsight.at("lyra").insightBalance == 3);
+}
+
+TEST_CASE("MetaProgress::spendInsight: returns false when tally below threshold")
+{
+    MetaProgress meta{};
+    meta.unlockCharacter("lyra");
+
+    const AspectTree tree{AspectTree::loadForCharacter("lyra")};
+    // lyra_aggressive_1 requires threshold 5; tally starts at 0.
+    CHECK(!meta.spendInsight("lyra", "lyra_aggressive_1", tree));
+}
+
+TEST_CASE("MetaProgress::spendInsight: activates node when conditions met")
+{
+    MetaProgress meta{};
+    meta.unlockCharacter("lyra");
+    meta.characterInsight["lyra"].signalTallies[BehaviorSignal::Aggressive] = 5;
+    meta.characterInsight["lyra"].insightBalance = 10;
+
+    const AspectTree tree{AspectTree::loadForCharacter("lyra")};
+    CHECK(meta.spendInsight("lyra", "lyra_aggressive_1", tree));
+    CHECK(meta.characterInsight.at("lyra").insightBalance == 7); // 10 - 3
+    CHECK(meta.characterInsight.at("lyra").chosenAspects.size() == 1);
+    CHECK(meta.characterInsight.at("lyra").chosenAspects[0] == "lyra_aggressive_1");
+}
+
+TEST_CASE("MetaProgress::spendInsight: returns false for already active node")
+{
+    MetaProgress meta{};
+    meta.unlockCharacter("lyra");
+    meta.characterInsight["lyra"].signalTallies[BehaviorSignal::Aggressive] = 5;
+    meta.characterInsight["lyra"].insightBalance = 20;
+
+    const AspectTree tree{AspectTree::loadForCharacter("lyra")};
+    REQUIRE(meta.spendInsight("lyra", "lyra_aggressive_1", tree));
+    CHECK(!meta.spendInsight("lyra", "lyra_aggressive_1", tree));
+}
+
+TEST_CASE("MetaProgress::spendInsight: returns false when balance insufficient")
+{
+    MetaProgress meta{};
+    meta.unlockCharacter("lyra");
+    meta.characterInsight["lyra"].signalTallies[BehaviorSignal::Aggressive] = 5;
+    meta.characterInsight["lyra"].insightBalance = 1; // needs 3
+
+    const AspectTree tree{AspectTree::loadForCharacter("lyra")};
+    CHECK(!meta.spendInsight("lyra", "lyra_aggressive_1", tree));
+}
+
+TEST_CASE("MetaProgress: save/load round-trip preserves signalTallies and insightBalance")
+{
+    const std::filesystem::path testPath{"test_save_v093.json"};
+
+    MetaProgress original{};
+    original.unlockCharacter("lyra");
+    original.characterInsight["lyra"].signalTallies[BehaviorSignal::Aggressive] = 12;
+    original.characterInsight["lyra"].insightBalance = 7;
+    original.saveToFile(testPath);
+
+    const MetaProgress loaded{MetaProgress::loadFromFile(testPath)};
+    CHECK(loaded.characterInsight.at("lyra").signalTallies.at(BehaviorSignal::Aggressive) == 12);
+    CHECK(loaded.characterInsight.at("lyra").insightBalance == 7);
 
     std::filesystem::remove(testPath);
 }

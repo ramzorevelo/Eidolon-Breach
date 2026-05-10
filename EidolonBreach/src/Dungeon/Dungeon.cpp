@@ -400,17 +400,24 @@ bool Dungeon::run(Party &party, MetaProgress &meta,
     std::vector<int> reachable{};
     // Track stance crystallizations for Mastery Event logging.
     m_eventBus.subscribe<StanceCrystallizedEvent>(
-        [&meta](const StanceCrystallizedEvent &e)
+        [&meta, &renderer](const StanceCrystallizedEvent &e)
         {
             if (!e.character || e.stanceId.empty())
                 return;
             const std::string charId{e.character->getId()};
             auto &log{meta.masteryEventLog[charId]};
-            // Only record each stance once across all runs in the log.
             for (const std::string &recorded : log)
                 if (recorded == e.stanceId)
                     return;
             log.push_back(e.stanceId);
+            // Present story beat only when this stance crystallizes for the
+            // first time ever; the loop above would have returned early otherwise.
+            renderer.renderSelectionMenu(
+                "MASTERY EVENT",
+                {e.character->getName() + " has mastered the " +
+                     e.stanceId + " stance.",
+                 "A new facet of power awakens.",
+                 "Continue"});
         },
         EventScope::Run);
     for (int i{0}; i < static_cast<int>(m_layers[0].size()); ++i)

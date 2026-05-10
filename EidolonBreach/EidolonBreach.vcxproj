@@ -73,7 +73,9 @@
     <ClCompile Include="src\Items\ItemRegistry.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Meta\AspectTree.cpp" />
+    <ClCompile Include="src\Meta\BondTrial.cpp" />
     <ClCompile Include="src\Summons\SummonRegistry.cpp" />
+    <ClCompile Include="src\UI\AspectTreeScreen.cpp" />
     <ClCompile Include="src\UI\SDL3InputHandler.cpp" />
     <ClCompile Include="src\UI\SDL3Renderer.cpp" />
     <ClCompile Include="src\Vestiges\AttunistGambitVestige.cpp" />
@@ -172,10 +174,13 @@
     <ClInclude Include="src\Items\Item.h" />
     <ClInclude Include="src\Items\ItemRegistry.h" />
     <ClInclude Include="src\Meta\AspectTree.h" />
+    <ClInclude Include="src\Meta\BondTrial.h" />
     <ClInclude Include="src\Summons\SummonAction.h" />
     <ClInclude Include="src\Summons\SummonDefinition.h" />
     <ClInclude Include="src\Summons\SummonRegistry.h" />
+    <ClInclude Include="src\UI\AspectTreeScreen.h" />
     <ClInclude Include="src\UI\IInputHandler.h" />
+    <ClInclude Include="src\UI\ILayoutQuery.h" />
     <ClInclude Include="src\UI\IRenderer.h" />
     <ClInclude Include="src\UI\SDL3InputHandler.h" />
     <ClInclude Include="src\UI\SDL3Renderer.h" />

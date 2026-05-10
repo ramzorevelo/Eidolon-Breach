@@ -97,8 +97,10 @@
     <ClCompile Include="tests\Core\test_ActionResult.cpp" />
     <ClCompile Include="tests\Core\test_Affinity.cpp" />
     <ClCompile Include="tests\Core\test_BattleState.cpp" />
+    <ClCompile Include="tests\Core\test_CharacterMod.cpp" />
     <ClCompile Include="tests\Core\test_Drop.cpp" />
     <ClCompile Include="tests\Core\test_EventBus.cpp" />
+    <ClCompile Include="tests\Core\test_FieldDiscovery.cpp" />
     <ClCompile Include="tests\Core\test_MetaProgress.cpp" />
     <ClCompile Include="tests\Core\test_RunContext.cpp" />
     <ClCompile Include="tests\Core\test_Stats.cpp" />
@@ -121,6 +123,7 @@
     <ClCompile Include="tests\Items\test_Equipment.cpp" />
     <ClCompile Include="tests\Items\test_Inventory.cpp" />
     <ClCompile Include="tests\Items\test_ItemRegistry.cpp" />
+    <ClCompile Include="tests\Meta\test_AspectTree.cpp" />
     <ClCompile Include="tests\Vestiges\test_Vestiges.cpp" />
   </ItemGroup>
   <ItemGroup>

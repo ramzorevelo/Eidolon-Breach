@@ -270,6 +270,12 @@
     <ClCompile Include="src\Meta\AspectTree.cpp">
       <Filter>Meta</Filter>
     </ClCompile>
+    <ClCompile Include="src\Meta\BondTrial.cpp">
+      <Filter>Meta</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\AspectTreeScreen.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Battle\Battle.h">
@@ -577,6 +583,15 @@
     </ClInclude>
     <ClInclude Include="src\Core\CharacterMod.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Meta\BondTrial.h">
+      <Filter>Meta</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\AspectTreeScreen.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\ILayoutQuery.h">
+      <Filter>UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
