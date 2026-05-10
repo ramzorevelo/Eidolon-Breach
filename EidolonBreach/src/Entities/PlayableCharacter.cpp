@@ -13,6 +13,7 @@
 #include "UI/IRenderer.h"
 #include <algorithm>
 #include <utility>
+#include <variant>
 
 PlayableCharacter::PlayableCharacter(std::string id,
                                      std::string name,
@@ -76,14 +77,14 @@ bool PlayableCharacter::canVent() const
 float PlayableCharacter::getExposureAVModifier() const
 {
     if (isBreachbornActive())
-        return CombatConstants::kAvModBreachborn;
+        return CombatConstants::kAvModBreachborn + m_avModBonusBreachborn;
     if (isFractured())
-        return CombatConstants::kAvModFractured;
-    if (m_exposure >= CombatConstants::kExposureThreshold75)
-        return CombatConstants::kAvModSurging;
-    if (m_exposure >= CombatConstants::kExposureThreshold50)
-        return CombatConstants::kAvModResonating;
-    return CombatConstants::kAvModBaseline;
+        return CombatConstants::kAvModFractured + m_avModBonusFractured;
+    if (m_exposure >= m_exposureThreshold75)
+        return CombatConstants::kAvModSurging + m_avModBonusSurging;
+    if (m_exposure >= m_exposureThreshold50)
+        return CombatConstants::kAvModResonating + m_avModBonusResonating;
+    return CombatConstants::kAvModBaseline + m_avModBonusBaseline;
 }
 
 std::size_t PlayableCharacter::selectActionIndex(const Party &allies,
@@ -226,7 +227,7 @@ void PlayableCharacter::equipSkillToSlot(int slotIndex, IAction *skill)
 
 void PlayableCharacter::consumeArchSkill()
 {
-    m_archSkillCooldown = CombatConstants::kArchSkillCooldownTurns;
+    m_archSkillCooldown = effectiveArchSkillCooldown();
 }
 
 void PlayableCharacter::tickArchSkillCooldown()
@@ -262,11 +263,81 @@ void PlayableCharacter::resetArchSkillCooldown()
     m_archSkillCooldown = 0;
 }
 
+int PlayableCharacter::effectiveArchSkillCooldown() const
+{
+    return std::max(0, CombatConstants::kArchSkillCooldownTurns - m_cooldownReduction);
+}
+
+void PlayableCharacter::applyCharacterMod(const CharacterMod &mod)
+{
+    std::visit(
+        [this](auto &&m)
+        {
+            using T = std::decay_t<decltype(m)>;
+            if constexpr (std::is_same_v<T, StatBonus>)
+            {
+                m_stats.maxHp += m.hp;
+                m_stats.hp = m_stats.maxHp;
+                m_stats.atk += m.atk;
+                m_stats.def += m.def;
+                m_stats.spd += m.spd;
+            }
+            else if constexpr (std::is_same_v<T, CooldownReduction>)
+            {
+                m_cooldownReduction += m.turns;
+            }
+            else if constexpr (std::is_same_v<T, ExposureThresholdShift>)
+            {
+                if (m.threshold == CombatConstants::kExposureThreshold50)
+                    m_exposureThreshold50 += m.delta;
+                else if (m.threshold == CombatConstants::kExposureThreshold75)
+                    m_exposureThreshold75 += m.delta;
+            }
+            else if constexpr (std::is_same_v<T, SlotUnlockEarly>)
+            {
+                if (m.slot == 0)
+                    m_slotUnlockLevelOverride[0] = std::min(m_slotUnlockLevelOverride[0],
+                                                            m.levelRequired);
+                else if (m.slot == 1)
+                    m_slotUnlockLevelOverride[1] = std::min(m_slotUnlockLevelOverride[1],
+                                                            m.levelRequired);
+            }
+            else if constexpr (std::is_same_v<T, ProcEnhancement>)
+            {
+                m_procEnhancementMultiplier *= m.multiplier;
+            }
+            else if constexpr (std::is_same_v<T, AVModifierBonus>)
+            {
+                switch (m.state)
+                {
+                case ExposureState::Baseline:
+                    m_avModBonusBaseline += m.delta;
+                    break;
+                case ExposureState::Resonating:
+                    m_avModBonusResonating += m.delta;
+                    break;
+                case ExposureState::Surging:
+                    m_avModBonusSurging += m.delta;
+                    break;
+                case ExposureState::Breachborn:
+                    m_avModBonusBreachborn += m.delta;
+                    break;
+                case ExposureState::Fractured:
+                    m_avModBonusFractured += m.delta;
+                    break;
+                }
+            }
+        },
+        mod);
+}
+
 void PlayableCharacter::applyUnlocks(int level)
 {
     if (level >= CombatConstants::kArchSkillUnlockLevel)
         setFlag(CharFlag::ArchSkillUnlocked);
-    if (level >= CombatConstants::kSlot2UnlockLevel)
+    if (level >= m_slotUnlockLevelOverride[0])
+        tryUnlockSlot(0);
+    if (level >= m_slotUnlockLevelOverride[1])
         tryUnlockSlot(1);
 }
 

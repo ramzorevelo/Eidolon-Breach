@@ -7,6 +7,7 @@
 #include "Actions/IAction.h"
 #include "Actions/SlotState.h"
 #include "Core/ResourceStats.h"
+#include "Core/CharacterMod.h"
 #include "Entities/Unit.h"
 #include "Items/Item.h"
 #include "UI/IInputHandler.h"
@@ -65,6 +66,23 @@ class PlayableCharacter : public Unit
     [[nodiscard]] int breachbornActionBurnDuration() const
     {
         return m_breachbornActionBurnDuration;
+    }
+
+    /**
+     * @brief Permanently apply a CharacterMod to this character.
+     *        StatBonus modifies base stats and resets HP to the new max.
+     *        All other mods update the corresponding override member.
+     *        Call once per activated node during CharacterRegistry::create().
+     */
+    void applyCharacterMod(const CharacterMod &mod);
+
+    /** @return Effective arch skill cooldown after CooldownReduction mods. */
+    [[nodiscard]] int effectiveArchSkillCooldown() const;
+
+    /** @return Proc damage/duration multiplier from ProcEnhancement nodes. */
+    [[nodiscard]] float procEnhancementMultiplier() const
+    {
+        return m_procEnhancementMultiplier;
     }
 
     const std::vector<std::unique_ptr<IAction>> &getAbilities() const;
@@ -405,4 +423,17 @@ class PlayableCharacter : public Unit
     float m_breachbornActionBonusDivisor{0.0f};
     int m_breachbornActionBurnDamage{0};
     int m_breachbornActionBurnDuration{0};
+
+    // CharacterMod overrides. Applied by CharacterRegistry::create()
+    int m_cooldownReduction{0};
+    int m_exposureThreshold50{CombatConstants::kExposureThreshold50};
+    int m_exposureThreshold75{CombatConstants::kExposureThreshold75};
+    int m_slotUnlockLevelOverride[2]{CombatConstants::kSlot1UnlockLevel,
+                                     CombatConstants::kSlot2UnlockLevel};
+    float m_procEnhancementMultiplier{1.0f};
+    float m_avModBonusBaseline{0.0f};
+    float m_avModBonusResonating{0.0f};
+    float m_avModBonusSurging{0.0f};
+    float m_avModBonusBreachborn{0.0f};
+    float m_avModBonusFractured{0.0f};
 };
