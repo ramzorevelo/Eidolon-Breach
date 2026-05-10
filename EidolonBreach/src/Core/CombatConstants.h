@@ -44,6 +44,8 @@ constexpr int kMaxActiveSummons{2};
 
 // Character leveling (Classic mode)
 constexpr int kMaxEchoes{5};         
+constexpr int kInsightPerSignalPoints{3}; 
+constexpr int kBondTrialInsightBonus{10}; 
 
 constexpr int kMaxPlayerCharacters{3};
 

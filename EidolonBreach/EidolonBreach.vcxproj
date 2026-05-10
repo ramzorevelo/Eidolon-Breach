@@ -72,6 +72,7 @@
     <ClCompile Include="src\Items\Inventory.cpp" />
     <ClCompile Include="src\Items\ItemRegistry.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Meta\AspectTree.cpp" />
     <ClCompile Include="src\Summons\SummonRegistry.cpp" />
     <ClCompile Include="src\UI\SDL3InputHandler.cpp" />
     <ClCompile Include="src\UI\SDL3Renderer.cpp" />
@@ -122,6 +123,7 @@
     <ClInclude Include="src\Core\Affinity.h" />
     <ClInclude Include="src\Core\BattleEvents.h" />
     <ClInclude Include="src\Core\BehaviorSignal.h" />
+    <ClInclude Include="src\Core\CharacterMod.h" />
     <ClInclude Include="src\Core\CombatConstants.h" />
     <ClInclude Include="src\Core\CombatUtils.h" />
     <ClInclude Include="src\Core\DataLoader.h" />
@@ -169,6 +171,7 @@
     <ClInclude Include="src\Items\Inventory.h" />
     <ClInclude Include="src\Items\Item.h" />
     <ClInclude Include="src\Items\ItemRegistry.h" />
+    <ClInclude Include="src\Meta\AspectTree.h" />
     <ClInclude Include="src\Summons\SummonAction.h" />
     <ClInclude Include="src\Summons\SummonDefinition.h" />
     <ClInclude Include="src\Summons\SummonRegistry.h" />
@@ -188,6 +191,9 @@
     <ClInclude Include="src\Vestiges\VoidHungerVestige.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="data\aspect_trees\lyra.json" />
+    <None Include="data\aspect_trees\vex.json" />
+    <None Include="data\aspect_trees\zara.json" />
     <None Include="data\characters.json" />
     <None Include="data\encounters.json" />
     <None Include="data\enemies.json" />

@@ -64,6 +64,12 @@
     <Filter Include="data\fonts">
       <UniqueIdentifier>{dfb52097-1de0-464b-a5de-286ccc9fc0e4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="data\aspect_trees">
+      <UniqueIdentifier>{7fa10424-d57f-431e-82d5-26025f2ede66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Meta">
+      <UniqueIdentifier>{90ffef8a-b8ce-4160-854e-7910c2df27fe}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -260,6 +266,9 @@
     </ClCompile>
     <ClCompile Include="src\Battle\AVTurnOrderCalculator.cpp">
       <Filter>Battle</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Meta\AspectTree.cpp">
+      <Filter>Meta</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -563,6 +572,12 @@
     <ClInclude Include="src\Battle\AVTurnOrderCalculator.h">
       <Filter>Battle</Filter>
     </ClInclude>
+    <ClInclude Include="src\Meta\AspectTree.h">
+      <Filter>Meta</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\CharacterMod.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="data\items.json">
@@ -576,6 +591,15 @@
     </None>
     <None Include="data\characters.json">
       <Filter>data</Filter>
+    </None>
+    <None Include="data\aspect_trees\lyra.json">
+      <Filter>data\aspect_trees</Filter>
+    </None>
+    <None Include="data\aspect_trees\vex.json">
+      <Filter>data\aspect_trees</Filter>
+    </None>
+    <None Include="data\aspect_trees\zara.json">
+      <Filter>data\aspect_trees</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

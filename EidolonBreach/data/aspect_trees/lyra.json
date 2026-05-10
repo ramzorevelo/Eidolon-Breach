@@ -1,0 +1,160 @@
+[
+  {
+    "id": "lyra_aggressive_1",
+    "branch": "Aggressive",
+    "unlockThreshold": 5,
+    "insightCost": 3,
+    "effect": {
+      "type": "StatBonus",
+      "atk": 2
+    }
+  },
+  {
+    "id": "lyra_aggressive_2",
+    "branch": "Aggressive",
+    "unlockThreshold": 10,
+    "insightCost": 5,
+    "effect": {
+      "type": "ProcEnhancement",
+      "multiplier": 1.15
+    }
+  },
+  {
+    "id": "lyra_aggressive_3",
+    "branch": "Aggressive",
+    "unlockThreshold": 20,
+    "insightCost": 8,
+    "effect": {
+      "type": "AVModifierBonus",
+      "state": "Surging",
+      "delta": -0.05
+    }
+  },
+  {
+    "id": "lyra_methodical_1",
+    "branch": "Methodical",
+    "unlockThreshold": 5,
+    "insightCost": 3,
+    "effect": {
+      "type": "CooldownReduction",
+      "turns": 1
+    }
+  },
+  {
+    "id": "lyra_methodical_2",
+    "branch": "Methodical",
+    "unlockThreshold": 10,
+    "insightCost": 5,
+    "effect": {
+      "type": "SlotUnlockEarly",
+      "slot": 0,
+      "levelRequired": 10
+    }
+  },
+  {
+    "id": "lyra_methodical_3",
+    "branch": "Methodical",
+    "unlockThreshold": 20,
+    "insightCost": 8,
+    "effect": {
+      "type": "StatBonus",
+      "atk": 3,
+      "spd": 1
+    }
+  },
+  {
+    "id": "lyra_sacrificial_1",
+    "branch": "Sacrificial",
+    "unlockThreshold": 5,
+    "insightCost": 3,
+    "effect": {
+      "type": "AVModifierBonus",
+      "state": "Fractured",
+      "delta": -0.05
+    }
+  },
+  {
+    "id": "lyra_sacrificial_2",
+    "branch": "Sacrificial",
+    "unlockThreshold": 10,
+    "insightCost": 5,
+    "effect": {
+      "type": "StatBonus",
+      "hp": 8
+    }
+  },
+  {
+    "id": "lyra_sacrificial_3",
+    "branch": "Sacrificial",
+    "unlockThreshold": 20,
+    "insightCost": 8,
+    "effect": {
+      "type": "ProcEnhancement",
+      "multiplier": 1.25
+    }
+  },
+  {
+    "id": "lyra_supportive_1",
+    "branch": "Supportive",
+    "unlockThreshold": 5,
+    "insightCost": 3,
+    "effect": {
+      "type": "StatBonus",
+      "hp": 5
+    }
+  },
+  {
+    "id": "lyra_supportive_2",
+    "branch": "Supportive",
+    "unlockThreshold": 10,
+    "insightCost": 5,
+    "effect": {
+      "type": "ExposureThresholdShift",
+      "threshold": 50,
+      "delta": -5
+    }
+  },
+  {
+    "id": "lyra_supportive_3",
+    "branch": "Supportive",
+    "unlockThreshold": 20,
+    "insightCost": 8,
+    "effect": {
+      "type": "AVModifierBonus",
+      "state": "Resonating",
+      "delta": -0.03
+    }
+  },
+  {
+    "id": "lyra_reactive_1",
+    "branch": "Reactive",
+    "unlockThreshold": 5,
+    "insightCost": 3,
+    "effect": {
+      "type": "ExposureThresholdShift",
+      "threshold": 75,
+      "delta": -5
+    }
+  },
+  {
+    "id": "lyra_reactive_2",
+    "branch": "Reactive",
+    "unlockThreshold": 10,
+    "insightCost": 5,
+    "effect": {
+      "type": "StatBonus",
+      "spd": 2
+    }
+  },
+  {
+    "id": "lyra_reactive_3",
+    "branch": "Reactive",
+    "unlockThreshold": 20,
+    "insightCost": 8,
+    "effect": {
+      "type": "AVModifierBonus",
+      "state": "Breachborn",
+      "delta": -0.05
+    }
+  }
+]
