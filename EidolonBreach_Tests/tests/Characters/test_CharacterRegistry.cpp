@@ -8,7 +8,6 @@
 #include "Characters/Zara/ZaraUltimateAction.h"
 #include "Actions/BasicStrikeAction.h"
 #include "Actions/SkillAction.h"
-#include "Actions/UltimateAction.h"
 #include "Characters/Lyra/EmberCallAction.h"
 #include "Characters/Vex/VexBulwarkAction.h"
 #include "Characters/Zara/ZaraFrostbindAction.h"
@@ -28,9 +27,6 @@ AbilityRegistry makeAbilityRegistry()
     reg.registerAbility("arch_skill_default",
                         []
                         { return std::make_unique<SkillAction>(2.0f); });
-    reg.registerAbility("ultimate_default",
-                        []
-                        { return std::make_unique<UltimateAction>(); });
     reg.registerAbility("lyra_ultimate",
                         []
                         { return std::make_unique<LyraUltimateAction>(); });

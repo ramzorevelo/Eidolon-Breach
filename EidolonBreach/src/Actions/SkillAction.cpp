@@ -18,7 +18,6 @@ SkillAction::SkillAction(float skillPower)
           .energyGain = 0,
           .toughnessDamage = CombatConstants::kSkillToughDmg,
           .targetMode = TargetMode::SingleEnemy,
-          .affinity = Affinity::Blaze,
           .category = ActionCategory::ArchSkill}}
 {
 }
@@ -53,11 +52,12 @@ ActionResult SkillAction::execute(PlayableCharacter &user,
                                                         t->getFinalStats(),
                                                         m_data.scaling);
             t->takeDamage(result.value);
-            t->applyToughnessHit(m_data.toughnessDamage, m_data.affinity);
+            t->applyToughnessHit(m_data.toughnessDamage, user.getAffinity());
             result.toughnessDamage = m_data.toughnessDamage;
             result.targetEnemyIndex = static_cast<int>(target->index);
         }
     }
+    result.actionAffinity = user.getAffinity();
     return result;
 }
 

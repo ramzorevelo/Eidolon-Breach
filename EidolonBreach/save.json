@@ -4,32 +4,33 @@
             "bondTrialComplete": false,
             "chosenAspects": [],
             "echoCount": 5,
-            "insightBalance": 46,
+            "insightBalance": 48,
             "signalTallies": {
-                "Aggressive": 61,
-                "Reactive": 45,
-                "Supportive": 39
+                "Aggressive": 65,
+                "Reactive": 47,
+                "Supportive": 41
             }
         },
         "vex": {
             "bondTrialComplete": false,
             "chosenAspects": [],
             "echoCount": 5,
-            "insightBalance": 21,
+            "insightBalance": 43,
             "signalTallies": {
-                "Aggressive": 29,
-                "Reactive": 20,
-                "Supportive": 21
+                "Aggressive": 47,
+                "Reactive": 44,
+                "Sacrificial": 9,
+                "Supportive": 40
             }
         },
         "zara": {
             "bondTrialComplete": false,
             "chosenAspects": [],
             "echoCount": 5,
-            "insightBalance": 31,
+            "insightBalance": 32,
             "signalTallies": {
-                "Aggressive": 36,
-                "Reactive": 33,
+                "Aggressive": 37,
+                "Reactive": 35,
                 "Supportive": 28
             }
         }
@@ -53,12 +54,15 @@
         "lyra": [
             "lyra_predator"
         ],
+        "vex": [
+            "vex_bastion"
+        ],
         "zara": [
             "zara_glacial"
         ]
     },
     "playerLevel": 4,
-    "playerXp": 2161,
+    "playerXp": 2182,
     "unlockedCharacterIds": [
         "lyra",
         "vex",

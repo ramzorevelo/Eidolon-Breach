@@ -8,7 +8,7 @@
 #include "Core/CombatUtils.h"
 #include "Entities/Party.h"
 #include "Entities/PlayableCharacter.h"
-
+#include <iostream>
 BasicStrikeAction::BasicStrikeAction()
     : m_data{ActionData{
           .skillPower = 1.0f,
@@ -18,7 +18,6 @@ BasicStrikeAction::BasicStrikeAction()
           .energyGain = 0,
           .toughnessDamage = CombatConstants::kBasicToughDmg,
           .targetMode = TargetMode::SingleEnemy,
-          .affinity = Affinity::Blaze,
           .category = ActionCategory::Basic
       }}
 {
@@ -55,11 +54,13 @@ ActionResult BasicStrikeAction::execute(PlayableCharacter &user,
                                                         t->getFinalStats(),
                                                         m_data.scaling);
             t->takeDamage(result.value);
-            t->applyToughnessHit(m_data.toughnessDamage, m_data.affinity);
+            t->applyToughnessHit(m_data.toughnessDamage, user.getAffinity());
             result.toughnessDamage = m_data.toughnessDamage;
             result.targetEnemyIndex = static_cast<int>(target->index);
         }
     }
+    result.actionAffinity = user.getAffinity();
+    std::cout << "Basic attack affinity: " << static_cast<int>(result.actionAffinity) << std::endl;
     return result;
 }
 

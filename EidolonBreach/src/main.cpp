@@ -4,7 +4,6 @@
  */
 #include "Actions/BasicStrikeAction.h"
 #include "Actions/SkillAction.h"
-#include "Actions/UltimateAction.h"
 #include "Characters/AbilityRegistry.h"
 #include "Characters/CharacterRegistry.h"
 #include "Characters/Lyra/EmberCallAction.h"
@@ -39,9 +38,6 @@ static AbilityRegistry buildAbilityRegistry()
     reg.registerAbility("arch_skill_default",
                         []
                         { return std::make_unique<SkillAction>(2.0f); });
-    reg.registerAbility("ultimate_default",
-                        []
-                        { return std::make_unique<UltimateAction>(); });
     reg.registerAbility("lyra_ultimate",
                         []
                         { return std::make_unique<LyraUltimateAction>(); });

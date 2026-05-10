@@ -12,6 +12,7 @@
 #include "Core/MetaProgress.h"
 #include "Meta/AspectTree.h"
 #include <stdexcept>
+#include <cassert>
 
 void CharacterRegistry::loadFromJson(const std::string &jsonPath,
                                      const AbilityRegistry &abilityRegistry)
@@ -184,6 +185,8 @@ CharacterRegistry::parseBlueprint(const std::string &id, const nlohmann::json &j
     bp.basicId = abilities.value("basic", "basic_strike");
     bp.archSkillId = abilities.value("archSkill", "arch_skill_default");
     bp.ultimateId = abilities.value("ultimate", "ultimate_default");
+    assert(bp.ultimateId != "ultimate_default" &&
+           "ultimate_default is deprecated; assign a character-specific ultimate");
     for (const auto &skillId : abilities.value("slotSkills", nlohmann::json::array()))
         bp.slotSkillIds.push_back(skillId.get<std::string>());
     return bp;

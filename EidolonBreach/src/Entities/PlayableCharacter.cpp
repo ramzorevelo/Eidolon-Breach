@@ -202,10 +202,8 @@ ActionResult PlayableCharacter::takeTurn(Party &allies,
             break;
         }
 
-        const Affinity actionAffinity{m_abilities[actionIdx]->getAffinity()};
         ActionResult result{
             m_abilities[actionIdx]->execute(*this, allies, enemies, target)};
-        result.actionAffinity = actionAffinity;
         ++state.turnNumber;
         return result;
     }
