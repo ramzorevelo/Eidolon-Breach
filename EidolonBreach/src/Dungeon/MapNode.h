@@ -29,4 +29,19 @@ class MapNode
 
     /** @return One-line description shown on the map screen. */
     [[nodiscard]] virtual std::string description() const = 0;
+    enum class NodeType
+    {
+        Battle,
+        Elite,
+        Boss,
+        Rest,
+        Treasure,
+        Shop,
+        Event
+    };
+
+    /**
+     * @brief Returns the node's type for dungeon generation constraint checks.
+     */
+    [[nodiscard]] virtual NodeType nodeType() const = 0;
 };

@@ -20,7 +20,10 @@ class TreasureNode : public MapNode
                IRenderer &renderer, IInputHandler &input) override;
 
     [[nodiscard]] std::string description() const override;
-
+    [[nodiscard]] NodeType nodeType() const override
+    {
+        return NodeType::Treasure;
+    }
   private:
     int m_goldAmount{30};
     std::uint32_t m_vestigeRngSeed{0u};

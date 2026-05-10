@@ -26,13 +26,11 @@ void AttunistGambitVestige::onBattleStart(Battle & /*battle*/, BattleState &stat
             if (state.playerParty == nullptr ||
                 !state.playerParty->contains(e.killer))
                 return;
-            // dynamic_cast is justified here: the vestige interface specifically
-            // operates on PlayableCharacter, and playerParty is confirmed to contain
-            // the unit. This is the one place in Vestiges/ where the cast is
-            // intentional and documented.
-            auto *pc{dynamic_cast<PlayableCharacter *>(e.killer)};
+            
+            auto *pc{e.killer ? e.killer->asPlayableCharacter() : nullptr};
             if (!pc)
                 return;
+
             const int reduction{
                 std::min(kExposureOnKill,
                          kMaxReductionPerBattle - m_exposureReducedThisBattle)};

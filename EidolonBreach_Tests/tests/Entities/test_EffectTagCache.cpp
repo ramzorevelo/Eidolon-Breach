@@ -55,7 +55,7 @@ TEST_CASE("Unit: tag cache cleared after effect expires via tickEffects")
     hero->applyEffect(std::make_unique<SlowEffect>(0.20f, 1)); // expires after 1 tick
     REQUIRE(hero->hasEffectWithTag(EffectTags::kDebuff));
 
-    hero->tickEffects(); // expires the slow
+    (void)hero->tickEffects(); // expires the slow
     CHECK(!hero->hasEffectWithTag(EffectTags::kDebuff));
 }
 

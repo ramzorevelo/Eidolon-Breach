@@ -252,6 +252,8 @@ void SDL3Renderer::drawPlayerCardBars(const PlayableCharacter *pc,
 
 void SDL3Renderer::drawPlayerCard(const Unit *u, float &py, bool isActive, bool highlighted)
 {
+    if (!u)
+        return;
     static constexpr float kNameH = 18.f;
     static constexpr float kBarH = 6.f;
     static constexpr float kGapH = 4.f;
@@ -288,6 +290,8 @@ void SDL3Renderer::drawPlayerCard(const Unit *u, float &py, bool isActive, bool 
 
 void SDL3Renderer::drawEnemyCard(const Unit *u, float &ey, bool highlighted)
 {
+    if (!u)
+        return;
     static constexpr float kNameH = 18.f;
     static constexpr float kBarH = 6.f;
     static constexpr float kThinH = 4.f;

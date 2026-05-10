@@ -49,3 +49,9 @@ int Summon::getSummonerAtk() const
 {
     return m_summonerAtk;
 }
+
+bool Summon::tickSummonLifecycle()
+{
+    tickDuration();
+    return isExpired();
+}

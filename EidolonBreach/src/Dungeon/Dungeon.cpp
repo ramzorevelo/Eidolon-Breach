@@ -219,11 +219,11 @@ void Dungeon::buildGraph(std::uint32_t seed,
                                    prevLayerHadTreasure,
                                    noBattle,
                                    prevLayerHadShop)};
-                if (dynamic_cast<EliteNode *>(node.get()))
+                if (node->nodeType() == MapNode::NodeType::Elite)
                     thisLayerHadElite = true;
-                if (dynamic_cast<RestNode *>(node.get()))
+                if (node->nodeType() == MapNode::NodeType::Rest)
                     thisLayerHadRest = true;
-                if (dynamic_cast<TreasureNode *>(node.get()))
+                if (node->nodeType() == MapNode::NodeType::Treasure)
                     thisLayerHadTreasure = true;
                 layerNodes.push_back({std::move(node), {}});
             }
@@ -235,7 +235,7 @@ void Dungeon::buildGraph(std::uint32_t seed,
             bool thisLayerHadShop{false};
             for (const auto &node : layerNodes)
             {
-                if (dynamic_cast<ShopNode *>(node.content.get()))
+                if (node.content->nodeType() == MapNode::NodeType::Shop)
                 {
                     thisLayerHadShop = true;
                     break;
@@ -246,7 +246,7 @@ void Dungeon::buildGraph(std::uint32_t seed,
             // Mark that the party has seen combat once any battle node appears.
             for (const auto &n : layerNodes)
             {
-                if (dynamic_cast<BattleNode *>(n.content.get()))
+                if (n.content->nodeType() == MapNode::NodeType::Battle) 
                 {
                     hasSeenCombat = true;
                     break;

@@ -167,3 +167,9 @@ std::string Enemy::getIntentLabel() const
         return "";
     return "Attack";
 }
+
+void Enemy::triggerBreakEffect(BattleState &state)
+{
+    if (m_breakEffect.onBreak)
+        m_breakEffect.onBreak(*this, state);
+}

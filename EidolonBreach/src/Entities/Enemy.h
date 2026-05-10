@@ -67,7 +67,6 @@ class Enemy : public Unit
      *        Used by BattleNode to apply floor-affinity toughness modifiers at spawn.
      * @param factor Multiplier (e.g. 1.10f for +10%, 0.90f for -10%).
      */
-    void scaleMaxToughness(float factor);
     [[nodiscard]] float getAffinityModifier(Affinity a) const;
 
     // Break effect
@@ -101,6 +100,15 @@ class Enemy : public Unit
     virtual void onBreakCallback() {}
 
     [[nodiscard]] std::string getIntentLabel() const override;
+
+    [[nodiscard]] std::vector<Drop> generateDropsForBattle(unsigned int seed) const override
+    {
+        return generateDrops(seed);
+    }
+
+    void triggerBreakEffect(BattleState &state) override;
+
+    void scaleMaxToughness(float factor) override;
 
   protected:
     virtual ActionResult performAttack();

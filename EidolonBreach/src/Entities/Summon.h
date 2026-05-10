@@ -43,7 +43,7 @@ class Summon : public Unit
     void tickDuration();
     /** @return The summoner's ATK stat recorded at spawn time. */
     [[nodiscard]] int getSummonerAtk() const;
-
+    [[nodiscard]] bool tickSummonLifecycle() override;
   private:
     const SummonDefinition *m_definition{nullptr};
     int m_resonanceContribution{};

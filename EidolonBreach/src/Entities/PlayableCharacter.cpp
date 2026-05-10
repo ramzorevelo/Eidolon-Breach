@@ -393,3 +393,9 @@ int PlayableCharacter::getAffinityResistance(Affinity affinity) const
     check(m_equipment.accessory);
     return total;
 }
+
+void PlayableCharacter::onBattleReset()
+{
+    resetBattleConsumableState();
+    resetArchSkillCooldown();
+}

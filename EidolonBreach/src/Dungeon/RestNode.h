@@ -18,7 +18,10 @@ class RestNode : public MapNode
                IRenderer &renderer, IInputHandler &input) override;
 
     [[nodiscard]] std::string description() const override;
-
+    [[nodiscard]] NodeType nodeType() const override
+    {
+        return NodeType::Rest;
+    }
   private:
     /** @brief Restore partial HP to all alive party members. */
     void applyHeal(Party &party) const;

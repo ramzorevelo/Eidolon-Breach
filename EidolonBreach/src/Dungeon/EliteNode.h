@@ -23,4 +23,8 @@ class EliteNode : public BattleNode
                IRenderer &renderer, IInputHandler &input) override;
 
     [[nodiscard]] std::string description() const override;
+    [[nodiscard]] NodeType nodeType() const override
+    {
+        return NodeType::Elite;
+    }
 };

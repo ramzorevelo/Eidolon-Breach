@@ -221,11 +221,11 @@ TEST_CASE("Unit::tickEffects: decrements duration each call")
     auto hero = makeHero();
     hero->applyEffect(std::make_unique<CountingEffect>(3));
 
-    hero->tickEffects();
+    (void)hero->tickEffects();
     REQUIRE(hero->hasEffect(EffectIds::kBurn));
     CHECK(*hero->getEffects()[0]->getDuration() == 2);
 
-    hero->tickEffects();
+    (void)hero->tickEffects();
     CHECK(*hero->getEffects()[0]->getDuration() == 1);
 }
 
@@ -235,7 +235,7 @@ TEST_CASE("Unit::tickEffects: removes effect when duration reaches 0")
     hero->applyEffect(std::make_unique<CountingEffect>(1)); // expires after 1 tick
     REQUIRE(hero->hasEffect(EffectIds::kBurn));
 
-    hero->tickEffects();
+    (void)hero->tickEffects();
     CHECK(!hero->hasEffect(EffectIds::kBurn));
 }
 
@@ -246,7 +246,7 @@ TEST_CASE("Unit::tickEffects: removes exhausted shield after next tick")
     hero->takeDamage(20); // depletes shield (absorbs 10, 10 overflows)
     REQUIRE(hero->getEffects()[0]->isExhausted());
 
-    hero->tickEffects(); // cleanup pass
+    (void)hero->tickEffects(); // cleanup pass
     CHECK(!hero->hasEffect(EffectIds::kShield));
 }
 
@@ -281,7 +281,7 @@ TEST_CASE("Unit::tickEffects: permanent effect never expires")
     hero->applyEffect(std::make_unique<PermanentShield>());
 
     for (int i{0}; i < 10; ++i)
-        hero->tickEffects();
+        (void)hero->tickEffects();
 
     CHECK(hero->hasEffect(EffectIds::kShield));
 }
@@ -316,7 +316,7 @@ TEST_CASE("Unit::tickEffects: BurnEffect deals damage via takeTrueDamage")
 {
     auto hero = makeHero(); // 120 HP
     hero->applyEffect(std::make_unique<BurnEffect>(15, 2));
-    hero->tickEffects();
+    (void)hero->tickEffects();
     CHECK(hero->getHp() == 105); // 120 - 15
 }
 
@@ -325,7 +325,7 @@ TEST_CASE("Unit::tickEffects: BurnEffect bypasses ShieldEffect")
     auto hero = makeHero(); // 120 HP
     hero->applyEffect(std::make_unique<ShieldEffect>(100, 3));
     hero->applyEffect(std::make_unique<BurnEffect>(20, 2));
-    hero->tickEffects();
+    (void)hero->tickEffects();
     // Burn calls takeTrueDamage — shield untouched, HP drops.
     CHECK(hero->getHp() == 100);
 }
@@ -335,7 +335,7 @@ TEST_CASE("Unit::tickEffects: RegenEffect heals HP on tick")
     auto hero = makeHero();   // 120 HP
     hero->takeTrueDamage(40); // 80 HP
     hero->applyEffect(std::make_unique<RegenEffect>(10, 2));
-    hero->tickEffects();
+    (void)hero->tickEffects();
     CHECK(hero->getHp() == 90);
 }
 
@@ -357,7 +357,7 @@ TEST_CASE("Unit::tickEffects: ShieldEffect expired by duration is removed")
     auto hero = makeHero();
     hero->applyEffect(std::make_unique<ShieldEffect>(50, 1)); // expires after 1 tick
     REQUIRE(hero->hasEffect(EffectIds::kShield));
-    hero->tickEffects();
+    (void)hero->tickEffects();
     CHECK(!hero->hasEffect(EffectIds::kShield));
 }
 

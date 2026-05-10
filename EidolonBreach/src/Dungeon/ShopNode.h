@@ -28,7 +28,10 @@ class ShopNode : public MapNode
                IRenderer &renderer, IInputHandler &input) override;
 
     [[nodiscard]] std::string description() const override;
-
+    [[nodiscard]] NodeType nodeType() const override
+    {
+        return NodeType::Shop;
+    }
   private:
     const ItemRegistry &m_registry;
     std::vector<std::string> m_stockIds;

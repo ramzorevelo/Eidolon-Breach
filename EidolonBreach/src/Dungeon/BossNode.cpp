@@ -31,7 +31,8 @@ void BossNode::enter(Party &party, MetaProgress &meta,
     for (std::size_t i = 0; i < party.size(); ++i)
     {
         Unit *u = party.getUnitAt(i);
-        if (auto *pc = dynamic_cast<PlayableCharacter *>(u))
+        auto *pc{u ? u->asPlayableCharacter() : nullptr};
+        if (pc)
             pc->modifyExposure(CombatConstants::kEliteExposureSpike);
     }
 

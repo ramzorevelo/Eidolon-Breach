@@ -150,20 +150,12 @@ void Battle::runBattleLoop(BattleState &state)
                 processEnemyTurn(slot.unit, state);
             
 
-            if (slot.unit->isSummon())
+            if (slot.unit->isSummon() && slot.unit->tickSummonLifecycle())
             {
-                auto *s{dynamic_cast<Summon *>(slot.unit)};
-                if (s)
-                {
-                    s->tickDuration();
-                    if (s->isExpired())
-                    {
-                        const std::string name{slot.unit->getName()};
-                        const std::string id{slot.unit->getId()};
-                        m_renderer.renderMessage(name + " fades away.");
-                        m_playerParty.removeUnit(id);
-                    }
-                }
+                const std::string name{slot.unit->getName()};
+                const std::string id{slot.unit->getId()};
+                m_renderer.renderMessage(name + " fades away.");
+                m_playerParty.removeUnit(id);
             }
 
             if (checkAndHandleBattleEnd(state))
@@ -216,7 +208,7 @@ void Battle::processPlayerTurn(Unit *unit, BattleState &state)
     if (!unit)
         return;
 
-    auto *pc{dynamic_cast<PlayableCharacter *>(unit)};
+    auto *pc{unit->asPlayableCharacter()};
     if (pc)
     {
         pc->tickArchSkillCooldown();
@@ -359,7 +351,7 @@ void Battle::applyResonanceContribution(Unit &unit,
     }
 
     // Apply Stance modifier if the unit is a PC with a crystallized Stance.
-    if (const auto *pc{dynamic_cast<const PlayableCharacter *>(&unit)})
+    if (auto *pc{unit.asPlayableCharacter()})
     {
         const RunCharacterState *cs{m_runContext.findCharacterState(pc->getId())};
         if (cs && cs->crystallizedStanceId.has_value() &&
@@ -415,8 +407,7 @@ void Battle::applyResonanceTrigger(Affinity affinity, BattleState &state)
 
     case Affinity::Tempest:
         for (Unit *u : m_playerParty.getAliveUnits())
-            if (auto *pc = dynamic_cast<PlayableCharacter *>(u))
-                pc->gainEnergy(CombatConstants::kRFTempestEnergy);
+            u->gainEnergyIfApplicable(CombatConstants::kRFTempestEnergy);
         break;
 
     case Affinity::Terra:
@@ -624,15 +615,8 @@ void Battle::processNewBreaks(const std::vector<bool> &before,
         if (!u->isAlive())
             continue; // death message takes priority; skip break notification
         m_renderer.renderBreak(u->getName());
-        state.eventBus.emit(BreakTriggeredEvent{
-            dynamic_cast<Enemy *>(u), actionAffinity, &state});
-
-        if (auto *e{dynamic_cast<Enemy *>(u)})
-        {
-            const BreakEffect &effect{e->getBreakEffect()};
-            if (effect.onBreak)
-                effect.onBreak(*e, state);
-        }
+        state.eventBus.emit(BreakTriggeredEvent{u, actionAffinity, &state});
+        u->triggerBreakEffect(state);
     }
 }
 
@@ -641,11 +625,8 @@ void Battle::resetAllPcConsumableState()
     for (std::size_t i{0}; i < m_playerParty.size(); ++i)
     {
         Unit *u{m_playerParty.getUnitAt(i)};
-        if (auto *pc = dynamic_cast<PlayableCharacter *>(u))
-        {
-            pc->resetBattleConsumableState();
-            pc->resetArchSkillCooldown();
-        }
+        if (u)
+            u->onBattleReset();
     }
 }
 
@@ -657,12 +638,11 @@ void Battle::collectDrops(BattleState &state)
         Unit *u{m_enemyParty.getUnitAt(i)};
         if (!u || u->isAlive())
             continue;
-        if (auto *e = dynamic_cast<Enemy *>(u))
+        for (const Drop &drop : u->generateDropsForBattle(seed))
         {
-            for (const Drop &drop : e->generateDrops(seed))
-                if (drop.type == Drop::Type::Gold ||
-                    drop.type == Drop::Type::GuaranteedItem)
-                    m_playerParty.getInventory().gold += drop.goldAmount;
+            if (drop.type == Drop::Type::Gold ||
+                drop.type == Drop::Type::GuaranteedItem)
+                m_playerParty.getInventory().gold += drop.goldAmount;
         }
     }
 }
@@ -872,8 +852,7 @@ void Battle::applyBreachbornEffect(PlayableCharacter &pc, BattleState &state)
     case Affinity::Tempest:
         if (state.playerParty != nullptr)
             for (Unit *u : state.playerParty->getAliveUnits())
-                if (auto *ally = dynamic_cast<PlayableCharacter *>(u))
-                    ally->gainEnergy(CombatConstants::kBreachbornTempestEnergy);
+                u->gainEnergyIfApplicable(CombatConstants::kBreachbornTempestEnergy);
         state.renderer.renderMessage(
             pc.getName() + " — Breachborn: Tempest surges through the party (+20 Energy)!");
         break;

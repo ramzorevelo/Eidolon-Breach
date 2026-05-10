@@ -86,7 +86,7 @@ void BattleNode::runBattle(Party &party, MetaProgress &meta,
 
             const int newLevel{meta.gainXP(u->getId(), xp)};
 
-            auto *pc{dynamic_cast<PlayableCharacter *>(u)};
+            auto *pc{u->asPlayableCharacter()};
             if (!pc)
                 continue;
 
@@ -112,13 +112,10 @@ void BattleNode::applyFloorAffinityModifiers(Party &enemyParty) const
         Unit *u{enemyParty.getUnitAt(i)};
         if (!u)
             continue;
-        auto *e{dynamic_cast<Enemy *>(u)};
-        if (!e)
-            continue;
 
         if (u->getAffinity() == m_floorAffinity)
-            e->scaleMaxToughness(1.0f + CombatConstants::kFloorAffinityToughnessBonus);
+            u->scaleMaxToughness(1.0f + CombatConstants::kFloorAffinityToughnessBonus);
         else if (u->getAffinity() == opponent)
-            e->scaleMaxToughness(1.0f - CombatConstants::kFloorAffinityToughnessBonus);
+            u->scaleMaxToughness(1.0f - CombatConstants::kFloorAffinityToughnessBonus);
     }
 }

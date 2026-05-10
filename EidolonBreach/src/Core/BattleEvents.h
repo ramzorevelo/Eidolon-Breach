@@ -25,7 +25,7 @@ struct UnitDefeatedEvent
 /** Emitted when an enemy's Toughness reaches 0 and the break fires. */
 struct BreakTriggeredEvent
 {
-    Enemy *broken{nullptr};
+    Unit *broken{nullptr};
     Affinity affinity{};
     BattleState *state{nullptr};
 };

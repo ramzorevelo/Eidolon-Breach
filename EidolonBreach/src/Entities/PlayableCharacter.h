@@ -277,6 +277,16 @@ class PlayableCharacter : public Unit
      */
     [[nodiscard]] Stats getFinalStats() const;
     [[nodiscard]] int getAffinityResistance(Affinity affinity) const override;
+
+    void onBattleReset() override;
+    void gainEnergyIfApplicable(int amount) override
+    {
+        gainEnergy(amount);
+    }
+    [[nodiscard]] PlayableCharacter *asPlayableCharacter() override
+    {
+        return this;
+    }
   private:
     std::vector<std::unique_ptr<IAction>> m_abilities;
     ResourceStats m_resources{0, kMaxEnergy};
@@ -306,6 +316,19 @@ class PlayableCharacter : public Unit
     std::optional<TargetInfo> selectAllyTarget(const Party &allies,
                                                IInputHandler &input,
                                                IRenderer &renderer);
+
+    /**
+     * @brief Shared targeting logic for both enemy and ally selection.
+     * @param pool       Party to select from.
+     * @param isAlly     true for ally targeting, false for enemy targeting.
+     * @param input      Input handler reference.
+     * @param renderer   Renderer reference.
+     * @return TargetInfo with the appropriate type, or nullopt on cancel.
+     */
+    std::optional<TargetInfo> selectFromParty(const Party &pool,
+                                              bool isAlly,
+                                              IInputHandler &input,
+                                              IRenderer &renderer);
     int m_archSkillCooldown{0};
     int m_consumableCooldown{0};
     int m_breachbornTurnsRemaining{0};

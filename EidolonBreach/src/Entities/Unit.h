@@ -7,6 +7,7 @@
 
 #include "Core/ActionResult.h"
 #include "Core/Affinity.h"
+#include "Core/Drop.h"
 #include "Core/Stats.h"
 #include "Core/IStatusEffect.h"
 #include <string>
@@ -15,6 +16,7 @@
 
 class Party;   
 struct BattleState;
+class PlayableCharacter;
 /** Abstract base for all Units (players, enemies, summons). */
 class Unit
 {
@@ -127,7 +129,62 @@ public:
     {
         return {};
     }
+    /**
+     * @brief Called by Battle at the end of combat for cleanup.
+     *        PlayableCharacter overrides to reset consumable state and cooldowns.
+     *        Default: no-op.
+     */
+    virtual void onBattleReset() {}
 
+    /**
+     * @brief Tick summon-specific lifecycle (duration countdown).
+     *        Summon overrides; returns true if the summon has expired.
+     *        Default: returns false.
+     */
+    [[nodiscard]] virtual bool tickSummonLifecycle()
+    {
+        return false;
+    }
+
+    /**
+     * @brief Generate drops for defeated units.
+     *        Enemy overrides to produce its drop table.
+     *        Default: returns empty vector.
+     * @param seed RNG seed for drop rolls.
+     */
+    [[nodiscard]] virtual std::vector<Drop> generateDropsForBattle(unsigned int seed) const
+    {
+        (void)seed;
+        return {};
+    }
+
+    /**
+     * @brief Fire this unit's break callback if one is set.
+     *        Enemy overrides to invoke its BreakEffect::onBreak with itself.
+     *        Default: no-op. Keeps Battle free of Enemy* casts.
+     */
+    virtual void triggerBreakEffect(BattleState & /*state*/) {}
+
+    /**
+     * @brief Gain energy if applicable. Only meaningful for PlayableCharacter.
+     *        Default: no-op.
+     */
+    virtual void gainEnergyIfApplicable(int /*amount*/) {}
+
+    /**
+     * @brief Scale max toughness by a factor. Only meaningful for Enemy.
+     *        Default: no-op.
+     */
+    virtual void scaleMaxToughness(float /*factor*/) {}
+
+    /**
+     * @brief Polymorphic accessor. Returns this as PlayableCharacter if applicable.
+     *        Default: returns nullptr.
+     */
+    [[nodiscard]] virtual PlayableCharacter *asPlayableCharacter()
+    {
+        return nullptr;
+    }
     /**
      * @return The unit's Resonance Field contribution value.
      *         Base implementation returns 0 (enemies never contribute).

@@ -79,7 +79,8 @@ void RestNode::applyPurge(Party &party, IRenderer &renderer) const
         Unit *u{party.getUnitAt(i)};
         if (!u)
             continue;
-        if (auto *pc = dynamic_cast<PlayableCharacter *>(u))
+        auto *pc{u->asPlayableCharacter()};
+        if (pc)
             pc->modifyExposure(-CombatConstants::kPurgeExposureReduction);
     }
     renderer.renderMessage("Exposure reduced across the party.");
@@ -91,7 +92,7 @@ void RestNode::applyAttune(Party &party, IRenderer &renderer) const
     for (std::size_t i{0}; i < party.size(); ++i)
     {
         Unit *u{party.getUnitAt(i)};
-        auto *pc{dynamic_cast<PlayableCharacter *>(u)};
+        auto *pc{u->asPlayableCharacter()};
         if (!pc)
             continue;
         const auto &slots{pc->getEquippedSkills()};
@@ -148,9 +149,12 @@ void RestNode::applyEquip(Party &party,
     // Collect alive player characters.
     std::vector<PlayableCharacter *> pcs{};
     for (std::size_t i{0}; i < party.size(); ++i)
-        if (auto *pc = dynamic_cast<PlayableCharacter *>(party.getUnitAt(i)))
-            if (pc->isAlive())
-                pcs.push_back(pc);
+    {
+        Unit *u{party.getUnitAt(i)};
+        auto *pc{u ? u->asPlayableCharacter() : nullptr};
+        if (pc && pc->isAlive())
+            pcs.push_back(pc);
+    }
 
     if (pcs.empty())
     {
