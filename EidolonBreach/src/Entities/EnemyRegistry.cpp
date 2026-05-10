@@ -67,24 +67,47 @@ EnemyBlueprint EnemyRegistry::parseBlueprint(const std::string &id,
     bp.faction = j.value("faction", "");
     bp.category = j.value("category", "");
     bp.affinity = j.value("affinity", "Aether");
+    if (j.contains("drops"))
+    {
+        for (const auto &dropJson : j.at("drops"))
+        {
+            Drop d{};
+            const std::string dtype{dropJson.at("type").get<std::string>()};
+            if (dtype == "gold")
+                d.type = Drop::Type::Gold;
+            else if (dtype == "guaranteed_item")
+                d.type = Drop::Type::GuaranteedItem;
+            else
+                d.type = Drop::Type::Item;
+            d.goldAmount = dropJson.value("goldAmount", 0);
+            d.itemId = dropJson.value("itemId", "");
+            d.dropChance = dropJson.value("dropChance", 1.0f);
+            bp.drops.push_back(d);
+        }
+    }
     return bp;
 }
 
 std::unique_ptr<Enemy> EnemyRegistry::instantiate(const EnemyBlueprint &bp)
 {
-    if (bp.enemyType == "slime")
-        return std::make_unique<Slime>(bp.name, bp.maxHp, bp.maxToughness);
-    if (bp.enemyType == "stone_golem")
-        return std::make_unique<StoneGolem>(bp.name, bp.maxHp, bp.maxToughness);
-    if (bp.enemyType == "vampire_bat")
-        return std::make_unique<VampireBat>(bp.name, bp.maxHp, bp.maxToughness);
+    std::unique_ptr<Enemy> enemy{};
 
-    // Fallback: generic enemy with minimal stats. Used for future enemy types
-    // defined purely in JSON before a dedicated subclass is written.
-    return std::make_unique<Enemy>(
-        bp.id, bp.name,
-        Stats{bp.maxHp, bp.maxHp, 10, 0, 5},
-        parseAffinityStr(bp.affinity),
-        bp.maxToughness,
-        std::make_unique<BasicAIStrategy>());
+    if (bp.enemyType == "slime")
+        enemy = std::make_unique<Slime>(bp.name, bp.maxHp, bp.maxToughness);
+    else if (bp.enemyType == "stone_golem")
+        enemy = std::make_unique<StoneGolem>(bp.name, bp.maxHp, bp.maxToughness);
+    else if (bp.enemyType == "vampire_bat")
+        enemy = std::make_unique<VampireBat>(bp.name, bp.maxHp, bp.maxToughness);
+    else
+        enemy = std::make_unique<Enemy>(
+            bp.id, bp.name,
+            Stats{bp.maxHp, bp.maxHp, 10, 0, 5},
+            parseAffinityStr(bp.affinity),
+            bp.maxToughness,
+            std::make_unique<BasicAIStrategy>());
+
+    for (const Drop &drop : bp.drops)
+        enemy->addDrop(drop);
+
+    return enemy;
 }

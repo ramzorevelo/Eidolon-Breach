@@ -5,7 +5,14 @@
     "faction": "Primordial",
     "category": "Aberration",
     "maxHp": 80,
-    "maxToughness": 30
+    "maxToughness": 30,
+    "drops": [
+      {
+        "type": "item",
+        "itemId": "iron_sword",
+        "dropChance": 0.10
+      }
+    ]
   },
   "slime_beta": {
     "name": "Slime Beta",
@@ -13,7 +20,14 @@
     "faction": "Primordial",
     "category": "Aberration",
     "maxHp": 60,
-    "maxToughness": 25
+    "maxToughness": 25,
+    "drops": [
+      {
+        "type": "item",
+        "itemId": "leather_armor",
+        "dropChance": 0.10
+      }
+    ]
   },
   "stone_golem": {
     "name": "Stone Golem",
@@ -21,7 +35,14 @@
     "faction": "Construct",
     "category": "Construct",
     "maxHp": 130,
-    "maxToughness": 60
+    "maxToughness": 60,
+    "drops": [
+      {
+        "type": "item",
+        "itemId": "steel_sword",
+        "dropChance": 0.50
+      }
+    ]
   },
   "vampire_bat": {
     "name": "Vampire Bat",
@@ -29,7 +50,14 @@
     "faction": "Hollow",
     "category": "Beast",
     "maxHp": 100,
-    "maxToughness": 40
+    "maxToughness": 40,
+    "drops": [
+      {
+        "type": "item",
+        "itemId": "chain_mail",
+        "dropChance": 0.50
+      }
+    ]
   },
   "breach_warden": {
     "name": "Breach Warden",
@@ -37,7 +65,13 @@
     "faction": "Construct",
     "category": "Construct",
     "maxHp": 200,
-    "maxToughness": 90
+    "maxToughness": 90,
+    "drops": [
+      {
+        "type": "guaranteed_item",
+        "itemId": "breach_shard"
+      }
+    ]
   },
   "shard_wraith": {
     "name": "Shard Wraith",
@@ -45,7 +79,14 @@
     "faction": "Hollow",
     "category": "Beast",
     "maxHp": 120,
-    "maxToughness": 50
+    "maxToughness": 50,
+    "drops": [
+      {
+        "type": "item",
+        "itemId": "chain_mail",
+        "dropChance": 0.50
+      }
+    ]
   },
   "frost_wisp": {
     "name": "Frost Wisp",
@@ -54,7 +95,14 @@
     "category": "Spirit",
     "affinity": "Frost",
     "maxHp": 65,
-    "maxToughness": 28
+    "maxToughness": 28,
+    "drops": [
+      {
+        "type": "item",
+        "itemId": "iron_sword",
+        "dropChance": 0.10
+      }
+    ]
   },
   "iron_sentinel": {
     "name": "Iron Sentinel",
@@ -63,6 +111,13 @@
     "category": "Construct",
     "affinity": "Terra",
     "maxHp": 110,
-    "maxToughness": 55
+    "maxToughness": 55,
+    "drops": [
+      {
+        "type": "item",
+        "itemId": "iron_sword",
+        "dropChance": 0.10
+      }
+    ]
   }
 }

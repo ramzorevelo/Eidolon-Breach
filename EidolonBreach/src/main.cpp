@@ -284,8 +284,7 @@ static void runGame(SDL3Renderer &renderer, SDL3InputHandler &input,
                 bool previousCleared{true};
                 for (const auto &def : classicDungeons)
                 {
-                    const bool levelMet{meta.playerLevel >= def.unlockPlayerLevel};
-                    if (levelMet && previousCleared)
+                    if (previousCleared)
                         available.push_back(&def);
                     previousCleared = meta.clearedDungeonIds.count(def.id) > 0;
                 }

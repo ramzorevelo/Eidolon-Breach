@@ -56,8 +56,8 @@ inline constexpr float kXpLevelExponent{1.5f};
 // Player (account) XP
 inline constexpr int kPlayerXpDungeonBase{30};       
 inline constexpr int kPlayerXpFirstClearBonus{100};  
-inline constexpr float kPlayerXpLevelBase{100.0f};   
-inline constexpr float kPlayerXpLevelExponent{1.8f}; 
+inline constexpr float kPlayerXpLevelBase{50.0f};
+inline constexpr float kPlayerXpLevelExponent{1.5f};
 inline constexpr float kCharBattleXpMultiplier{5.0f};
 inline constexpr float kCharBattleXpLevelScale{0.2f};
 inline constexpr float kPlayerXpLevelScale{0.1f};

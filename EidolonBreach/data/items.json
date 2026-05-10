@@ -81,5 +81,49 @@
         "amount": 5
       }
     ]
+  },
+  "steel_sword": {
+    "name": "Steel Sword",
+    "type": "Equipment",
+    "equipSlot": "Weapon",
+    "rarity": "Rare",
+    "stackSize": 1,
+    "goldValue": 90,
+    "effects": [
+      {
+        "type": "StatModifier",
+        "stat": "ATK",
+        "amount": 14
+      }
+    ]
+  },
+  "chain_mail": {
+    "name": "Chain Mail",
+    "type": "Equipment",
+    "equipSlot": "Armor",
+    "rarity": "Rare",
+    "stackSize": 1,
+    "goldValue": 80,
+    "effects": [
+      {
+        "type": "StatModifier",
+        "stat": "DEF",
+        "amount": 10
+      }
+    ]
+  },
+  "breach_shard": {
+    "name": "Breach Shard",
+    "type": "Equipment",
+    "equipSlot": "Accessory",
+    "rarity": "Epic",
+    "stackSize": 1,
+    "goldValue": 150,
+    "effects": [
+      {
+        "type": "ResonanceModifier",
+        "amount": 10
+      }
+    ]
   }
 }

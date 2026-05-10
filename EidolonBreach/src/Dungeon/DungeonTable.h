@@ -2,9 +2,9 @@
 /**
  * @file DungeonTable.h
  * @brief Ordered list of Classic mode dungeon tiers.
- *        Dungeons unlock when: playerLevel >= unlockPlayerLevel
- *        AND the previous dungeon ID is in MetaProgress::clearedDungeonIds
- *        (the first dungeon is always accessible regardless).
+ *        Dungeons unlock sequentially: clear dungeon N to unlock dungeon N+1.
+ *        The first dungeon is always accessible. Player account level no longer
+ *        gates Classic dungeon access.
  */
 #include "Dungeon/DungeonDefinition.h"
 #include <vector>
@@ -22,7 +22,6 @@ namespace DungeonTable
             "A lone enemy guards the entrance. Learn the basics of combat.",
             /*enemyLevel*/ 1,
             /*recommendedPlayer*/ 1,
-            /*unlockPlayerLevel*/ 1,
             /*numFloors*/ 1,
             DungeonDifficulty::Normal,
             /*fixedLayout*/ {"battle"},
@@ -35,7 +34,6 @@ namespace DungeonTable
             "Enemies resist simple attacks. Strike their weak points to break them.",
             /*enemyLevel*/ 2,
             /*recommendedPlayer*/ 1,
-            /*unlockPlayerLevel*/ 1,
             /*numFloors*/ 2,
             DungeonDifficulty::Normal,
             /*fixedLayout*/ {"battle", "battle"},
@@ -48,7 +46,6 @@ namespace DungeonTable
             "The breach opens wider. Rest sites offer relief between encounters.",
             /*enemyLevel*/ 3,
             /*recommendedPlayer*/ 2,
-            /*unlockPlayerLevel*/ 2,
             /*numFloors*/ 3,
             DungeonDifficulty::Normal,
             /*fixedLayout*/ {"battle", "rest", "battle"},
@@ -61,7 +58,6 @@ namespace DungeonTable
             "Your actions resonate together. Coordinate affinities for greater power.",
             /*enemyLevel*/ 4,
             /*recommendedPlayer*/ 3,
-            /*unlockPlayerLevel*/ 3,
             /*numFloors*/ 5,
             DungeonDifficulty::Normal,
             /*fixedLayout*/ {"battle", "battle", "rest", "battle", "battle"},
@@ -75,7 +71,6 @@ namespace DungeonTable
             "The breach warps your senses. Manage risk carefully — or vent the pressure.",
             /*enemyLevel*/ 6,
             /*recommendedPlayer*/ 4,
-            /*unlockPlayerLevel*/ 5,
             /*numFloors*/ 6,
             DungeonDifficulty::Normal,
             /*fixedLayout*/ {
@@ -95,7 +90,6 @@ namespace DungeonTable
             "Elite threats demand full coordination. Defeat them for powerful rewards.",
             /*enemyLevel*/ 9,
             /*recommendedPlayer*/ 6,
-            /*unlockPlayerLevel*/ 7,
             /*numFloors*/ 7,
             DungeonDifficulty::Normal,
             /*fixedLayout*/ {
@@ -116,7 +110,6 @@ namespace DungeonTable
             "Every system in play. The guardian of the breach awaits at the core.",
             /*enemyLevel*/ 14,
             /*recommendedPlayer*/ 9,
-            /*unlockPlayerLevel*/ 10,
             /*numFloors*/ 9,
             DungeonDifficulty::Hard,
             /*fixedLayout*/ {

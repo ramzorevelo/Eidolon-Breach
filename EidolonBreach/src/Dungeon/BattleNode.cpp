@@ -58,7 +58,7 @@ void BattleNode::runBattle(Party &party, MetaProgress &meta,
     applyFloorAffinityModifiers(enemyParty);
 
     Battle battle{party, enemyParty, renderer, input,
-                  runCtx, eventBus, nullptr, m_summonRegistry};
+                  runCtx, eventBus, nullptr, m_summonRegistry, m_itemRegistry};
     try
     {
         battle.run();

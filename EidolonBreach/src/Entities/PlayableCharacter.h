@@ -208,6 +208,15 @@ class PlayableCharacter : public Unit
     }
 
     /**
+     * @brief Remove Fracture state. Called by RestNode::applyStabilize().
+     *        Has no effect if the character is not Fractured.
+     */
+    void clearFracture()
+    {
+        clearFlag(CharFlag::Fractured);
+    }
+
+    /**
      * @brief Activates Breachborn for 3 turns. Safe to call while Fractured
      *        (refreshes the counter without changing Fracture status).
      */

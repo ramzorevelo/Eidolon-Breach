@@ -4,52 +4,56 @@
             "bondTrialComplete": false,
             "chosenAspects": [],
             "echoCount": 5,
-            "insightBalance": 52,
+            "insightBalance": 63,
             "signalTallies": {
                 "Aggressive": 65,
-                "Reactive": 56,
-                "Supportive": 47
+                "Reactive": 74,
+                "Sacrificial": 2,
+                "Supportive": 64
             }
         },
         "vex": {
             "bondTrialComplete": false,
             "chosenAspects": [],
             "echoCount": 5,
-            "insightBalance": 53,
+            "insightBalance": 55,
             "signalTallies": {
-                "Aggressive": 47,
-                "Reactive": 63,
+                "Aggressive": 48,
+                "Reactive": 70,
                 "Sacrificial": 9,
-                "Supportive": 52
+                "Supportive": 55
             }
         },
         "zara": {
             "bondTrialComplete": false,
             "chosenAspects": [],
             "echoCount": 5,
-            "insightBalance": 51,
+            "insightBalance": 60,
             "signalTallies": {
                 "Aggressive": 37,
-                "Reactive": 66,
-                "Supportive": 55
+                "Reactive": 79,
+                "Sacrificial": 2,
+                "Supportive": 70
             }
         }
     },
     "characterXP": {
-        "ignis": 3007,
-        "lyra": 2196,
-        "vex": 2224,
-        "zara": 2224
+        "ignis": 3645,
+        "lyra": 2572,
+        "vex": 2600,
+        "zara": 2600
     },
     "clearedDungeonIds": [
         "dungeon_01",
         "dungeon_02",
         "dungeon_03",
-        "dungeon_04"
+        "dungeon_04",
+        "dungeon_05",
+        "dungeon_06"
     ],
     "currency": 0,
     "draftModeUnlocked": false,
-    "highestFloorReached": 5,
+    "highestFloorReached": 7,
     "masteryEventLog": {
         "lyra": [
             "lyra_predator"
@@ -61,8 +65,8 @@
             "zara_glacial"
         ]
     },
-    "playerLevel": 4,
-    "playerXp": 2269,
+    "playerLevel": 7,
+    "playerXp": 2571,
     "unlockedCharacterIds": [
         "lyra",
         "vex",

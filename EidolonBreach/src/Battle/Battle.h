@@ -22,6 +22,7 @@ class PlayableCharacter;
 class IAction;
 class SummonRegistry;
 struct RunCharacterState;
+class ItemRegistry;
 
 class Battle
 {
@@ -35,6 +36,8 @@ class Battle
      * @param runContext     Per-run state for signal tracking and crystallization.
      * @param eventBus       Typed event bus for cross-system notifications.
      * @param turnOrderCalc  Turn order strategy; defaults to SpeedBasedTurnOrderCalculator.
+     * @param itemRegistry   Used by collectDrops() to resolve item drops.
+     *                       Optional; pass nullptr if drops are not needed (tests).
      */
     Battle(Party &playerParty,
            Party &enemyParty,
@@ -43,7 +46,8 @@ class Battle
            RunContext &runContext,
            EventBus &eventBus,
            std::unique_ptr<ITurnOrderCalculator> turnOrderCalc = nullptr,
-           const SummonRegistry *summonRegistry = nullptr);
+           const SummonRegistry *summonRegistry = nullptr,
+           const ItemRegistry *itemRegistry = nullptr);
 
     void run();
 
@@ -62,6 +66,7 @@ class Battle
     IInputHandler &m_inputHandler;
     ResonanceField m_field{};
     const SummonRegistry *m_summonRegistry{nullptr};
+    const ItemRegistry *m_itemRegistry{nullptr};
 
     void runBattleLoop(BattleState &state);
     [[nodiscard]] bool isBattleOver() const;

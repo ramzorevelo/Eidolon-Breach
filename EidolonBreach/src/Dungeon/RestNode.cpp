@@ -19,36 +19,81 @@ void RestNode::enter(Party &party, MetaProgress &meta,
 {
     const bool isDraft = (runCtx.runMode == RunMode::EidolonLabyrinth);
 
-    std::vector<std::string> options{};
-    options.push_back("Heal — restore partial HP to all allies");
-    options.push_back("Purge — reduce all Exposure by " + std::to_string(CombatConstants::kPurgeExposureReduction));
-    options.push_back("Equip — equip items from party inventory");
-    if (isDraft)
-        options.push_back("Attune — re-equip slot skills");
-    options.push_back("Continue");
+    bool healUsed{false};
+    bool purgeUsed{false};
+    bool equipUsed{false};
 
-    input.setMenuContext("REST SITE", options);
-    renderer.renderSelectionMenu("REST SITE", options);
-    const std::size_t choice = input.getMenuChoice(options.size());
+    while (true)
+    {
+        // Check whether any PC is Fractured.
+        bool anyFractured{false};
+        for (std::size_t i{0}; i < party.size(); ++i)
+        {
+            Unit *u{party.getUnitAt(i)};
+            auto *pc{u ? u->asPlayableCharacter() : nullptr};
+            if (pc && pc->isFractured())
+            {
+                anyFractured = true;
+                break;
+            }
+        }
 
-    if (options[choice].rfind("Heal", 0) == 0)
-    {
-        applyHeal(party);
-        renderer.renderMessage("The party rests and recovers HP.");
+        std::vector<std::string> options{};
+        if (!healUsed)
+            options.push_back("Heal — restore partial HP to all allies");
+        if (!purgeUsed)
+            options.push_back("Purge — reduce all Exposure by " +
+                              std::to_string(CombatConstants::kPurgeExposureReduction));
+        if (!equipUsed)
+            options.push_back("Equip — equip items from party inventory");
+        if (isDraft)
+            options.push_back("Attune — re-equip slot skills");
+        if (anyFractured)
+            options.push_back("Stabilize — remove Fracture from one character");
+        options.push_back("Continue");
+
+        input.setMenuContext("REST SITE", options);
+        renderer.renderSelectionMenu("REST SITE", options);
+        const std::size_t choice = input.getMenuChoice(options.size());
+
+        const std::string &chosen{options[choice]};
+
+        if (chosen.rfind("Heal", 0) == 0)
+        {
+            applyHeal(party);
+            renderer.renderMessage("The party rests and recovers HP.");
+            healUsed = true;
+        }
+        else if (chosen.rfind("Purge", 0) == 0)
+        {
+            applyPurge(party, renderer);
+            purgeUsed = true;
+        }
+        else if (chosen.rfind("Equip", 0) == 0)
+        {
+            applyEquip(party, renderer, input);
+            equipUsed = true;
+        }
+        else if (isDraft && chosen.rfind("Attune", 0) == 0)
+        {
+            applyAttune(party, renderer);
+        }
+        else if (chosen.rfind("Stabilize", 0) == 0)
+        {
+            applyStabilize(party, renderer, input);
+            break; // Stabilize consumes the node immediately.
+        }
+        else
+        {
+            break; // "Continue"
+        }
+
+        // If all repeatable options are exhausted and there are no Fractured PCs,
+        // auto-exit to avoid trapping the player in an empty menu.
+        const bool allUsed{healUsed && purgeUsed && equipUsed};
+        if (allUsed && !anyFractured && !isDraft)
+            break;
     }
-    else if (options[choice].rfind("Purge", 0) == 0)
-    {
-        applyPurge(party, renderer);
-    }
-    else if (options[choice].rfind("Equip", 0) == 0)
-    {
-        applyEquip(party, renderer, input);
-    }
-    else if (isDraft && options[choice].rfind("Attune", 0) == 0)
-    {
-        applyAttune(party, renderer);
-    }
-    // "Continue": fall through
 
     (void)meta;
     (void)eventBus;
@@ -189,4 +234,46 @@ void RestNode::applyEquip(Party &party,
         party.getInventory().addItem(*displaced, 1);
         renderer.renderMessage(displaced->name + " returned to inventory.");
     }
+}
+
+void RestNode::applyStabilize(Party &party,
+                              IRenderer &renderer,
+                              IInputHandler &input) const
+{
+    // Collect Fractured PCs.
+    std::vector<PlayableCharacter *> fractured{};
+    for (std::size_t i{0}; i < party.size(); ++i)
+    {
+        Unit *u{party.getUnitAt(i)};
+        auto *pc{u ? u->asPlayableCharacter() : nullptr};
+        if (pc && pc->isFractured())
+            fractured.push_back(pc);
+    }
+
+    if (fractured.empty())
+    {
+        renderer.renderMessage("No Fractured characters to stabilize.");
+        return;
+    }
+
+    PlayableCharacter *target{nullptr};
+
+    if (fractured.size() == 1)
+    {
+        target = fractured[0];
+    }
+    else
+    {
+        std::vector<std::string> picks{};
+        for (const PlayableCharacter *pc : fractured)
+            picks.push_back(pc->getName());
+
+        input.setMenuContext("STABILIZE — CHOOSE CHARACTER", picks);
+        renderer.renderSelectionMenu("STABILIZE — CHOOSE CHARACTER", picks);
+        const std::size_t pick = input.getMenuChoice(picks.size());
+        target = fractured[pick];
+    }
+
+    target->clearFracture();
+    renderer.renderMessage(target->getName() + "'s Fracture has been stabilized.");
 }

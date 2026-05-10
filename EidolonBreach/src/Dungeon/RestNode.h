@@ -32,4 +32,10 @@ class RestNode : public MapNode
     void applyAttune(Party &party, IRenderer &renderer) const;
     /** @brief Let each PC equip one item from the party's equipment inventory. */
     void applyEquip(Party &party, IRenderer &renderer, IInputHandler &input) const;
+    /**
+     * @brief Remove Fracture from one chosen character.
+     *        Presents a character picker when more than one PC is Fractured.
+     *        Exits the rest-node loop immediately after applying.
+     */
+    void applyStabilize(Party &party, IRenderer &renderer, IInputHandler &input) const;
 };

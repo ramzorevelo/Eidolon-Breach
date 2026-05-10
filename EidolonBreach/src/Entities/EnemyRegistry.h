@@ -7,7 +7,7 @@
  */
 
 #include "Core/Drop.h"
-#include "Items/Item.h" // for Drop
+#include "Items/Item.h" 
 #include <memory>
 #include <string>
 #include <string_view>
@@ -26,6 +26,7 @@ struct EnemyBlueprint
     std::string faction{};
     std::string category{};
     std::string affinity{"Aether"};
+    std::vector<Drop> drops{};
 };
 
 class EnemyRegistry

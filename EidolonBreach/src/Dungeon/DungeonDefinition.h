@@ -20,7 +20,6 @@ struct DungeonDefinition
     std::string description{};
     int enemyLevel{1};
     int recommendedPlayerLevel{1};
-    int unlockPlayerLevel{1};
     int numFloors{5};
     DungeonDifficulty difficulty{DungeonDifficulty::Normal};
     /**

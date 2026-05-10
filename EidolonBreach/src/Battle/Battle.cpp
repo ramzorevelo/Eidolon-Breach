@@ -6,6 +6,7 @@
 #include "Core/FieldDiscovery.h"
 #include "Battle/Battle.h"
 #include "Battle/AVTurnOrderCalculator.h"
+#include "Items/ItemRegistry.h"
 #include "Core/BattleEvents.h"
 #include "Core/CombatConstants.h"
 #include "Core/EffectIds.h"
@@ -43,7 +44,8 @@ Battle::Battle(Party &playerParty,
                RunContext &runContext,
                EventBus &eventBus,
                std::unique_ptr<ITurnOrderCalculator> turnOrderCalc,
-               const SummonRegistry *summonRegistry)
+               const SummonRegistry *summonRegistry,
+               const ItemRegistry *itemRegistry)
     : m_playerParty{playerParty},
       m_enemyParty{enemyParty},
       m_runContext{runContext},
@@ -52,7 +54,8 @@ Battle::Battle(Party &playerParty,
                                     : std::make_unique<AVTurnOrderCalculator>()},
       m_renderer{renderer},
       m_inputHandler{inputHandler},
-      m_summonRegistry{summonRegistry}
+      m_summonRegistry{summonRegistry},
+      m_itemRegistry{itemRegistry}
 {
 }
 
@@ -554,9 +557,23 @@ void Battle::collectDrops(BattleState &state)
             continue;
         for (const Drop &drop : u->generateDropsForBattle(seed))
         {
-            if (drop.type == Drop::Type::Gold ||
-                drop.type == Drop::Type::GuaranteedItem)
+            if (drop.type == Drop::Type::Gold)
+            {
                 m_playerParty.getInventory().gold += drop.goldAmount;
+            }
+            else if (drop.type == Drop::Type::Item ||
+                     drop.type == Drop::Type::GuaranteedItem)
+            {
+                if (m_itemRegistry && !drop.itemId.empty())
+                {
+                    auto item{m_itemRegistry->create(drop.itemId)};
+                    if (item.has_value())
+                    {
+                        m_playerParty.getInventory().addItem(*item, 1);
+                        m_renderer.renderMessage("Item dropped: " + item->name);
+                    }
+                }
+            }
         }
     }
 }
