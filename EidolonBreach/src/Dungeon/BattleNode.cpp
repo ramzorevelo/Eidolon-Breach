@@ -64,34 +64,9 @@ void BattleNode::runBattle(Party &party, MetaProgress &meta,
     }
     renderer.clearBattleCache();
 
-    if (enemyParty.isAllDead() && runCtx.runMode == RunMode::Classic)
+    if (enemyParty.isAllDead())
     {
-        for (std::size_t i{0}; i < party.size(); ++i)
-        {
-            Unit *u{party.getUnitAt(i)};
-            if (!u || !u->isAlive())
-                continue;
-
-            const int charLevel{
-                meta.characterLevels.count(u->getId()) > 0
-                    ? meta.characterLevels.at(u->getId())
-                    : 1};
-            const float gap{static_cast<float>(m_dungeonEnemyLevel - charLevel)};
-            const float scale{std::clamp(
-                1.0f + gap * CombatConstants::kCharBattleXpLevelScale,
-                0.1f, 2.0f)};
-            const int xp{static_cast<int>(
-                static_cast<float>(m_dungeonEnemyLevel) *
-                CombatConstants::kCharBattleXpMultiplier * scale)};
-
-            const int newLevel{meta.gainXP(u->getId(), xp)};
-
-            auto *pc{u->asPlayableCharacter()};
-            if (!pc)
-                continue;
-
-            pc->applyUnlocks(newLevel);
-        }
+        awardBattleXp(party, meta, runCtx);
     }
 }
 
@@ -117,5 +92,37 @@ void BattleNode::applyFloorAffinityModifiers(Party &enemyParty) const
             u->scaleMaxToughness(1.0f + CombatConstants::kFloorAffinityToughnessBonus);
         else if (u->getAffinity() == opponent)
             u->scaleMaxToughness(1.0f - CombatConstants::kFloorAffinityToughnessBonus);
+    }
+}
+
+void BattleNode::awardBattleXp(Party &party, MetaProgress &meta,
+                               const RunContext &runCtx) const
+{
+    if (runCtx.runMode != RunMode::Classic)
+        return;
+
+    for (std::size_t i{0}; i < party.size(); ++i)
+    {
+        Unit *u{party.getUnitAt(i)};
+        if (!u || !u->isAlive())
+            continue;
+
+        const int charLevel{
+            meta.characterLevels.count(u->getId()) > 0
+                ? meta.characterLevels.at(u->getId())
+                : 1};
+        const float gap{static_cast<float>(m_dungeonEnemyLevel - charLevel)};
+        const float scale{std::clamp(
+            1.0f + gap * CombatConstants::kCharBattleXpLevelScale,
+            0.1f, 2.0f)};
+        const int xp{static_cast<int>(
+            static_cast<float>(m_dungeonEnemyLevel) *
+            CombatConstants::kCharBattleXpMultiplier * scale)};
+
+        const int newLevel{meta.gainXP(u->getId(), xp)};
+
+        auto *pc{u->asPlayableCharacter()};
+        if (pc)
+            pc->applyUnlocks(newLevel);
     }
 }

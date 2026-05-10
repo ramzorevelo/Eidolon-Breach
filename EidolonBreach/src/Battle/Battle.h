@@ -163,4 +163,13 @@ class Battle
      */
     [[nodiscard]] static BehaviorSignal findDominantSignal(
         const RunCharacterState &cs);
+    void handlePcTurnStart(PlayableCharacter &pc, BattleState &state);
+    void handlePostAction(Unit *unit, PlayableCharacter *pc,
+                          ActionResult &result, BattleState &state);
+    void matchActionToAbilityAndSignal(PlayableCharacter &pc,
+                                       const ActionResult &result,
+                                       BattleState &state);
+    void handleSummonExpiry(Unit *unit);
+    void buildAndRenderRemainingStrip(std::vector<TurnSlot> &turnOrder,
+                                      std::size_t currentSlotIdx);
 };

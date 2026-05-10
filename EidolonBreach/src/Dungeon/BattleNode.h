@@ -49,7 +49,7 @@ class BattleNode : public MapNode
                    RunContext &runCtx, EventBus &eventBus,
                    IRenderer &renderer, IInputHandler &input);
 
-
+    void awardBattleXp(Party &party, MetaProgress &meta, const RunContext &runCtx) const;
   private:
     std::function<void(Party &)> m_populateEnemies;
     const SummonRegistry *m_summonRegistry{nullptr};

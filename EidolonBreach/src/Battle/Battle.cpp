@@ -150,37 +150,12 @@ void Battle::runBattleLoop(BattleState &state)
                 processEnemyTurn(slot.unit, state);
             
 
-            if (slot.unit->isSummon() && slot.unit->tickSummonLifecycle())
-            {
-                const std::string name{slot.unit->getName()};
-                const std::string id{slot.unit->getId()};
-                m_renderer.renderMessage(name + " fades away.");
-                m_playerParty.removeUnit(id);
-            }
+            handleSummonExpiry(slot.unit);
 
             if (checkAndHandleBattleEnd(state))
                 return;
 
-            // Build remaining strip from turnOrder plus any newly summoned units.
-            std::vector<TurnSlot> remaining{
-                turnOrder.begin() + static_cast<std::ptrdiff_t>(slotIdx) + 1,
-                turnOrder.end()};
-            for (std::size_t pi{0}; pi < m_playerParty.size(); ++pi)
-            {
-                Unit *u{m_playerParty.getUnitAt(pi)};
-                if (!u || !u->isAlive())
-                    continue;
-                const bool inOrder{std::any_of(
-                    turnOrder.begin(), turnOrder.end(),
-                    [u](const TurnSlot &s)
-                    { return s.unit == u; })};
-                if (!inOrder)
-                {
-                    remaining.push_back({u, true, pi});
-                    turnOrder.push_back({u, true, pi});
-                }
-            }
-            m_renderer.renderTurnOrder(remaining);
+            buildAndRenderRemainingStrip(turnOrder, slotIdx);
 
             m_renderer.presentPause(slot.isPlayer ? kPlayerTurnPauseMs : kEnemyTurnPauseMs);
         }
@@ -210,30 +185,7 @@ void Battle::processPlayerTurn(Unit *unit, BattleState &state)
 
     auto *pc{unit->asPlayableCharacter()};
     if (pc)
-    {
-        pc->tickArchSkillCooldown();
-        pc->tickConsumableCooldown();
-
-        // Fracture start-of-turn effect (permanent after Breachborn ends).
-        if (pc->isFractured())
-            applyFractureStartOfTurn(*pc, state);
-
-        // Breachborn turn counter.
-        if (pc->isBreachbornActive())
-        {
-            m_renderer.renderMessage(pc->getName() +
-                                     " — BREACHBORN (" +
-                                     std::to_string(pc->getBreachbornTurnsRemaining()) +
-                                     " turns remaining)");
-            const bool fractureActivated{pc->tickBreachborn()};
-            if (fractureActivated)
-                m_renderer.renderMessage(pc->getName() +
-                                         " — Breachborn ends. FRACTURE activated!");
-        }
-
-        for (auto &v : m_playerParty.getVestiges())
-            v->onTurnStart(*pc, state);
-    }
+        handlePcTurnStart(*pc, state);
 
     auto enemyAliveBefore{snapshotAliveStates(m_enemyParty)};
     auto enemyBreaksBefore{snapshotBreakStates(m_enemyParty)};
@@ -242,7 +194,7 @@ void Battle::processPlayerTurn(Unit *unit, BattleState &state)
         m_renderer.renderHintBar(buildHintString(*pc));
 
     ActionResult result{unit->takeTurn(m_playerParty, m_enemyParty, state)};
-    state.renderer.clearTargetHighlight(); 
+    state.renderer.clearTargetHighlight();
 
     if (result.targetEnemyIndex >= 0 && state.enemyParty != nullptr)
     {
@@ -263,52 +215,7 @@ void Battle::processPlayerTurn(Unit *unit, BattleState &state)
     processNewBreaks(enemyBreaksBefore, m_enemyParty, result.actionAffinity, state);
     checkNewDeaths(enemyAliveBefore, m_enemyParty, unit, state);
 
-    // Resonance contribution applies to all player-side units (PCs and Summons).
-    applyResonanceContribution(*unit, result.actionAffinity, state);
-
-    if (pc)
-    {
-        processActionResult(*pc, m_playerParty, result, state);
-        if (pc->isResonatingProcArmed() &&
-            result.actionAffinity == pc->getAffinity())
-        {
-            pc->consumeResonatingProc();
-            applyResonatingProc(*pc, result, state);
-        }
-
-        if (pc->isSurgingProcArmed())
-        {
-            pc->consumeSurgingProc();
-            applySurgingProc(*pc, result, state);
-        }
-
-        if (result.ventConsolation && pc->isResonatingProcArmed())
-        {
-            state.renderer.renderMessage(
-                pc->getName() + " vents — Resonating discharge fires as consolation!");
-            pc->consumeResonatingProc();
-            applyResonatingProc(*pc, result, state);
-        }
-
-        if (pc && pc->isBreachbornActive())
-            applyBreachbornActionBonus(*pc, result, state);
-
-        if (result.summonEffect.has_value())
-        {
-            processSummonEffect(*result.summonEffect, pc->getResonanceContribution(), state);
-        }
-
-        // Determine the action that was used from the action result metadata.
-        const auto &abilities{pc->getAbilities()};
-        for (const auto &ability : abilities)
-        {
-            if (ability->getAffinity() == result.actionAffinity)
-            {
-                applyBehaviorSignals(*pc, *ability, result, state);
-                break;
-            }
-        }
-    }
+    handlePostAction(unit, pc, result, state);
 
     if (state.resonanceField.isReady())
     {
@@ -923,4 +830,119 @@ void Battle::applyBreachbornActionBonus(PlayableCharacter &pc,
                 std::to_string(bonus) + " bonus damage + Burn!");
         }
     }
+}
+void Battle::handlePcTurnStart(PlayableCharacter &pc, BattleState &state)
+{
+    pc.tickArchSkillCooldown();
+    pc.tickConsumableCooldown();
+
+    if (pc.isFractured())
+        applyFractureStartOfTurn(pc, state);
+
+    if (pc.isBreachbornActive())
+    {
+        m_renderer.renderMessage(pc.getName() +
+                                 " — BREACHBORN (" +
+                                 std::to_string(pc.getBreachbornTurnsRemaining()) +
+                                 " turns remaining)");
+        const bool fractureActivated{pc.tickBreachborn()};
+        if (fractureActivated)
+            m_renderer.renderMessage(pc.getName() +
+                                     " — Breachborn ends. FRACTURE activated!");
+    }
+
+    for (auto &v : m_playerParty.getVestiges())
+        v->onTurnStart(pc, state);
+}
+
+void Battle::matchActionToAbilityAndSignal(PlayableCharacter &pc,
+                                           const ActionResult &result,
+                                           BattleState &state)
+{
+    const auto &abilities{pc.getAbilities()};
+    for (const auto &ability : abilities)
+    {
+        if (ability->getAffinity() == result.actionAffinity)
+        {
+            applyBehaviorSignals(pc, *ability, result, state);
+            break;
+        }
+    }
+}
+
+void Battle::handlePostAction(Unit *unit, PlayableCharacter *pc,
+                              ActionResult &result, BattleState &state)
+{
+    applyResonanceContribution(*unit, result.actionAffinity, state);
+
+    if (!pc)
+        return;
+
+    processActionResult(*pc, m_playerParty, result, state);
+
+    if (pc->isResonatingProcArmed() &&
+        result.actionAffinity == pc->getAffinity())
+    {
+        pc->consumeResonatingProc();
+        applyResonatingProc(*pc, result, state);
+    }
+
+    if (pc->isSurgingProcArmed())
+    {
+        pc->consumeSurgingProc();
+        applySurgingProc(*pc, result, state);
+    }
+
+    if (result.ventConsolation && pc->isResonatingProcArmed())
+    {
+        state.renderer.renderMessage(
+            pc->getName() + " vents — Resonating discharge fires as consolation!");
+        pc->consumeResonatingProc();
+        applyResonatingProc(*pc, result, state);
+    }
+
+    if (pc->isBreachbornActive())
+        applyBreachbornActionBonus(*pc, result, state);
+
+    if (result.summonEffect.has_value())
+        processSummonEffect(*result.summonEffect, pc->getResonanceContribution(), state);
+
+    matchActionToAbilityAndSignal(*pc, result, state);
+}
+
+void Battle::handleSummonExpiry(Unit *unit)
+{
+    if (!unit->isSummon())
+        return;
+    if (!unit->tickSummonLifecycle())
+        return;
+    const std::string name{unit->getName()};
+    const std::string id{unit->getId()};
+    m_renderer.renderMessage(name + " fades away.");
+    m_playerParty.removeUnit(id);
+}
+
+void Battle::buildAndRenderRemainingStrip(std::vector<TurnSlot> &turnOrder,
+                                          std::size_t currentSlotIdx)
+{
+    std::vector<TurnSlot> remaining{
+        turnOrder.begin() + static_cast<std::ptrdiff_t>(currentSlotIdx) + 1,
+        turnOrder.end()};
+
+    for (std::size_t pi{0}; pi < m_playerParty.size(); ++pi)
+    {
+        Unit *u{m_playerParty.getUnitAt(pi)};
+        if (!u || !u->isAlive())
+            continue;
+        const bool inOrder{std::any_of(
+            turnOrder.begin(), turnOrder.end(),
+            [u](const TurnSlot &s)
+            { return s.unit == u; })};
+        if (!inOrder)
+        {
+            remaining.push_back({u, true, pi});
+            turnOrder.push_back({u, true, pi});
+        }
+    }
+    m_renderer.renderTurnOrder(remaining);
 }
