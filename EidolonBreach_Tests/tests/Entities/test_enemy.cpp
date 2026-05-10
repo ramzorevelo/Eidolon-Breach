@@ -42,22 +42,13 @@ TEST_CASE("Enemy: toughness does not go below zero")
     CHECK(e->getToughness() == 5);
 }
 
-TEST_CASE("Enemy: takeTurn returns Skip when broken")
+TEST_CASE("Enemy: checkAndClearBroken clears flag after break")
 {
     auto e = makeEnemy(100, 10);
     e->applyToughnessHit(10);
     REQUIRE(e->isBroken());
-
-    Party playerParty, enemyParty;
-    ResonanceField field{};
-    NullInputHandler inputHandler{};
-    NullRenderer renderer{};
-    RunContext runContext{};
-    EventBus eventBus{};
-    BattleState state{0, 0, Affinity::Aether, field, inputHandler, renderer, runContext, eventBus};
-
-    ActionResult result = e->takeTurn(enemyParty, playerParty, state);
-    CHECK(result.type == ActionResult::Type::Skip);
+    const bool cleared{e->checkAndClearBroken()};
+    CHECK(cleared);
     CHECK(!e->isBroken());
 }
 

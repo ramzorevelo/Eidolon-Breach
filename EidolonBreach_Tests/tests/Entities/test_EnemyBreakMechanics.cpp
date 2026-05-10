@@ -3,6 +3,8 @@
  * @brief Phase 5 tests: affinity scaling, break trigger, broken damage bonus,
  *        break window, and BreakEffect callback execution.
  */
+
+#include "Actions/BasicStrikeAction.h"
 #include "Battle/BattleState.h"
 #include "Battle/ResonanceField.h"
 #include "Core/Affinity.h"
@@ -161,22 +163,14 @@ TEST_CASE("Enemy::takeDamage: no bonus when not broken")
 
 TEST_CASE("Enemy::takeDamage: bonus ends after break window (skipped turn)")
 {
-    Party playerParty, enemyParty;
-    ResonanceField field{};
-    NullInputHandler input{};
-    NullRenderer renderer{};
-
     auto ePtr = makeEnemyWithModifiers(10, {});
     Enemy *e = ePtr.get();
-    enemyParty.addUnit(std::move(ePtr));
 
-    // Break the enemy.
     e->applyToughnessHit(10, Affinity::Aether);
     REQUIRE(e->isBroken());
 
-    // Simulate enemy's skipped turn — this should clear broken state.
-    BattleState state = makeBattleState(field, input, renderer, &playerParty, &enemyParty);
-    e->takeTurn(enemyParty, playerParty, state);
+    // Battle calls checkAndClearBroken() at the start of the suppressed slot.
+    e->checkAndClearBroken();
     REQUIRE(!e->isBroken()); // bonus window over
 
     // Damage after recovery: no bonus.
@@ -199,12 +193,36 @@ TEST_CASE("Enemy::takeDamage: bonus applies to ALL player actions during window,
 }
 
 
-TEST_CASE("Enemy::takeTurn: returns Skip and clears broken state after 1 skipped turn")
+TEST_CASE("Enemy::checkAndClearBroken: clears flag and returns true when broken")
 {
+    auto e = makeEnemyWithModifiers(10, {});
+    e->applyToughnessHit(10, Affinity::Aether);
+    REQUIRE(e->isBroken());
+
+    const bool wasCleared{e->checkAndClearBroken()};
+    CHECK(wasCleared);
+    CHECK(!e->isBroken());
+}
+
+TEST_CASE("Enemy::checkAndClearBroken: returns false when not broken")
+{
+    auto e = makeEnemyWithModifiers(10, {});
+    CHECK(!e->checkAndClearBroken());
+}
+
+TEST_CASE("Enemy::takeTurn: acts normally while broken (break cleared by Battle first)")
+{
+    // In the AV system, Battle calls checkAndClearBroken() before takeTurn.
+    // Enemy::takeTurn should not skip or return Skip on its own.
     Party playerParty, enemyParty;
     ResonanceField field{};
     NullInputHandler input{};
     NullRenderer renderer{};
+
+    auto hero = std::make_unique<PlayableCharacter>(
+        "h", "Hero", Stats{100, 100, 10, 0, 10}, Affinity::Aether, 10);
+    hero->addAbility(std::make_unique<BasicStrikeAction>());
+    playerParty.addUnit(std::move(hero));
 
     auto ePtr = makeEnemyWithModifiers(10, {});
     Enemy *e = ePtr.get();
@@ -213,11 +231,14 @@ TEST_CASE("Enemy::takeTurn: returns Skip and clears broken state after 1 skipped
     e->applyToughnessHit(10, Affinity::Aether);
     REQUIRE(e->isBroken());
 
+    // Simulate Battle clearing broken before the turn.
+    e->checkAndClearBroken();
+    REQUIRE(!e->isBroken());
+
     BattleState state = makeBattleState(field, input, renderer, &playerParty, &enemyParty);
     ActionResult result = e->takeTurn(enemyParty, playerParty, state);
-
-    CHECK(result.type == ActionResult::Type::Skip);
-    CHECK(!e->isBroken());
+    // Enemy acts normally; no Skip.
+    CHECK(result.type == ActionResult::Type::Damage);
 }
 
 TEST_CASE("recoverFromBreak: manually clears broken flag")

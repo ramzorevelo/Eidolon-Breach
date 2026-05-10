@@ -58,6 +58,10 @@ class Enemy : public Unit
      */
     void applyToughnessHit(int amount, Affinity sourceAffinity = Affinity::Aether) override;
     void recoverFromBreak() override;
+
+    /** @brief Clears broken flag if set. Called by Battle at enemy turn start. */
+    bool checkAndClearBroken() override;
+
     [[nodiscard]] float getToughnessAffinityModifier(Affinity affinity) const override;
 
     [[nodiscard]] int getToughness() const;
@@ -117,7 +121,6 @@ class Enemy : public Unit
     int m_toughness{};
     int m_maxToughness{};
     bool m_isBroken{false};
-    int m_brokenTurnsRemaining{0};
     float m_brokenDamageBonus{CombatConstants::kBrokenDamageBonus};
     BreakEffect m_breakEffect{};
     std::unique_ptr<IAIStrategy> m_aiStrategy;

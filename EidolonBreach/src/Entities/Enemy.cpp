@@ -38,7 +38,6 @@ void Enemy::applyToughnessHit(int amount, Affinity sourceAffinity)
     if (m_toughness == 0)
     {
         m_isBroken = true;
-        m_brokenTurnsRemaining = 1;
         m_toughness = m_maxToughness; // reset immediately
     }
 }
@@ -46,6 +45,14 @@ void Enemy::applyToughnessHit(int amount, Affinity sourceAffinity)
 void Enemy::recoverFromBreak()
 {
     m_isBroken = false;
+}
+
+bool Enemy::checkAndClearBroken()
+{
+    if (!m_isBroken)
+        return false;
+    m_isBroken = false;
+    return true;
 }
 
 float Enemy::getAffinityModifier(Affinity a) const
@@ -120,15 +127,6 @@ void Enemy::scaleMaxToughness(float factor)
 
 ActionResult Enemy::takeTurn(Party & /*allies*/, Party &targets, BattleState & /*state*/)
 {
-    if (m_isBroken)
-    {
-        // Decrement the break window. When it reaches 0 the bonus ends and the
-        // enemy is no longer considered broken.
-        --m_brokenTurnsRemaining;
-        if (m_brokenTurnsRemaining <= 0)
-            m_isBroken = false;
-        return ActionResult{ActionResult::Type::Skip, 0};
-    }
 
     AIDecision decision = m_aiStrategy->decide(*this, targets);
     Unit *target = targets.getUnitAt(decision.targetIndex);
