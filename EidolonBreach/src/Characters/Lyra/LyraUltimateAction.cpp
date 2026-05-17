@@ -62,6 +62,7 @@ ActionResult LyraUltimateAction::execute(PlayableCharacter &user,
             result.flavorText = user.getName() + " unleashes Pyre's Ruin!";
         }
     }
+    result.actionCategory = m_data.category;
     return result;
 }
 

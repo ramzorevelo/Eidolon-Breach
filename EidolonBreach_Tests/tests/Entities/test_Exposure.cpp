@@ -106,3 +106,26 @@ TEST_CASE("PlayableCharacter: canVent returns true when Fractured but re-hits 10
     hero->modifyExposure(40); // now at 100
     CHECK(!hero->canVent());
 }
+
+TEST_CASE("PlayableCharacter: fracture fields default to zero/false")
+{
+    auto hero = makeHero();
+    CHECK(hero->fractureShieldBonus() == doctest::Approx(0.0f));
+    CHECK(!hero->fractureResonatingOnAny());
+    CHECK(hero->fractureDebuffDurationBonus() == 0);
+    CHECK(!hero->fractureConsumeAllyBuff());
+    CHECK(hero->labyrinthOnKill() == 0);
+    CHECK(hero->labyrinthOnSlot() == 0);
+    CHECK(hero->labyrinthOnDebuff() == 0);
+}
+
+TEST_CASE("PlayableCharacter: fracture setters round-trip")
+{
+    auto hero = makeHero();
+    hero->setFractureShieldBonus(0.40f);
+    CHECK(hero->fractureShieldBonus() == doctest::Approx(0.40f));
+    hero->setFractureResonatingOnAny(true);
+    CHECK(hero->fractureResonatingOnAny());
+    hero->setLabyrinthOnKill(4);
+    CHECK(hero->labyrinthOnKill() == 4);
+}

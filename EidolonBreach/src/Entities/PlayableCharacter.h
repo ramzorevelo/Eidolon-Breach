@@ -68,6 +68,77 @@ class PlayableCharacter : public Unit
         return m_breachbornActionBurnDuration;
     }
 
+    void setFractureShieldBonus(float bonus)
+    {
+        m_fractureShieldBonus = bonus;
+    }
+    [[nodiscard]] float fractureShieldBonus() const
+    {
+        return m_fractureShieldBonus;
+    }
+
+    void setFractureResonatingOnAny(bool value)
+    {
+        m_fractureResonatingOnAny = value;
+    }
+    [[nodiscard]] bool fractureResonatingOnAny() const
+    {
+        return m_fractureResonatingOnAny;
+    }
+
+    void setFractureDebuffDurationBonus(int turns)
+    {
+        m_fractureDebuffDurationBonus = turns;
+    }
+    [[nodiscard]] int fractureDebuffDurationBonus() const
+    {
+        return m_fractureDebuffDurationBonus;
+    }
+
+    void setFractureConsumeAllyBuff(bool value)
+    {
+        m_fractureConsumeAllyBuff = value;
+    }
+    [[nodiscard]] bool fractureConsumeAllyBuff() const
+    {
+        return m_fractureConsumeAllyBuff;
+    }
+
+    void setFractureEnergyPerSlowedEnemy(int amount)
+    {
+        m_fractureEnergyPerSlowedEnemy = amount;
+    }
+    [[nodiscard]] int fractureEnergyPerSlowedEnemy() const
+    {
+        return m_fractureEnergyPerSlowedEnemy;
+    }
+
+    void setLabyrinthOnKill(int amount)
+    {
+        m_labyrinthOnKill = amount;
+    }
+    void setLabyrinthOnSlot(int amount)
+    {
+        m_labyrinthOnSlot = amount;
+    }
+    void setLabyrinthOnDebuff(int amount)
+    {
+        m_labyrinthOnDebuff = amount;
+    }
+
+    [[nodiscard]] int labyrinthOnKill() const
+    {
+        return m_labyrinthOnKill;
+    }
+    [[nodiscard]] int labyrinthOnSlot() const
+    {
+        return m_labyrinthOnSlot;
+    }
+    [[nodiscard]] int labyrinthOnDebuff() const
+    {
+        return m_labyrinthOnDebuff;
+    }
+
     /**
      * @brief Permanently apply a CharacterMod to this character.
      *        StatBonus modifies base stats and resets HP to the new max.
@@ -432,6 +503,16 @@ class PlayableCharacter : public Unit
     float m_breachbornActionBonusDivisor{0.0f};
     int m_breachbornActionBurnDamage{0};
     int m_breachbornActionBurnDuration{0};
+
+    float m_fractureShieldBonus{0.0f};
+    bool m_fractureResonatingOnAny{false};
+    int m_fractureDebuffDurationBonus{0};
+    bool m_fractureConsumeAllyBuff{false};
+    int m_fractureEnergyPerSlowedEnemy{0};
+
+    int m_labyrinthOnKill{0};
+    int m_labyrinthOnSlot{0};
+    int m_labyrinthOnDebuff{0};
 
     // CharacterMod overrides. Applied by CharacterRegistry::create()
     int m_cooldownReduction{0};

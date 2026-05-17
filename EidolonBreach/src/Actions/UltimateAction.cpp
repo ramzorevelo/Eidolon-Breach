@@ -58,6 +58,7 @@ ActionResult UltimateAction::execute(PlayableCharacter &user,
 
         }
     }
+    result.actionCategory = m_data.category;
     return result;
 }
 

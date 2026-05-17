@@ -63,6 +63,15 @@ class CharacterRegistry
         float breachbornActionBonusDivisor{0.0f};
         int breachbornActionBurnDamage{0};
         int breachbornActionBurnDuration{0};
+
+        float fractureShieldBonus{0.0f};
+        bool fractureResonatingOnAny{false};
+        int fractureDebuffDurationBonus{0};
+        bool fractureConsumeAllyBuff{false};
+        int fractureEnergyPerSlowedEnemy{0};
+        int labyrinthOnKill{0};
+        int labyrinthOnSlot{0};
+        int labyrinthOnDebuff{0};
     };
 
     std::vector<std::string> m_orderedIds{};

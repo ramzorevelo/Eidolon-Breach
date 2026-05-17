@@ -168,6 +168,9 @@ class SDL3Renderer : public IRenderer, public ILayoutQuery
 
     const Unit *m_breakFlashUnit{nullptr};
     Uint64 m_breakFlashExpiry{0};
+    const Unit *m_deathFlashUnit{nullptr};
+    Uint64 m_deathFlashExpiry{0};
+    static constexpr int kDeathFlashDurationMs{400};
 
     struct DamageNumber
     {

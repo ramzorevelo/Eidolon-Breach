@@ -37,7 +37,14 @@
       "archSkill": "arch_skill_default",
       "ultimate": "vex_ultimate",
       "slotSkills": [ "vex_bulwark" ]
-    }
+    },
+    "fractureSelfDotPct": 0.0,
+    "breachbornActionBonusDivisor": 0.0,
+    "breachbornActionBurnDamage": 0,
+    "breachbornActionBurnDuration": 0,
+    "fractureShieldBonus": 0.40,
+    "fractureResonatingOnAny": true,
+    "labyrinthTriggers": { "onSlot": 3 }
   },
   {
     "id": "zara",
@@ -55,6 +62,14 @@
       "archSkill": "arch_skill_default",
       "ultimate": "zara_ultimate",
       "slotSkills": [ "zara_frostbind" ]
-    }
+    },
+    "fractureSelfDotPct": 0.0,
+    "breachbornActionBonusDivisor": 0.0,
+    "breachbornActionBurnDamage": 0,
+    "breachbornActionBurnDuration": 0,
+    "fractureDebuffDurationBonus": 1,
+    "fractureConsumeAllyBuff": true,
+    "fractureEnergyPerSlowedEnemy": 10,
+    "labyrinthTriggers": { "onDebuff": 3 }
   }
 ]

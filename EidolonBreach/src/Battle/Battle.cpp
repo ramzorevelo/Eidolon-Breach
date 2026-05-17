@@ -243,10 +243,10 @@ void Battle::processPlayerTurn(Unit *unit, BattleState &state)
 
 void Battle::processEnemyTurn(Unit *unit, BattleState &state)
 {
-    // Break window ends when this suppressed slot is consumed.
     unit->checkAndClearBroken();
 
     auto playerAliveBefore{snapshotAliveStates(m_playerParty)};
+    const auto hpBefore{snapshotHpStates(m_playerParty)};
 
     const ActionResult result{unit->takeTurn(m_enemyParty, m_playerParty, state)};
 
@@ -255,11 +255,13 @@ void Battle::processEnemyTurn(Unit *unit, BattleState &state)
     else
         m_renderer.renderActionResult(unit->getName(), result);
     state.renderer.flushVisualEffects();
+
+    applyHitExposure(hpBefore, state);
     checkNewDeaths(playerAliveBefore, m_playerParty, unit, state);
 }
-
 void Battle::applyResonanceContribution(Unit &unit,
                                         Affinity actionAffinity,
+                                        ActionCategory category,
                                         BattleState &state)
 {
     int contribution{unit.getResonanceContribution()};
@@ -273,15 +275,41 @@ void Battle::applyResonanceContribution(Unit &unit,
             (1.0f + CombatConstants::kFloorAffinityResonanceBonus));
     }
 
-    // Apply Stance modifier if the unit is a PC with a crystallized Stance.
+    float scale{1.0f};
+    switch (category)
+    {
+    case ActionCategory::ArchSkill:
+        scale = CombatConstants::kRFScaleArch;
+        break;
+    case ActionCategory::Slot:
+        scale = CombatConstants::kRFScaleSlot;
+        break;
+    case ActionCategory::Ultimate:
+        scale = CombatConstants::kRFScaleUltimate;
+        break;
+    case ActionCategory::Consumable:
+    case ActionCategory::Vent:
+        scale = 0.0f;
+        break;
+    default:
+        scale = CombatConstants::kRFScaleBasic;
+        break;
+    }
+
+    contribution = static_cast<int>(static_cast<float>(contribution) * scale);
+    if (contribution == 0)
+        return;
+
     if (auto *pc{unit.asPlayableCharacter()})
     {
-        const RunCharacterState *cs{m_runContext.findCharacterState(pc->getId())};
+        const RunCharacterState *cs{
+            m_runContext.findCharacterState(pc->getId())};
         if (cs && cs->crystallizedStanceId.has_value() &&
             !cs->crystallizedStanceId->empty())
         {
             contribution = StanceModifiers::applyResonanceModifier(
-                *cs->crystallizedStanceId, *pc, actionAffinity, contribution, state);
+                *cs->crystallizedStanceId, *pc, actionAffinity,
+                contribution, state);
         }
     }
 
@@ -525,6 +553,21 @@ void Battle::checkNewDeaths(const std::vector<bool> &aliveBefore,
             state.renderer.renderDefeat(u->getName());
         state.renderer.renderPartyStatus(m_playerParty, m_enemyParty);
         state.eventBus.emit(UnitDefeatedEvent{u, attacker, &state});
+
+        if (&party == &m_enemyParty &&
+            m_runContext.runMode == RunMode::EidolonLabyrinth)
+        {
+            auto *killerPc{attacker
+                               ? attacker->asPlayableCharacter()
+                               : nullptr};
+            if (killerPc && killerPc->labyrinthOnKill() > 0)
+            {
+                const int old{killerPc->getExposure()};
+                killerPc->modifyExposure(killerPc->labyrinthOnKill());
+                checkExposureThresholds(*killerPc, old,
+                                        killerPc->getExposure(), state);
+            }
+        }
     }
 }
 
@@ -822,6 +865,7 @@ void Battle::applyBreachbornEffect(PlayableCharacter &pc, BattleState &state)
 
 void Battle::applyFractureStartOfTurn(PlayableCharacter &pc, BattleState &state)
 {
+    // Lyra: self-DoT
     const float dotPct{pc.fractureSelfDotPct()};
     if (dotPct > 0.0f)
     {
@@ -829,13 +873,92 @@ void Battle::applyFractureStartOfTurn(PlayableCharacter &pc, BattleState &state)
             std::max(1, static_cast<int>(
                             static_cast<float>(pc.getFinalStats().maxHp) * dotPct))};
         pc.takeTrueDamage(selfDamage);
-        state.renderer.renderMessage(
-            pc.getName() + " — Fracture: -" + std::to_string(selfDamage) +
-            " HP (self-DoT)");
+        state.renderer.renderMessage(pc.getName() +
+                                     " — Fracture: -" +
+                                     std::to_string(selfDamage) +
+                                     " HP (self-DoT)");
     }
     else
     {
         state.renderer.renderMessage(pc.getName() + " — [Fractured]");
+    }
+
+    // Vex: overprotection — any shielded ally costs Exposure
+    if (pc.fractureShieldBonus() > 0.0f || pc.fractureResonatingOnAny())
+    {
+        bool anyShielded{false};
+        for (std::size_t i{0}; i < m_playerParty.size(); ++i)
+        {
+            const Unit *u{m_playerParty.getUnitAt(i)};
+            if (u && u->isAlive() && u->getTotalShieldAmount() > 0)
+            {
+                anyShielded = true;
+                break;
+            }
+        }
+        if (anyShielded)
+        {
+            const int old{pc.getExposure()};
+            pc.modifyExposure(5);
+            checkExposureThresholds(pc, old, pc.getExposure(), state);
+            state.renderer.renderMessage(
+                pc.getName() +
+                " — Fracture: overprotection +5 Exposure");
+        }
+    }
+
+    // Zara: consume one random buff on a random ally
+    if (pc.fractureConsumeAllyBuff())
+    {
+        std::vector<Unit *> buffedUnits{};
+        for (std::size_t i{0}; i < m_playerParty.size(); ++i)
+        {
+            Unit *u{m_playerParty.getUnitAt(i)};
+            if (u && u->isAlive() &&
+                u->hasEffectWithTag(EffectTags::kBuff))
+                buffedUnits.push_back(u);
+        }
+        if (!buffedUnits.empty())
+        {
+            Unit *target{buffedUnits[static_cast<std::size_t>(std::rand()) %
+                                     buffedUnits.size()]};
+            for (const auto &effect : target->getEffects())
+            {
+                if (effect->isBuff())
+                {
+                    const std::string buffId{
+                        std::string{effect->getId()}};
+                    target->removeEffect(buffId);
+                    state.renderer.renderMessage(
+                        pc.getName() +
+                        " — Fracture: consumed a buff on " +
+                        target->getName());
+                    break;
+                }
+            }
+        }
+    }
+
+    // Zara: gain Energy for each Slowed enemy when fractured
+    const int energyPerSlowed{pc.fractureEnergyPerSlowedEnemy()};
+    if (energyPerSlowed > 0)
+    {
+        int slowedCount{0};
+        for (std::size_t i{0}; i < m_enemyParty.size(); ++i)
+        {
+            const Unit *u{m_enemyParty.getUnitAt(i)};
+            if (u && u->isAlive() && u->hasEffect(EffectIds::kSlow))
+                ++slowedCount;
+        }
+        if (slowedCount > 0)
+        {
+            const int gain{std::min(energyPerSlowed * slowedCount, 20)};
+            pc.gainEnergy(gain);
+            state.renderer.renderMessage(
+                pc.getName() + " — Fracture: +" +
+                std::to_string(gain) +
+                " Energy from Slowed enemies");
+        }
     }
 }
 
@@ -912,7 +1035,8 @@ void Battle::matchActionToAbilityAndSignal(PlayableCharacter &pc,
 void Battle::handlePostAction(Unit *unit, PlayableCharacter *pc,
                               ActionResult &result, BattleState &state)
 {
-    applyResonanceContribution(*unit, result.actionAffinity, state);
+    applyResonanceContribution(*unit, result.actionAffinity,
+                               result.actionCategory, state);
 
     if (!pc)
         return;
@@ -920,7 +1044,8 @@ void Battle::handlePostAction(Unit *unit, PlayableCharacter *pc,
     processActionResult(*pc, m_playerParty, result, state);
 
     if (pc->isResonatingProcArmed() &&
-        result.actionAffinity == pc->getAffinity())
+        (result.actionAffinity == pc->getAffinity() ||
+         (pc->isFractured() && pc->fractureResonatingOnAny())))
     {
         pc->consumeResonatingProc();
         applyResonatingProc(*pc, result, state);
@@ -953,6 +1078,22 @@ void Battle::handlePostAction(Unit *unit, PlayableCharacter *pc,
         m_turnOrderCalc->applySuppress(result.suppress->target, result.suppress->pct);
 
     matchActionToAbilityAndSignal(*pc, result, state);
+    if (pc && m_runContext.runMode == RunMode::EidolonLabyrinth)
+    {
+        if (pc->labyrinthOnSlot() > 0 &&
+            result.actionCategory == ActionCategory::Slot)
+        {
+            const int old{pc->getExposure()};
+            pc->modifyExposure(pc->labyrinthOnSlot());
+            checkExposureThresholds(*pc, old, pc->getExposure(), state);
+        }
+        if (pc->labyrinthOnDebuff() > 0 && result.appliedStatusToEnemy)
+        {
+            const int old{pc->getExposure()};
+            pc->modifyExposure(pc->labyrinthOnDebuff());
+            checkExposureThresholds(*pc, old, pc->getExposure(), state);
+        }
+    }
 }
 
 void Battle::handleSummonExpiry(Unit *unit)
@@ -965,4 +1106,34 @@ void Battle::handleSummonExpiry(Unit *unit)
     const std::string id{unit->getId()};
     m_renderer.renderMessage(name + " fades away.");
     m_playerParty.removeUnit(id);
+}
+
+std::vector<int> Battle::snapshotHpStates(const Party &party) const
+{
+    std::vector<int> hps{};
+    hps.reserve(party.size());
+    for (std::size_t i{0}; i < party.size(); ++i)
+    {
+        const Unit *u{party.getUnitAt(i)};
+        hps.push_back(u ? u->getHp() : 0);
+    }
+    return hps;
+}
+
+void Battle::applyHitExposure(const std::vector<int> &hpBefore,
+                              BattleState &state)
+{
+    for (std::size_t i{0}; i < m_playerParty.size(); ++i)
+    {
+        Unit *u{m_playerParty.getUnitAt(i)};
+        auto *pc{u ? u->asPlayableCharacter() : nullptr};
+        if (!pc || !pc->isAlive())
+            continue;
+        if (i < hpBefore.size() && pc->getHp() < hpBefore[i])
+        {
+            const int old{pc->getExposure()};
+            pc->modifyExposure(CombatConstants::kExposureOnHit);
+            checkExposureThresholds(*pc, old, pc->getExposure(), state);
+        }
+    }
 }

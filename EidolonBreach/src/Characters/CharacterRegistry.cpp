@@ -47,6 +47,14 @@ CharacterRegistry::create(std::string_view characterId,
     pc->setBreachbornActionBonus(bp.breachbornActionBonusDivisor,
                                  bp.breachbornActionBurnDamage,
                                  bp.breachbornActionBurnDuration);
+    pc->setFractureShieldBonus(bp.fractureShieldBonus);
+    pc->setFractureResonatingOnAny(bp.fractureResonatingOnAny);
+    pc->setFractureDebuffDurationBonus(bp.fractureDebuffDurationBonus);
+    pc->setFractureConsumeAllyBuff(bp.fractureConsumeAllyBuff);
+    pc->setFractureEnergyPerSlowedEnemy(bp.fractureEnergyPerSlowedEnemy);
+    pc->setLabyrinthOnKill(bp.labyrinthOnKill);
+    pc->setLabyrinthOnSlot(bp.labyrinthOnSlot);
+    pc->setLabyrinthOnDebuff(bp.labyrinthOnDebuff);
 
     if (m_abilityRegistry)
     {
@@ -180,6 +188,24 @@ CharacterRegistry::parseBlueprint(const std::string &id, const nlohmann::json &j
     bp.breachbornActionBonusDivisor = j.value("breachbornActionBonusDivisor", 0.0f);
     bp.breachbornActionBurnDamage = j.value("breachbornActionBurnDamage", 0);
     bp.breachbornActionBurnDuration = j.value("breachbornActionBurnDuration", 0);
+    bp.fractureShieldBonus =
+        j.value("fractureShieldBonus", 0.0f);
+    bp.fractureResonatingOnAny =
+        j.value("fractureResonatingOnAny", false);
+    bp.fractureDebuffDurationBonus =
+        j.value("fractureDebuffDurationBonus", 0);
+    bp.fractureConsumeAllyBuff =
+        j.value("fractureConsumeAllyBuff", false);
+    bp.fractureEnergyPerSlowedEnemy =
+        j.value("fractureEnergyPerSlowedEnemy", 0);
+
+    if (j.contains("labyrinthTriggers"))
+    {
+        const auto &lt{j.at("labyrinthTriggers")};
+        bp.labyrinthOnKill = lt.value("onKill", 0);
+        bp.labyrinthOnSlot = lt.value("onSlot", 0);
+        bp.labyrinthOnDebuff = lt.value("onDebuff", 0);
+    }
 
     const auto &abilities = j.at("abilities");
     bp.basicId = abilities.value("basic", "basic_strike");

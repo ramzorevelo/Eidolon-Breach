@@ -46,6 +46,7 @@ ActionResult VentAction::execute(PlayableCharacter &user,
 
     ActionResult result{ActionResult::Type::Skip, 0};
     result.ventConsolation = consolation;
+    result.actionCategory = kVentData.category;
     return result;
 }
 

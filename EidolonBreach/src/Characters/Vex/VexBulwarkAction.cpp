@@ -33,7 +33,7 @@ bool VexBulwarkAction::isAvailable(const PlayableCharacter &user,
     return user.canAffordSp(kSpCost, party);
 }
 
-ActionResult VexBulwarkAction::execute(PlayableCharacter & /*user*/,
+ActionResult VexBulwarkAction::execute(PlayableCharacter & user,
                                        Party &allies,
                                        Party & /*enemies*/,
                                        std::optional<TargetInfo> target)
@@ -47,12 +47,22 @@ ActionResult VexBulwarkAction::execute(PlayableCharacter & /*user*/,
 
     Unit *t{allies.getUnitAt(targetIdx)};
     if (t && t->isAlive())
-        t->applyEffect(std::make_unique<ShieldEffect>(kShieldAmount, kShieldDuration));
+    {
+        const int shieldAmt{
+            user.isFractured() && user.fractureShieldBonus() > 0.0f
+                ? static_cast<int>(
+                      static_cast<float>(kShieldAmount) *
+                      (1.0f + user.fractureShieldBonus()))
+                : kShieldAmount};
+        t->applyEffect(
+            std::make_unique<ShieldEffect>(shieldAmt, kShieldDuration));
+    }
 
     ActionResult result{ActionResult::Type::Skip, 0};
     result.spCost = kSpCost;
     result.actionAffinity = Affinity::Terra;
     result.flavorText = "raises an earthen shield on " + (t ? t->getName() : "ally");
+    result.actionCategory = m_data.category;
     return result;
 }
 

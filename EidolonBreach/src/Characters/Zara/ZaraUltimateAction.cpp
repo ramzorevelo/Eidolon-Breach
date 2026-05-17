@@ -53,15 +53,21 @@ ActionResult ZaraUltimateAction::execute(PlayableCharacter &user,
             m_data.skillPower, user.getFinalStats(),
             u->getFinalStats(), m_data.scaling)};
         u->takeDamage(dmg);
-        u->applyEffect(std::make_unique<SlowEffect>(kSlowRatio, kSlowDuration));
+        const int slowDur{kSlowDuration +
+                          (user.isFractured()
+                               ? user.fractureDebuffDurationBonus()
+                               : 0)};
+        u->applyEffect(std::make_unique<SlowEffect>(kSlowRatio, slowDur));
         u->applyToughnessHit(kToughnessDamage, Affinity::Frost);
 
         totalDamage += dmg;
         result.aoeTargets.push_back({u->getName(), dmg});
     }
+    result.appliedStatusToEnemy = !enemies.getAliveUnits().empty();
 
     result.value = totalDamage;
     result.flavorText = user.getName() + " shatters the field with Arctic Shatter!";
+    result.actionCategory = m_data.category;
     return result;
 }
 

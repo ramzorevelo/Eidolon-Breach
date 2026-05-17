@@ -90,6 +90,20 @@ inline constexpr int kRFMoltenLatticeShield{15};
 inline constexpr int kRFMoltenLatticeDuration{1};
 inline constexpr int kRFArcticSurgeSlowDuration{3};
 
+// RF contribution scale by action category
+inline constexpr float kRFScaleBasic{1.0f};
+inline constexpr float kRFScaleArch{1.5f};
+inline constexpr float kRFScaleSlot{1.25f};
+inline constexpr float kRFScaleUltimate{2.0f};
+
+// Exposure: Labyrinth character triggers
+inline constexpr int kLabyrinthExposureOnKill{4};
+inline constexpr int kLabyrinthExposureOnSlot{3};
+inline constexpr int kLabyrinthExposureOnDebuff{3};
+
+// Exposure: hit-based source
+inline constexpr int kExposureOnHit{3};
+
 // Breachborn burst effects — fires for any character that enters Breachborn
 inline constexpr int kBreachbornBlazeBurnDamage{10};
 inline constexpr int kBreachbornBlazeBurnDuration{3};

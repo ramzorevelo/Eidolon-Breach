@@ -68,14 +68,13 @@ void BattleNode::runBattle(Party &party, MetaProgress &meta,
         renderer.clearBattleCache();
         throw;
     }
-    renderer.clearBattleCache();
-
     if (enemyParty.isAllDead())
     {
         awardBattleXp(party, meta, runCtx);
         renderer.renderMessage("Battle complete. Press Enter to continue.");
         input.getMenuChoice(1);
     }
+    renderer.clearBattleCache();
 }
 
 std::string BattleNode::description() const

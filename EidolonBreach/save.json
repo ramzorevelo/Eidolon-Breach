@@ -4,44 +4,44 @@
             "bondTrialComplete": false,
             "chosenAspects": [],
             "echoCount": 5,
-            "insightBalance": 121,
+            "insightBalance": 138,
             "signalTallies": {
                 "Aggressive": 65,
-                "Reactive": 140,
-                "Sacrificial": 45,
-                "Supportive": 154
+                "Reactive": 168,
+                "Sacrificial": 48,
+                "Supportive": 183
             }
         },
         "vex": {
             "bondTrialComplete": false,
             "chosenAspects": [],
             "echoCount": 5,
-            "insightBalance": 78,
+            "insightBalance": 87,
             "signalTallies": {
                 "Aggressive": 48,
-                "Reactive": 98,
-                "Sacrificial": 32,
-                "Supportive": 92
+                "Reactive": 109,
+                "Sacrificial": 33,
+                "Supportive": 110
             }
         },
         "zara": {
             "bondTrialComplete": false,
             "chosenAspects": [],
             "echoCount": 5,
-            "insightBalance": 105,
+            "insightBalance": 122,
             "signalTallies": {
                 "Aggressive": 39,
-                "Reactive": 129,
+                "Reactive": 152,
                 "Sacrificial": 31,
-                "Supportive": 141
+                "Supportive": 177
             }
         }
     },
     "characterXP": {
-        "ignis": 10491,
-        "lyra": 6688,
-        "vex": 6716,
-        "zara": 6716
+        "ignis": 10571,
+        "lyra": 6728,
+        "vex": 6756,
+        "zara": 6756
     },
     "clearedDungeonIds": [
         "dungeon_01",
@@ -68,7 +68,7 @@
         ]
     },
     "playerLevel": 8,
-    "playerXp": 3105,
+    "playerXp": 3204,
     "unlockedCharacterIds": [
         "lyra",
         "vex",

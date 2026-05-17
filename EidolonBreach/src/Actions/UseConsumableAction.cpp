@@ -80,6 +80,7 @@ ActionResult UseConsumableAction::execute(PlayableCharacter &user,
     }
 
     result.flavorText = "Used " + m_item.name + ".";
+    result.actionCategory = m_data.category;
     return result;
 }
 

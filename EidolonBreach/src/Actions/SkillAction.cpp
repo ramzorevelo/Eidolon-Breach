@@ -58,6 +58,7 @@ ActionResult SkillAction::execute(PlayableCharacter &user,
         }
     }
     result.actionAffinity = user.getAffinity();
+    result.actionCategory = m_data.category;
     return result;
 }
 

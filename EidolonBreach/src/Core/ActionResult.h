@@ -12,6 +12,7 @@
 
 #include <string>
 #include "Core/Affinity.h"
+#include "Core/ActionData.h"
 #include <optional>
 #include <vector>
 
@@ -55,6 +56,9 @@ struct ActionResult
     int exposureDelta{0};
     bool ventConsolation{false};
     Affinity actionAffinity{Affinity::Aether};
+    ActionCategory actionCategory{ActionCategory::Basic};
+    bool appliedStatusToEnemy{false};
+
     /**
      * @brief Base toughness damage dealt by this action (before affinity scaling).
      *        Set by actions that call applyToughnessHit. Read by ToughnessBreakerVestige.

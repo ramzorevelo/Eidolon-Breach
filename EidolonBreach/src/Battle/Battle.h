@@ -4,6 +4,7 @@
  * @brief Orchestrates turn-based combat between two Parties.
  */
 
+#include "Core/ActionData.h"
 #include "Battle/BattleState.h"
 #include "Battle/ITurnOrderCalculator.h"
 #include "Battle/ResonanceField.h"
@@ -77,6 +78,7 @@ class Battle
 
     void applyResonanceContribution(Unit &unit,
                                     Affinity actionAffinity,
+                                    ActionCategory category,
                                     BattleState &state);
     void applyResonanceTrigger(Affinity affinity, BattleState &state);
     /**
@@ -175,4 +177,18 @@ class Battle
                                        const ActionResult &result,
                                        BattleState &state);
     void handleSummonExpiry(Unit *unit);
+
+    /**
+     * @brief Snapshot current HP of all units in party. Index matches
+     *        party slot order (dead slots return 0).
+     */
+    [[nodiscard]] std::vector<int> snapshotHpStates(const Party &party) const;
+
+    /**
+     * @brief Apply kExposureOnHit Exposure to any PC whose HP is lower than
+     *        the corresponding value in hpBefore. Shields that fully absorbed
+     *        a hit leave HP unchanged, so no Exposure is applied for them.
+     */
+    void applyHitExposure(const std::vector<int> &hpBefore,
+                          BattleState &state);
 };

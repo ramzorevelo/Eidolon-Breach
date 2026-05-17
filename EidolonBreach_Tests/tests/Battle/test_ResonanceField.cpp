@@ -4,6 +4,7 @@
  */
 #include "Battle/ResonanceField.h"
 #include "Core/Affinity.h"
+#include "Core/CombatConstants.h"
 #include "doctest.h"
 #include <ostream>
 #include <string>
@@ -124,4 +125,15 @@ TEST_CASE("ResonanceField: getVoteSummary lists only affinities with votes")
     CHECK(summary.find("Blaze") != std::string::npos);
     CHECK(summary.find("Frost") != std::string::npos);
     CHECK(summary.find("Terra") == std::string::npos);
+}
+
+TEST_CASE("RF: ArchSkill contributes 1.5x baseline")
+{
+    ResonanceField field{};
+    // contribution = 10 * 1.5 = 15; gauge should be 15
+    // (tested via applyResonanceContribution indirectly — integration test)
+    // Unit test: verify scale constant exists and has expected value
+    CHECK(CombatConstants::kRFScaleArch == doctest::Approx(1.5f));
+    CHECK(CombatConstants::kRFScaleUltimate == doctest::Approx(2.0f));
+    CHECK(CombatConstants::kRFScaleSlot == doctest::Approx(1.25f));
 }

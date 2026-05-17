@@ -641,6 +641,20 @@ void SDL3Renderer::drawEnemyCard(const Unit *u, float &ey, bool highlighted)
         SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_NONE);
     }
 
+    // Death flash — white fade-out over the card while the unit is dying.
+    if (m_deathFlashUnit == u && SDL_GetTicks() < m_deathFlashExpiry)
+    {
+        const float t = 1.f - static_cast<float>(
+                                  m_deathFlashExpiry - SDL_GetTicks()) /
+                                  static_cast<float>(kDeathFlashDurationMs);
+        const Uint8 flashAlpha =
+            toUint8(static_cast<int>(200.f * (1.f - t)));
+        SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_BLEND);
+        SDL_SetRenderDrawColor(m_renderer, 255, 255, 255, flashAlpha);
+        SDL_RenderFillRect(m_renderer, &cardRect);
+        SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_NONE);
+    }
+
     // Portrait on far right, top-padded. Left corners chamfered (face toward bar content).
     const float portX = m_enemyPanel.x + m_enemyPanel.w - kEPortraitPadR - kEPortraitW + shakeX;
     const float portY = ey + kCardTopPad;
@@ -782,7 +796,12 @@ void SDL3Renderer::drawEnemyPanel()
     {
         const Unit *u = m_cachedEnemyParty->getUnitAt(i);
         if (!u || !u->isAlive())
+        {
+            if (m_deathFlashUnit == u &&
+                SDL_GetTicks() < m_deathFlashExpiry)
+                drawEnemyCard(u, ey, false);
             continue;
+        }
         const bool highlighted = (m_highlightingEnemies && m_highlightedTargetIndex == aliveIdx);
         drawEnemyCard(u, ey, highlighted);
         ++aliveIdx;
@@ -1588,7 +1607,64 @@ void SDL3Renderer::renderActionResult(const std::string &actorName,
         m_damageNumbers.push_back(dn);
     }
 
-    redrawAll();
+    // Sync bar targets with current unit HP so they animate alongside
+    // the damage number rather than waiting for the next renderPartyStatus.
+    if (m_cachedPlayerParty)
+    {
+        for (std::size_t i = 0; i < m_cachedPlayerParty->size(); ++i)
+        {
+            const Unit *u = m_cachedPlayerParty->getUnitAt(i);
+            if (!u)
+                continue;
+            const float frac = u->getMaxHp() > 0
+                                   ? static_cast<float>(u->getHp()) /
+                                         static_cast<float>(u->getMaxHp())
+                                   : 0.f;
+            m_hpBars[u].target = frac;
+        }
+    }
+    if (m_cachedEnemyParty)
+    {
+        for (std::size_t i = 0; i < m_cachedEnemyParty->size(); ++i)
+        {
+            const Unit *u = m_cachedEnemyParty->getUnitAt(i);
+            if (!u)
+                continue;
+            const float frac = u->getMaxHp() > 0
+                                   ? static_cast<float>(u->getHp()) /
+                                         static_cast<float>(u->getMaxHp())
+                                   : 0.f;
+            m_hpBars[u].target = frac;
+            const auto *e = dynamic_cast<const Enemy *>(u);
+            if (e && e->getMaxToughness() > 0)
+                m_toughnessBars[u].target =
+                    static_cast<float>(e->getToughness()) /
+                    static_cast<float>(e->getMaxToughness());
+        }
+    }
+    // Arm death flash for any enemy whose HP just reached 0 so the card
+    // stays visible during runAnimationFrames instead of vanishing immediately.
+    const bool flashAvailable = !m_deathFlashUnit ||
+                                SDL_GetTicks() >= m_deathFlashExpiry;
+    if (m_cachedEnemyParty && flashAvailable)
+    {
+        for (std::size_t i = 0; i < m_cachedEnemyParty->size(); ++i)
+        {
+            const Unit *u = m_cachedEnemyParty->getUnitAt(i);
+            if (!u || u->isAlive())
+                continue;
+            const auto it = m_hpBars.find(u);
+            if (it != m_hpBars.end() && it->second.displayed > 0.01f)
+            {
+                m_deathFlashUnit = u;
+                m_deathFlashExpiry =
+                    SDL_GetTicks() +
+                    static_cast<Uint64>(kDeathFlashDurationMs);
+                break;
+            }
+        }
+    }
+    runAnimationFrames(300);
 }
 
 void SDL3Renderer::renderBreak(const std::string &enemyName)
@@ -1616,7 +1692,8 @@ void SDL3Renderer::renderStunned(const std::string &name)
     redrawAll();
 }
 
-void SDL3Renderer::renderVictory(const std::string &name, std::optional<Drop> drop)
+void SDL3Renderer::renderVictory(const std::string &name,
+                                 std::optional<Drop> drop)
 {
     addLogMessage(name + " defeated!");
     if (drop)
@@ -2349,6 +2426,8 @@ void SDL3Renderer::clearBattleCache()
     m_rfGaugeTarget = 0.f;
     m_breakFlashUnit = nullptr;
     m_breakFlashExpiry = 0;
+    m_deathFlashUnit = nullptr;
+    m_deathFlashExpiry = 0;
     m_damageNumbers.clear();
     clearDamageTextures();
     clearTextCache();

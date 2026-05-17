@@ -42,8 +42,15 @@ ActionResult VexUltimateAction::execute(PlayableCharacter &user,
     user.gainEnergy(kEnergyRefund);
 
     // Shield all alive allies.
+    const int shieldAmt{
+        user.isFractured() && user.fractureShieldBonus() > 0.0f
+            ? static_cast<int>(
+                  static_cast<float>(kShieldAmount) *
+                  (1.0f + user.fractureShieldBonus()))
+            : kShieldAmount};
     for (Unit *u : allies.getAliveUnits())
-        u->applyEffect(std::make_unique<ShieldEffect>(kShieldAmount, kShieldDuration));
+        u->applyEffect(
+            std::make_unique<ShieldEffect>(shieldAmt, kShieldDuration));
 
     // Grant SP to the party.
     allies.gainSp(kSpGrant);
@@ -55,6 +62,7 @@ ActionResult VexUltimateAction::execute(PlayableCharacter &user,
     ActionResult result{ActionResult::Type::Skip, 0};
     result.actionAffinity = Affinity::Terra;
     result.flavorText = user.getName() + " raises Resonant Bulwark!";
+    result.actionCategory = m_data.category;
     return result;
 }
 

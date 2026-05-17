@@ -45,6 +45,7 @@ ActionResult EmberCallAction::execute(PlayableCharacter &user,
     result.flavorText = user.getName() + " calls forth Ignis!";
     result.summonEffect = SummonEffect{std::string{Ignis::kId}, 3,
                                        user.getFinalStats().atk};
+    result.actionCategory = m_data.category;
     return result;
 }
 

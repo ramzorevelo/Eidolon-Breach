@@ -48,7 +48,12 @@ ActionResult ZaraFrostbindAction::execute(PlayableCharacter &user,
         Unit *t{enemies.getUnitAt(target->index)};
         if (t && t->isAlive())
         {
-            t->applyEffect(std::make_unique<SlowEffect>(kSlowRatio, kSlowDuration));
+            const int slowDur{kSlowDuration +
+                              (user.isFractured()
+                                   ? user.fractureDebuffDurationBonus()
+                                   : 0)};
+            t->applyEffect(std::make_unique<SlowEffect>(kSlowRatio, slowDur));
+            result.appliedStatusToEnemy = true;
             t->applyToughnessHit(kToughnessDamage, Affinity::Frost);
             result.toughnessDamage = kToughnessDamage;
             result.targetEnemyIndex = static_cast<int>(target->index);
@@ -56,6 +61,7 @@ ActionResult ZaraFrostbindAction::execute(PlayableCharacter &user,
             result.flavorText = user.getName() + " binds " + result.targetName + " in frost !";
         }
     }
+    result.actionCategory = m_data.category;
     return result;
 }
 
