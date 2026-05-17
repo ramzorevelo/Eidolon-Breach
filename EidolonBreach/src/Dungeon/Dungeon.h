@@ -67,8 +67,7 @@ class Dungeon
      *        Called by generate() when dungeonDef.fixedLayout is non-empty.
      */
     void buildFixedGraph(std::uint32_t seed,
-                         const std::vector<std::string> &layout,
-                         DungeonDifficulty difficulty);
+                         const DungeonDefinition &def);
 
     [[nodiscard]] std::unique_ptr<MapNode> makeNode(int layer,
                                                     int numLayers,

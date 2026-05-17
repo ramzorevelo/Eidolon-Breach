@@ -11,6 +11,8 @@ constexpr int kSkillToughDmg{25};
 constexpr int kUltToughDmg{30};
 constexpr float kDefScalingK{100.0f};
 
+inline constexpr int kStartingSp{50};
+
 // Arch Skill cooldown (Hotfix 4)
 constexpr int kArchSkillCooldownTurns{2};
 
@@ -30,6 +32,19 @@ constexpr int kExposureThreshold100{100};
 // Depth and environmental modifiers
 constexpr int kFloorDepthExposureModifier{5};
 constexpr int kEliteExposureSpike{15};
+
+// Exposure modifiers by difficulty
+inline constexpr int kFloorDepthExposureModifierHard{8};
+inline constexpr int kFloorDepthExposureModifierNightmare{12};
+inline constexpr int kEliteExposureSpikeHard{20};
+inline constexpr int kEliteExposureSpikeNightmare{25};
+
+// Enemy stat scaling by difficulty
+inline constexpr float kHardEnemyHpScale{1.3f};
+inline constexpr float kHardEnemyAtkScale{1.2f};
+inline constexpr float kNightmareEnemyHpScale{1.6f};
+inline constexpr float kNightmareEnemyAtkScale{1.4f};
+
 constexpr float kFloorAffinityToughnessBonus{0.10f};
 constexpr float kFloorAffinityResonanceBonus{0.10f};
 constexpr int kPurgeExposureReduction{30};

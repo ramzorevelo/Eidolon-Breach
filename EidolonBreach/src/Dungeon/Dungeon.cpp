@@ -11,6 +11,7 @@
 #include "Core/MetaProgress.h"
 #include "Dungeon/BattleNode.h"
 #include "Dungeon/EncounterTable.h"
+#include "Entities/Enemy.h"
 #include "Entities/EnemyRegistry.h"
 #include "UI/IRenderer.h"
 #include "UI/IInputHandler.h"
@@ -81,7 +82,7 @@ void Dungeon::generate(std::uint32_t seed,
     assignFloorAffinities(effectiveSeed, floors);
 
     if (!dungeonDef.fixedLayout.empty())
-        buildFixedGraph(effectiveSeed, dungeonDef.fixedLayout, dungeonDef.difficulty);
+        buildFixedGraph(effectiveSeed, dungeonDef);
     else
         buildGraph(effectiveSeed, floors, dungeonDef.difficulty);
 }
@@ -127,12 +128,12 @@ std::unique_ptr<MapNode> Dungeon::makeNode(int layer,
         return std::make_unique<EliteNode>(
             m_encounterTable.getFactory(EncounterTable::Tier::Elite, rng),
             floorAffinity, m_currentDungeon.enemyLevel, m_summonRegistry,
-            layer, &m_itemRegistry);
+            layer, &m_itemRegistry, difficulty);
     if (roll < eW + battleW)
         return std::make_unique<BattleNode>(
             m_encounterTable.getFactory(EncounterTable::Tier::Standard, rng),
             floorAffinity, m_currentDungeon.enemyLevel, m_summonRegistry,
-            layer, &m_itemRegistry);
+            layer, &m_itemRegistry, difficulty);
     if (roll < eW + battleW + restW)
         return std::make_unique<RestNode>();
     if (roll < eW + battleW + restW + shopW)
@@ -174,7 +175,7 @@ void Dungeon::buildGraph(std::uint32_t seed,
             layerNodes.push_back({std::make_unique<BossNode>(
                                       m_encounterTable.getFactory(EncounterTable::Tier::Boss, rng),
                                       floorAffinity, m_currentDungeon.enemyLevel, m_summonRegistry,
-                                      layer, &m_itemRegistry),
+                                      layer, &m_itemRegistry, difficulty),
                                   {}});
             prevLayerHadElite = false;
             prevLayerHadRest = false;
@@ -194,7 +195,7 @@ void Dungeon::buildGraph(std::uint32_t seed,
             layerNodes.push_back({std::make_unique<EliteNode>(
                                       m_encounterTable.getFactory(EncounterTable::Tier::Elite, rng),
                                       floorAffinity, m_currentDungeon.enemyLevel, m_summonRegistry,
-                                      layer, &m_itemRegistry),
+                                      layer, &m_itemRegistry, difficulty),
                                   {}});
             prevLayerHadElite = true;
             prevLayerHadRest = false;
@@ -330,44 +331,55 @@ std::vector<int> Dungeon::getReachableIndices(
     return reachable;
 }
 void Dungeon::buildFixedGraph(std::uint32_t seed,
-                              const std::vector<std::string> &layout,
-                              DungeonDifficulty difficulty)
+                              const DungeonDefinition &def)
 {
-    (void)difficulty; // reserved for future per-node difficulty scaling
     std::mt19937 rng{seed};
     m_layers.clear();
 
-    for (std::size_t i{0}; i < layout.size(); ++i)
+    const DungeonDifficulty diff{def.difficulty};
+
+    for (std::size_t i{0}; i < def.fixedLayout.size(); ++i)
     {
         const Affinity floorAffinity{
             i < m_floorAffinities.size()
                 ? m_floorAffinities[i]
                 : Affinity::Aether};
-        const std::string &nodeType{layout[i]};
+        const std::string &nodeType{def.fixedLayout[i]};
+        const bool hasGroup{i < def.fixedEnemyGroups.size() &&
+                            !def.fixedEnemyGroups[i].empty()};
+
+        std::function<void(Party &)> factory;
+        if (hasGroup)
+        {
+            const std::vector<std::string> ids{def.fixedEnemyGroups[i]};
+            factory = [this, ids, nodeType, diff](Party &party)
+            {
+                for (const std::string &id : ids)
+                {
+                    auto e{m_enemyRegistry.create(id)};
+                    if (e)
+                        party.addUnit(std::move(e));
+                }
+                if (diff == DungeonDifficulty::Nightmare &&
+                    nodeType == "battle" && !ids.empty())
+                {
+                    auto extra{m_enemyRegistry.create(ids[0])};
+                    if (extra)
+                        party.addUnit(std::move(extra));
+                }
+            };
+        }
+        else
+        {
+            const EncounterTable::Tier tier{
+                (nodeType == "elite" || nodeType == "boss")
+                    ? EncounterTable::Tier::Elite
+                    : EncounterTable::Tier::Standard};
+            factory = m_encounterTable.getFactory(tier, rng);
+        }
 
         std::unique_ptr<MapNode> node{};
-        if (nodeType == "battle")
-        {
-            node = std::make_unique<BattleNode>(
-                m_encounterTable.getFactory(EncounterTable::Tier::Standard, rng),
-                floorAffinity, m_currentDungeon.enemyLevel, m_summonRegistry,
-                static_cast<int>(i), &m_itemRegistry);
-        }
-        else if (nodeType == "elite")
-        {
-            node = std::make_unique<EliteNode>(
-                m_encounterTable.getFactory(EncounterTable::Tier::Elite, rng),
-                floorAffinity, m_currentDungeon.enemyLevel, m_summonRegistry,
-                static_cast<int>(i), &m_itemRegistry);
-        }
-        else if (nodeType == "boss")
-        {
-            node = std::make_unique<BossNode>(
-                m_encounterTable.getFactory(EncounterTable::Tier::Boss, rng),
-                floorAffinity, m_currentDungeon.enemyLevel, m_summonRegistry,
-                static_cast<int>(i), &m_itemRegistry);
-        }
-        else if (nodeType == "rest")
+        if (nodeType == "rest")
         {
             node = std::make_unique<RestNode>();
         }
@@ -381,12 +393,30 @@ void Dungeon::buildFixedGraph(std::uint32_t seed,
             std::vector<std::string> stock{"heal_potion", "purification_vial"};
             if (static_cast<int>(i) % 2 == 0)
                 stock.push_back("mega_potion");
-            node = std::make_unique<ShopNode>(m_itemRegistry, std::move(stock), rng());
+            node = std::make_unique<ShopNode>(
+                m_itemRegistry, std::move(stock), rng());
+        }
+        else if (nodeType == "boss")
+        {
+            node = std::make_unique<BossNode>(
+                std::move(factory), floorAffinity,
+                def.enemyLevel, m_summonRegistry,
+                static_cast<int>(i), &m_itemRegistry, diff);
+        }
+        else if (nodeType == "elite")
+        {
+            node = std::make_unique<EliteNode>(
+                std::move(factory), floorAffinity,
+                def.enemyLevel, m_summonRegistry,
+                static_cast<int>(i), &m_itemRegistry, diff);
         }
         else
         {
-            // "event" and any unknown type fall back to EventNode
-            node = std::make_unique<EventNode>();
+            // "battle", "event", and any unknown type
+            node = std::make_unique<BattleNode>(
+                std::move(factory), floorAffinity,
+                def.enemyLevel, m_summonRegistry,
+                static_cast<int>(i), &m_itemRegistry, diff);
         }
 
         std::vector<DungeonGraphNode> layer{};
@@ -394,14 +424,47 @@ void Dungeon::buildFixedGraph(std::uint32_t seed,
         m_layers.push_back(std::move(layer));
     }
 
-    // Connect each layer to the next (linear, no branching).
     for (std::size_t i{0}; i + 1 < m_layers.size(); ++i)
         m_layers[i][0].nextIndices.push_back(0);
 }
+
 bool Dungeon::run(Party &party, MetaProgress &meta,
                   IRenderer &renderer, IInputHandler &input)
 {
     int floorsCleared{0};
+
+    if (m_runContext.runMode == RunMode::Classic)
+    {
+        for (std::size_t i{0}; i < party.size(); ++i)
+        {
+            Unit *u{party.getUnitAt(i)};
+            auto *pc{u ? u->asPlayableCharacter() : nullptr};
+            if (!pc)
+                continue;
+            pc->heal(pc->getMaxHp());
+            pc->resetEnergy();
+            pc->modifyExposure(-pc->getExposure());
+        }
+        party.resetSp();
+    }
+
+    // Classic runs are discrete — reset HP, Energy, Exposure, and SP to
+    // starting values so each dungeon entry is independent of the last.
+    if (m_runContext.runMode == RunMode::Classic)
+    {
+        for (std::size_t i{0}; i < party.size(); ++i)
+        {
+            Unit *u{party.getUnitAt(i)};
+            auto *pc{u ? u->asPlayableCharacter() : nullptr};
+            if (!pc)
+                continue;
+            pc->heal(pc->getMaxHp());
+            pc->resetEnergy();
+            pc->modifyExposure(-pc->getExposure());
+            pc->onBattleReset();
+        }
+        party.resetSp();
+    }
 
     // Player may start from any node on floor 0.
     std::vector<int> reachable{};

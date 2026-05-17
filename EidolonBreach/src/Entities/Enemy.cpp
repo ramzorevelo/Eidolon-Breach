@@ -33,6 +33,8 @@ int Enemy::getMaxToughness() const
 
 void Enemy::applyToughnessHit(int amount, Affinity sourceAffinity)
 {
+    if (m_maxToughness == 0)
+        return;
     int scaled{static_cast<int>(static_cast<float>(amount) * getAffinityModifier(sourceAffinity))};
     m_toughness = std::max(0, m_toughness - scaled);
     if (m_toughness == 0)

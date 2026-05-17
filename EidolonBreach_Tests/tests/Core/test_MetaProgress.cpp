@@ -292,3 +292,21 @@ TEST_CASE("MetaProgress: save/load round-trip preserves signalTallies and insigh
 
     std::filesystem::remove(testPath);
 }
+
+TEST_CASE("MetaProgress: Hard and Nightmare cleared sets start empty")
+{
+    MetaProgress meta{};
+    CHECK(meta.hardClearedDungeonIds.empty());
+    CHECK(meta.nightmareClearedDungeonIds.empty());
+}
+
+TEST_CASE("MetaProgress: save/load preserves Hard cleared set")
+{
+    const std::filesystem::path p{"test_hard_clear.json"};
+    MetaProgress orig{};
+    orig.hardClearedDungeonIds.insert("dungeon_03");
+    orig.saveToFile(p);
+    const MetaProgress loaded{MetaProgress::loadFromFile(p)};
+    CHECK(loaded.hardClearedDungeonIds.count("dungeon_03") == 1);
+    std::filesystem::remove(p);
+}   

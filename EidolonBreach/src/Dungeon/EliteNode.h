@@ -18,7 +18,9 @@ class EliteNode : public BattleNode
                        int dungeonEnemyLevel = 1,
                        const SummonRegistry *summonRegistry = nullptr,
                        int floorIndex = 0,
-                       const ItemRegistry *itemRegistry = nullptr);
+                       const ItemRegistry *itemRegistry = nullptr,
+                       DungeonDifficulty difficulty =
+                           DungeonDifficulty::Normal);
 
     void enter(Party &party, MetaProgress &meta,
                RunContext &runCtx, EventBus &eventBus,

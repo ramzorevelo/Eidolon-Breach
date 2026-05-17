@@ -105,6 +105,7 @@
     <ClCompile Include="tests\Core\test_RunContext.cpp" />
     <ClCompile Include="tests\Core\test_Stats.cpp" />
     <ClCompile Include="tests\Core\test_StatusEffectBase.cpp" />
+    <ClCompile Include="tests\Dungeon\test_DungeonTable.cpp" />
     <ClCompile Include="tests\EidolonBreach_Tests.cpp" />
     <ClCompile Include="tests\Entities\test_BreachbornFracture.cpp" />
     <ClCompile Include="tests\Entities\test_CharFlag.cpp" />

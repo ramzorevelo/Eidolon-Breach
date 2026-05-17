@@ -50,3 +50,19 @@ TEST_CASE("EnemyRegistry: contains returns true for registered id")
     CHECK(reg.contains("vampire_bat"));
     CHECK(!reg.contains("dragon_king"));
 }
+
+TEST_CASE("EnemyRegistry: spirit_01 has zero toughness")
+{
+    EnemyRegistry reg{};
+    reg.loadFromJson("data/enemies.json");
+    auto spirit{reg.create("spirit_01")};
+    REQUIRE(spirit != nullptr);
+    CHECK(spirit->getMaxToughness() == 0);
+}
+
+TEST_CASE("EnemyRegistry: void_herald exists and has drops")
+{
+    EnemyRegistry reg{};
+    reg.loadFromJson("data/enemies.json");
+    CHECK(reg.contains("void_herald"));
+}

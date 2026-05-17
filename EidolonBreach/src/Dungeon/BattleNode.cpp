@@ -29,13 +29,15 @@ BattleNode::BattleNode(std::function<void(Party &)> populateEnemies,
                        int dungeonEnemyLevel,
                        const SummonRegistry *summonRegistry,
                        int floorIndex,
-                       const ItemRegistry *itemRegistry)
+                       const ItemRegistry *itemRegistry,
+                       DungeonDifficulty difficulty)
     : m_populateEnemies{std::move(populateEnemies)},
       m_floorAffinity{floorAffinity},
       m_dungeonEnemyLevel{dungeonEnemyLevel},
       m_summonRegistry{summonRegistry},
-    m_floorIndex{floorIndex},
-    m_itemRegistry{itemRegistry}
+      m_floorIndex{floorIndex},
+      m_itemRegistry{itemRegistry},
+      m_difficulty{difficulty}
 {
 }
 
@@ -56,6 +58,7 @@ void BattleNode::runBattle(Party &party, MetaProgress &meta,
     Party enemyParty{};
     m_populateEnemies(enemyParty);
     applyFloorAffinityModifiers(enemyParty);
+    applyDifficultyScaling(enemyParty);
 
     Battle battle{party, enemyParty, renderer, input,
                   runCtx, eventBus, nullptr, m_summonRegistry, m_itemRegistry};
@@ -136,11 +139,37 @@ void BattleNode::awardBattleXp(Party &party, MetaProgress &meta,
 
 void BattleNode::applyFloorExposureModifier(Party &party) const
 {
+    int modifier{CombatConstants::kFloorDepthExposureModifier};
+    if (m_difficulty == DungeonDifficulty::Hard)
+        modifier = CombatConstants::kFloorDepthExposureModifierHard;
+    else if (m_difficulty == DungeonDifficulty::Nightmare)
+        modifier = CombatConstants::kFloorDepthExposureModifierNightmare;
+
     for (std::size_t i{0}; i < party.size(); ++i)
     {
         Unit *u{party.getUnitAt(i)};
         auto *pc{u ? u->asPlayableCharacter() : nullptr};
         if (pc && pc->isAlive())
-            pc->modifyExposure(m_floorIndex * CombatConstants::kFloorDepthExposureModifier);
+            pc->modifyExposure(m_floorIndex * modifier);
+    }
+}
+
+void BattleNode::applyDifficultyScaling(Party &enemyParty) const
+{
+    if (m_difficulty == DungeonDifficulty::Normal)
+        return;
+
+    const float hpScale{m_difficulty == DungeonDifficulty::Hard
+                            ? CombatConstants::kHardEnemyHpScale
+                            : CombatConstants::kNightmareEnemyHpScale};
+    const float atkScale{m_difficulty == DungeonDifficulty::Hard
+                             ? CombatConstants::kHardEnemyAtkScale
+                             : CombatConstants::kNightmareEnemyAtkScale};
+
+    for (std::size_t i{0}; i < enemyParty.size(); ++i)
+    {
+        Unit *u{enemyParty.getUnitAt(i)};
+        if (u)
+            u->scaleStats(hpScale, atkScale);
     }
 }

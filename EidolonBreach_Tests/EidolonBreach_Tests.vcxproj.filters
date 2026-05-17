@@ -375,6 +375,9 @@
     <ClCompile Include="tests\Meta\test_AspectTree.cpp">
       <Filter>Meta</Filter>
     </ClCompile>
+    <ClCompile Include="tests\Dungeon\test_DungeonTable.cpp">
+      <Filter>Dungeon</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="external\doctest.h">

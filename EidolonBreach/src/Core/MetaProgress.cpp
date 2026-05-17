@@ -119,6 +119,12 @@ MetaProgress MetaProgress::loadFromFile(const std::filesystem::path &path)
     meta.playerLevel = j.value("playerLevel", 1);
     for (const auto &id : j.value("clearedDungeonIds", nlohmann::json::array()))
         meta.clearedDungeonIds.insert(id.get<std::string>());
+    for (const auto &id :
+         j.value("hardClearedDungeonIds", nlohmann::json::array()))
+        meta.hardClearedDungeonIds.insert(id.get<std::string>());
+    for (const auto &id :
+         j.value("nightmareClearedDungeonIds", nlohmann::json::array()))
+        meta.nightmareClearedDungeonIds.insert(id.get<std::string>());
 
     const nlohmann::json insightJson{j.value("characterInsight", nlohmann::json::object())};
     for (const auto &[id, insight] : insightJson.items())
@@ -166,6 +172,12 @@ void MetaProgress::saveToFile(const std::filesystem::path &path) const
     j["clearedDungeonIds"] = nlohmann::json::array();
     for (const auto &id : clearedDungeonIds)
         j["clearedDungeonIds"].push_back(id);
+    j["hardClearedDungeonIds"] = nlohmann::json::array();
+    for (const auto &id : hardClearedDungeonIds)
+        j["hardClearedDungeonIds"].push_back(id);
+    j["nightmareClearedDungeonIds"] = nlohmann::json::array();
+    for (const auto &id : nightmareClearedDungeonIds)
+        j["nightmareClearedDungeonIds"].push_back(id);
 
     j["characterInsight"] = nlohmann::json::object();
     for (const auto &[id, data] : characterInsight)

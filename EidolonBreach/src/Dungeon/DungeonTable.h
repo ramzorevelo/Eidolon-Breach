@@ -11,119 +11,32 @@
 
 namespace DungeonTable
 {
-[[nodiscard]] inline const std::vector<DungeonDefinition> &getClassicDungeons()
+[[nodiscard]] inline const std::vector<DungeonDefinition> &
+getClassicDungeons()
 {
     static const std::vector<DungeonDefinition> kDungeons{
-        // One battle. No other mechanics in play yet.
-        // Player learns: HP bars, basic attack, turn order, winning a fight.
+
+        // Chapter 1 — The Breach Gate
         {
-            "dungeon_01",
-            "The Breach Gate",
-            "A lone enemy guards the entrance. Learn the basics of combat.",
-            /*enemyLevel*/ 1,
-            /*recommendedPlayer*/ 1,
-            /*numFloors*/ 1,
-            DungeonDifficulty::Normal,
-            /*fixedLayout*/ {"battle"},
-        },
-        // Two battles. Enemies have notable toughness bars.
-        // Player learns: toughness gauge, break, broken damage bonus.
+            "dungeon_01", "The Breach Gate", "A lone spirit guards the entrance. Learn to fight.", 1, 1, 1, DungeonDifficulty::Normal, {"battle"}, 1, {{"spirit_01"}}},
+        {"dungeon_02", "Fissure Approach", "Enemies resist simple attacks. Strike weak points to break them.", 2, 1, 2, DungeonDifficulty::Normal, {"battle", "battle"}, 1, {{"spirit_01", "breach_slime"}, {"breach_slime"}}},
+        {"dungeon_03", "Resonance Hollow", "The breach opens wider. Rest when you can.", 3, 2, 4, DungeonDifficulty::Normal, {"battle", "battle", "rest", "boss"}, 1, {{"breach_slime"}, {"breach_slime", "spirit_01"}, {}, {"gate_warden"}}},
+
+        // Chapter 2 — The Resonance Depths
         {
-            "dungeon_02",
-            "Fissure Approach",
-            "Enemies resist simple attacks. Strike their weak points to break them.",
-            /*enemyLevel*/ 2,
-            /*recommendedPlayer*/ 1,
-            /*numFloors*/ 2,
-            DungeonDifficulty::Normal,
-            /*fixedLayout*/ {"battle", "battle"},
-        },
-        // Battle → Rest → Battle. First Rest node in the game.
-        // Player learns: SP generation (basic attack), Slot Skill SP cost, rest options.
+            "dungeon_04", "Resonance Depths", "Your actions resonate together. Coordinate affinities.", 4, 3, 5, DungeonDifficulty::Normal, {"battle", "battle", "battle", "battle", "battle"}, 2, {{"spirit_01", "breach_slime"}, {"frost_wisp"}, {"iron_sentinel"}, {"breach_slime", "frost_wisp"}, {"frost_wisp", "iron_sentinel"}}},
+        {"dungeon_05", "Exposure Rift", "The breach warps your senses. Manage risk or vent the pressure.", 6, 4, 4, DungeonDifficulty::Normal, {"battle", "elite", "rest", "battle"}, 2, {{"breach_slime", "frost_wisp"}, {"stone_golem"}, {}, {"iron_sentinel", "breach_slime"}}},
+        {"dungeon_06", "Surge Point", "The resonance peaks. Ride the wave or be consumed.", 9, 6, 4, DungeonDifficulty::Normal, {"battle", "battle", "rest", "boss"}, 2, {{"iron_sentinel", "frost_wisp"}, {"stone_golem", "breach_slime"}, {}, {"surge_herald"}}},
+
+        // Chapter 3 — The Inner Sanctum
         {
-            "dungeon_03",
-            "Resonance Hollow",
-            "The breach opens wider. Rest sites offer relief between encounters.",
-            /*enemyLevel*/ 3,
-            /*recommendedPlayer*/ 2,
-            /*numFloors*/ 3,
-            DungeonDifficulty::Normal,
-            /*fixedLayout*/ {"battle", "rest", "battle"},
-        },
-        // Five floors. By floor 4 the field has plausibly triggered at least once.
-        // Player learns: affinity voting, gauge fill, trigger effects, floor affinity.
+            "dungeon_07", "Sanctum Approach", "The sanctum demands precision. No room for error.", 11, 8, 3, DungeonDifficulty::Normal, {"battle", "elite", "battle"}, 3, {{"iron_sentinel", "iron_sentinel"}, {"depth_golem"}, {"frost_wisp", "iron_sentinel", "breach_slime"}}},
+        {"dungeon_08", "Sanctum Depths", "Two elites, one rest. Both hit hard.", 13, 10, 4, DungeonDifficulty::Normal, {"battle", "elite", "rest", "elite"}, 3, {{"iron_sentinel", "iron_sentinel"}, {"depth_golem", "breach_slime"}, {}, {"breach_warden"}}},
+        {"dungeon_09", "Sanctum Throne", "The guardian waits. You arrive already taxed.", 15, 12, 3, DungeonDifficulty::Normal, {"elite", "rest", "boss"}, 3, {{"depth_golem", "frost_wisp"}, {}, {"sanctum_sentinel"}}},
+
+        // Chapter 4 — The Core
         {
-            "dungeon_04",
-            "Resonance Depths",
-            "Your actions resonate together. Coordinate affinities for greater power.",
-            /*enemyLevel*/ 4,
-            /*recommendedPlayer*/ 3,
-            /*numFloors*/ 5,
-            DungeonDifficulty::Normal,
-            /*fixedLayout*/ {"battle", "battle", "rest", "battle", "battle"},
-        },
-        // Six floors. Depth modifier adds Exposure each battle.
-        // First Treasure node awards a vestige.
-        // Player learns: Exposure gauge, Vent action, Purge at Rest, vestiges.
-        {
-            "dungeon_05",
-            "Exposure Rift",
-            "The breach warps your senses. Manage risk carefully — or vent the pressure.",
-            /*enemyLevel*/ 6,
-            /*recommendedPlayer*/ 4,
-            /*numFloors*/ 6,
-            DungeonDifficulty::Normal,
-            /*fixedLayout*/ {
-                "battle",
-                "battle",
-                "rest",
-                "battle",
-                "treasure",
-                "battle",
-            },
-        },
-        // Seven floors. First Elite node. Post-elite vestige reward.
-        // Player learns: elite node spike, Corrupted vestiges, vestige discard.
-        {
-            "dungeon_06",
-            "Deep Rift",
-            "Elite threats demand full coordination. Defeat them for powerful rewards.",
-            /*enemyLevel*/ 9,
-            /*recommendedPlayer*/ 6,
-            /*numFloors*/ 7,
-            DungeonDifficulty::Normal,
-            /*fixedLayout*/ {
-                "battle",
-                "elite",
-                "rest",
-                "battle",
-                "treasure",
-                "shop",
-                "battle",
-            },
-        },
-        // Nine floors. Guaranteed Rest before boss.
-        // Player has seen every core mechanic before this fight.
-        {
-            "dungeon_07",
-            "The Inner Breach",
-            "Every system in play. The guardian of the breach awaits at the core.",
-            /*enemyLevel*/ 14,
-            /*recommendedPlayer*/ 9,
-            /*numFloors*/ 9,
-            DungeonDifficulty::Hard,
-            /*fixedLayout*/ {
-                "battle",
-                "elite",
-                "rest",
-                "battle",
-                "treasure",
-                "shop",
-                "elite",
-                "rest",
-                "boss",
-            },
-        },
+            "dungeon_10", "The Core", "The final breach. No rest. No mercy.", 18, 15, 3, DungeonDifficulty::Normal, {"battle", "elite", "boss"}, 4, {{"iron_sentinel", "iron_sentinel", "breach_slime"}, {"breach_warden", "shard_wraith"}, {"void_herald"}}},
     };
     return kDungeons;
 }

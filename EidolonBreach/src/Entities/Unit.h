@@ -59,6 +59,13 @@ public:
     void heal(int amount);
 
     /**
+     * @brief Scale maxHp and atk by the given multipliers.
+     *        hp is reset to the new maxHp after scaling.
+     *        Called by BattleNode when applying difficulty modifiers at spawn.
+     */
+    void scaleStats(float hpMultiplier, float atkMultiplier);
+
+    /**
      * @brief Reduces HP without running the shield absorption pass.
      * Use for DoT ticks (BurnEffect::onTick). Direct attacks call takeDamage().
      */

@@ -4,6 +4,7 @@
  */
 
 #include "Dungeon/BossNode.h"
+
 #include "Core/EventBus.h"
 #include "Entities/Party.h"
 #include "Core/CombatConstants.h"
@@ -16,19 +17,29 @@ BossNode::BossNode(std::function<void(Party &)> populateEnemies,
                    int dungeonEnemyLevel,
                    const SummonRegistry *summonRegistry,
                    int floorIndex,
-                   const ItemRegistry *itemRegistry)
+                   const ItemRegistry *itemRegistry,
+                   DungeonDifficulty difficulty)
     : EliteNode{
           std::move(populateEnemies), floorAffinity, dungeonEnemyLevel,
-          summonRegistry, floorIndex, itemRegistry}
+          summonRegistry, floorIndex, itemRegistry, difficulty}
 {
 }
 void BossNode::enter(Party &party, MetaProgress &meta,
                      RunContext &runCtx, EventBus &eventBus,
                      IRenderer &renderer, IInputHandler &input)
 {
+    const int exposureSpike{
+        m_difficulty == DungeonDifficulty::Hard
+            ? CombatConstants::kEliteExposureSpikeHard
+            : (m_difficulty == DungeonDifficulty::Nightmare
+                   ? CombatConstants::kEliteExposureSpikeNightmare
+                   : CombatConstants::kEliteExposureSpike)};
+
     renderer.renderMessage("=== BOSS ENCOUNTER ===");
     renderer.renderMessage("The final guardian of the breach awaits.");
-    renderer.renderMessage("Exposure spikes by " + std::to_string(CombatConstants::kEliteExposureSpike) + " for all party members!");
+    renderer.renderMessage("Exposure spikes by " +
+                           std::to_string(exposureSpike) +
+                           " for all party members!");
     renderer.presentPause(800);
 
     applyFloorExposureModifier(party);
@@ -38,7 +49,7 @@ void BossNode::enter(Party &party, MetaProgress &meta,
         Unit *u = party.getUnitAt(i);
         auto *pc{u ? u->asPlayableCharacter() : nullptr};
         if (pc)
-            pc->modifyExposure(CombatConstants::kEliteExposureSpike);
+            pc->modifyExposure(exposureSpike);
     }
 
     runBattle(party, meta, runCtx, eventBus, renderer, input);

@@ -241,6 +241,40 @@ static void selectParty(Party &party,
     }
 }
 
+namespace
+{
+
+/** Returns the ID of the chapter-boss dungeon for the given dungeon. */
+static std::string_view chapterBossId(std::string_view dungeonId)
+{
+    if (dungeonId == "dungeon_01" || dungeonId == "dungeon_02" ||
+        dungeonId == "dungeon_03")
+        return "dungeon_03";
+    if (dungeonId == "dungeon_04" || dungeonId == "dungeon_05" ||
+        dungeonId == "dungeon_06")
+        return "dungeon_06";
+    if (dungeonId == "dungeon_07" || dungeonId == "dungeon_08" ||
+        dungeonId == "dungeon_09")
+        return "dungeon_09";
+    return "dungeon_10";
+}
+
+static bool isHardAvailable(const DungeonDefinition &def,
+                            const MetaProgress &meta)
+{
+    return meta.clearedDungeonIds.count(
+               std::string{chapterBossId(def.id)}) > 0;
+}
+
+static bool isNightmareAvailable(const DungeonDefinition &def,
+                                 const MetaProgress &meta)
+{
+    return meta.hardClearedDungeonIds.count(
+               std::string{chapterBossId(def.id)}) > 0;
+}
+
+} // namespace
+
 static void runGame(SDL3Renderer &renderer, SDL3InputHandler &input,
                     const CharacterRegistry &characterRegistry,
                     SummonRegistry &summonRegistry,
@@ -298,7 +332,10 @@ static void runGame(SDL3Renderer &renderer, SDL3InputHandler &input,
                                                 ? def->numFloors
                                                 : static_cast<int>(def->fixedLayout.size())};
                     dungeonOptions.push_back(
-                        def->name + "  Rec.Lv." + std::to_string(def->recommendedPlayerLevel) + " | EnemyLv." + std::to_string(def->enemyLevel) + " | " + std::to_string(displayFloors) + " floors" + (meta.clearedDungeonIds.count(def->id) > 0 ? " [CLEARED]" : ""));
+                        def->name + "  Rec.Lv." + std::to_string(def->recommendedPlayerLevel) +
+                        " | EnemyLv." + std::to_string(def->enemyLevel) +
+                        " | " + std::to_string(displayFloors) + " floors" +
+                        (meta.clearedDungeonIds.count(def->id) > 0 ? " [CLEARED]" : "") + (isHardAvailable(*def, meta) ? (isNightmareAvailable(*def, meta) ? " [N]" : " [H]") : ""));
                 }
                 dungeonOptions.push_back("<< Back");
 
@@ -315,15 +352,13 @@ static void runGame(SDL3Renderer &renderer, SDL3InputHandler &input,
                     info.enemyLevel = def->enemyLevel;
                     info.layout = def->fixedLayout.empty()
                                       ? std::vector<std::string>(
-                                            static_cast<std::size_t>(def->numFloors),
-                                            "battle")
+                                            static_cast<std::size_t>(def->numFloors), "battle")
                                       : def->fixedLayout;
                     info.cleared = meta.clearedDungeonIds.count(def->id) > 0;
-                    info.difficultyLabel = (def->difficulty == DungeonDifficulty::Hard)
-                                               ? "Hard"
-                                               : (def->difficulty == DungeonDifficulty::Nightmare
-                                                      ? "Nightmare"
-                                                      : "Normal");
+                    info.difficultyLabel =
+                        isNightmareAvailable(*def, meta) ? "Nightmare"
+                        : isHardAvailable(*def, meta)    ? "Hard"
+                                                         : "Normal";
                     dungeonInfos.push_back(std::move(info));
                 }
 
@@ -340,6 +375,36 @@ static void runGame(SDL3Renderer &renderer, SDL3InputHandler &input,
                     break;
                 }
                 selectedDungeon = available[dungeonPick];
+
+                // Difficulty sub-menu — show only unlocked tiers.
+                {
+                    std::vector<std::string> diffOpts{"Normal"};
+                    if (isHardAvailable(*selectedDungeon, meta))
+                        diffOpts.push_back("Hard");
+                    if (isNightmareAvailable(*selectedDungeon, meta))
+                        diffOpts.push_back("Nightmare");
+                    diffOpts.push_back("<< Back");
+
+                    input.setMenuContext("SELECT DIFFICULTY", diffOpts);
+                    renderer.renderSelectionMenu("SELECT DIFFICULTY", diffOpts);
+                    const std::size_t diffPick =
+                        input.getMenuChoice(diffOpts.size());
+
+                    if (diffPick == IInputHandler::kCancelChoice ||
+                        diffPick == diffOpts.size() - 1)
+                        break; // back to dungeon list
+
+                    // Build a difficulty-stamped copy of the definition.
+                    static DungeonDefinition adjustedDef{};
+                    adjustedDef = *selectedDungeon;
+                    if (diffOpts[diffPick] == "Hard")
+                        adjustedDef.difficulty = DungeonDifficulty::Hard;
+                    else if (diffOpts[diffPick] == "Nightmare")
+                        adjustedDef.difficulty = DungeonDifficulty::Nightmare;
+                    else
+                        adjustedDef.difficulty = DungeonDifficulty::Normal;
+                    selectedDungeon = &adjustedDef;
+                }
                 partyBackStage = MenuStage::Dungeon;
             }
             else

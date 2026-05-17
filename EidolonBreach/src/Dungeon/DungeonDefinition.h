@@ -28,4 +28,19 @@ struct DungeonDefinition
      *        When empty the dungeon uses the procedural generator (EidolonLabyrinth).
      */
     std::vector<std::string> fixedLayout{};
+    
+    /**
+     * @brief Chapter number (1–4). Classic mode only.
+     *        Used to determine which dungeons unlock Hard/Nightmare together.
+     */
+    int chapter{0};
+
+    /**
+     * @brief Enemy ID list per floor for Classic authored content.
+     *        Entry i lists the enemy IDs spawned on floor i.
+     *        When non-empty, buildFixedGraph instantiates these directly
+     *        via EnemyRegistry; EncounterTable is bypassed.
+     *        Rest node floors use an empty inner vector.
+     */
+    std::vector<std::vector<std::string>> fixedEnemyGroups{};
 };

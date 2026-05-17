@@ -166,6 +166,17 @@ void Unit::heal(int amount)
     m_stats.hp = std::min(m_stats.maxHp, m_stats.hp + amount);
 }
 
+void Unit::scaleStats(float hpMultiplier, float atkMultiplier)
+{
+    m_stats.maxHp = std::max(
+        1, static_cast<int>(
+               static_cast<float>(m_stats.maxHp) * hpMultiplier));
+    m_stats.hp = m_stats.maxHp;
+    m_stats.atk = std::max(
+        1, static_cast<int>(
+               static_cast<float>(m_stats.atk) * atkMultiplier));
+}
+
 void Unit::rebuildTagCache()
 {
     m_activeTags = 0;

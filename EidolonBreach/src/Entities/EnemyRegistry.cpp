@@ -98,6 +98,13 @@ std::unique_ptr<Enemy> EnemyRegistry::instantiate(const EnemyBlueprint &bp)
         enemy = std::make_unique<StoneGolem>(bp.name, bp.maxHp, bp.maxToughness);
     else if (bp.enemyType == "vampire_bat")
         enemy = std::make_unique<VampireBat>(bp.name, bp.maxHp, bp.maxToughness);
+    else if (bp.enemyType == "spirit")
+        enemy = std::make_unique<Enemy>(
+            bp.id, bp.name,
+            Stats{bp.maxHp, bp.maxHp, 8, 0, 18},
+            parseAffinityStr(bp.affinity),
+            0,
+            std::make_unique<BasicAIStrategy>());
     else
         enemy = std::make_unique<Enemy>(
             bp.id, bp.name,

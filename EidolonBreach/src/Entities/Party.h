@@ -41,8 +41,11 @@ public:
 	// Shared SP pool management
 	int  getSp() const { return m_resources.sp; }
 	int  getMaxSp() const { return m_resources.maxSp; }
-	void gainSp(int amount);
-	bool useSp(int amount);   // returns true if enough SP was available/** @return The shared party inventory (consumables, equipment, gold). */
+    void gainSp(int amount);
+    bool useSp(int amount); // returns true if enough SP was available
+    /** @brief Reset SP to the Classic starting value (CombatConstants::kStartingSp). */
+    void resetSp();
+    
     [[nodiscard]] Inventory &getInventory()
     {
         return m_inventory;

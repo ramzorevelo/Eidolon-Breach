@@ -113,5 +113,7 @@ class MetaProgress
     std::map<std::string, std::vector<std::string>> masteryEventLog{}; 
     int playerXp{0};                                                   
     int playerLevel{1};                                                
-    std::set<std::string> clearedDungeonIds{};                         
+    std::set<std::string> clearedDungeonIds{};               
+    std::set<std::string> hardClearedDungeonIds{};
+    std::set<std::string> nightmareClearedDungeonIds{};
 };

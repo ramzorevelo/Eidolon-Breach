@@ -1,4 +1,5 @@
 #include "Entities/Party.h"
+#include "Core/CombatConstants.h"
 #include <algorithm>
 
 void Party::addUnit(std::unique_ptr<Unit> unit) {
@@ -56,6 +57,11 @@ bool Party::useSp(int amount) {
 	if (m_resources.sp < amount) return false;
 	m_resources.sp -= amount;
 	return true;
+}
+
+void Party::resetSp()
+{
+    m_resources.sp = CombatConstants::kStartingSp;
 }
 
 std::optional<std::unique_ptr<IVestige>> Party::addVestige(std::unique_ptr<IVestige> vestige)

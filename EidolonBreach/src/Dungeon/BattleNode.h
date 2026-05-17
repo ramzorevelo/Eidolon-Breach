@@ -7,6 +7,7 @@
 
 #include "Core/Affinity.h"
 #include "Dungeon/MapNode.h"
+#include "Dungeon/DungeonDefinition.h"
 #include <functional>
 
 class Party;
@@ -28,7 +29,9 @@ class BattleNode : public MapNode
                         int dungeonEnemyLevel = 1,
                         const SummonRegistry *summonRegistry = nullptr,
                         int floorIndex = 0,
-                        const ItemRegistry *itemRegistry = nullptr);
+                        const ItemRegistry *itemRegistry = nullptr,
+                        DungeonDifficulty difficulty =
+                            DungeonDifficulty::Normal);
 
     void enter(Party &party, MetaProgress &meta,
                RunContext &runCtx, EventBus &eventBus,
@@ -62,6 +65,15 @@ class BattleNode : public MapNode
                    IRenderer &renderer, IInputHandler &input);
 
     void awardBattleXp(Party &party, MetaProgress &meta, const RunContext &runCtx) const;
+    
+    /**
+     * @brief Scale all enemy stats by the difficulty multipliers.
+     *        No-op for Normal. Called from runBattle after enemy party
+     *        is populated and floor-affinity modifiers are applied.
+     */
+    void applyDifficultyScaling(Party &enemyParty) const;
+    DungeonDifficulty m_difficulty{DungeonDifficulty::Normal};
+
   private:
     std::function<void(Party &)> m_populateEnemies;
     const SummonRegistry *m_summonRegistry{nullptr};

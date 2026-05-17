@@ -3,6 +3,8 @@
  * @brief Smoke tests for DungeonTable fixed layouts.
  */
 #include "Dungeon/DungeonTable.h"
+#include <array>
+#include <algorithm>
 #include "doctest.h"
 
 TEST_CASE("DungeonTable: all Classic dungeons have fixedLayout non-empty")
@@ -22,19 +24,28 @@ TEST_CASE("DungeonTable: Dungeon 1 is exactly 1 battle floor")
     CHECK(d1.fixedLayout[0] == "battle");
 }
 
-TEST_CASE("DungeonTable: Dungeon 7 ends with boss")
+TEST_CASE("DungeonTable: Dungeon 10 ends with boss")
 {
-    const auto &d7{DungeonTable::getClassicDungeons().back()};
-    CHECK(d7.fixedLayout.back() == "boss");
+    const auto &d10{DungeonTable::getClassicDungeons().back()};
+    CHECK(d10.fixedLayout.back() == "boss");
 }
 
-TEST_CASE("DungeonTable: no dungeon before dungeon 7 contains a boss node")
+TEST_CASE("DungeonTable: only chapter-boss dungeons contain a boss node")
 {
+    // Chapter bosses are at 0-based indices 2, 5, 8, and 9.
+    const std::array<std::size_t, 4> kBossIndices{2, 5, 8, 9};
     const auto &dungeons{DungeonTable::getClassicDungeons()};
-    for (std::size_t i{0}; i + 1 < dungeons.size(); ++i)
+    REQUIRE(dungeons.size() == 10);
+    for (std::size_t i{0}; i < dungeons.size(); ++i)
     {
+        const bool shouldHaveBoss{
+            std::find(kBossIndices.begin(), kBossIndices.end(), i) !=
+            kBossIndices.end()};
+        bool hasBoss{false};
         for (const auto &nodeType : dungeons[i].fixedLayout)
-            CHECK(nodeType != "boss");
+            if (nodeType == "boss")
+                hasBoss = true;
+        CHECK(hasBoss == shouldHaveBoss);
     }
 }
 

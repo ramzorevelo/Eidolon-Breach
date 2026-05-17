@@ -119,5 +119,146 @@
         "dropChance": 0.10
       }
     ]
+  },
+  "spirit_01": {
+    "name": "Rift Spirit",
+    "enemyType": "spirit",
+    "faction": "Primordial",
+    "category": "Spirit",
+    "affinity": "Aether",
+    "maxHp": 40,
+    "maxToughness": 0,
+    "drops": [
+      {
+        "type": "gold",
+        "goldAmount": 5,
+        "dropChance": 1.0
+      }
+    ]
+  },
+  "breach_slime": {
+    "name": "Breach Slime",
+    "enemyType": "slime",
+    "faction": "Primordial",
+    "category": "Aberration",
+    "maxHp": 75,
+    "maxToughness": 32,
+    "drops": [
+      {
+        "type": "gold",
+        "goldAmount": 8,
+        "dropChance": 1.0
+      }
+    ]
+  },
+  "resonance_wisp": {
+    "name": "Resonance Wisp",
+    "enemyType": "spirit",
+    "faction": "Primordial",
+    "category": "Spirit",
+    "affinity": "Aether",
+    "maxHp": 50,
+    "maxToughness": 0,
+    "drops": [
+      {
+        "type": "gold",
+        "goldAmount": 8,
+        "dropChance": 1.0
+      }
+    ]
+  },
+  "depth_golem": {
+    "name": "Depth Golem",
+    "enemyType": "stone_golem",
+    "faction": "Construct",
+    "category": "Construct",
+    "maxHp": 150,
+    "maxToughness": 70,
+    "drops": [
+      {
+        "type": "item",
+        "itemId": "chain_mail",
+        "dropChance": 0.30
+      }
+    ]
+  },
+  "gate_warden": {
+    "name": "Gate Warden",
+    "enemyType": "stone_golem",
+    "faction": "Construct",
+    "category": "Construct",
+    "maxHp": 180,
+    "maxToughness": 80,
+    "drops": [
+      {
+        "type": "item",
+        "itemId": "steel_sword",
+        "dropChance": 0.50
+      },
+      {
+        "type": "gold",
+        "goldAmount": 30,
+        "dropChance": 1.0
+      }
+    ]
+  },
+  "surge_herald": {
+    "name": "Surge Herald",
+    "enemyType": "vampire_bat",
+    "faction": "Hollow",
+    "category": "Beast",
+    "maxHp": 160,
+    "maxToughness": 75,
+    "drops": [
+      {
+        "type": "item",
+        "itemId": "breach_shard",
+        "dropChance": 0.40
+      },
+      {
+        "type": "gold",
+        "goldAmount": 35,
+        "dropChance": 1.0
+      }
+    ]
+  },
+  "sanctum_sentinel": {
+    "name": "Sanctum Sentinel",
+    "enemyType": "stone_golem",
+    "faction": "Construct",
+    "category": "Construct",
+    "maxHp": 220,
+    "maxToughness": 100,
+    "drops": [
+      {
+        "type": "guaranteed_item",
+        "itemId": "chain_mail"
+      },
+      {
+        "type": "gold",
+        "goldAmount": 50,
+        "dropChance": 1.0
+      }
+    ]
+  },
+  "void_herald": {
+    "name": "Void Herald",
+    "enemyType": "vampire_bat",
+    "faction": "Primordial",
+    "category": "Spirit",
+    "affinity": "Aether",
+    "maxHp": 280,
+    "maxToughness": 120,
+    "drops": [
+      {
+        "type": "guaranteed_item",
+        "itemId": "breach_shard"
+      },
+      {
+        "type": "gold",
+        "goldAmount": 80,
+        "dropChance": 1.0
+      }
+    ]
   }
 }
