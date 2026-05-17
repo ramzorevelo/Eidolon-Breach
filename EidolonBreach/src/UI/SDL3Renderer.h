@@ -78,10 +78,21 @@ class SDL3Renderer : public IRenderer, public ILayoutQuery
     {
         return m_windowHeight;
     }
+    [[nodiscard]] int getMenuRowAt(int x, int y) const override;
 
     void renderTooltip(const std::string &name, float hpFraction,
                        const std::string &effectSummary, int screenX, int screenY);
     void onWindowResized(int newWidth, int newHeight);
+
+    /**
+     * @brief Programmatically resize the window and update internal tracking.
+     *        Called by SettingsScreen when the player picks a new resolution.
+     *        The logical canvas stays at 1280x720; SDL letterboxing handles scaling.
+     * @param w New window width in physical pixels.
+     * @param h New window height in physical pixels.
+     */
+    void setResolution(int w, int h);
+
     void flushAnimations();
     void flushVisualEffects() override;
 
@@ -229,6 +240,16 @@ class SDL3Renderer : public IRenderer, public ILayoutQuery
     // calls on Up/Down navigation re-draw the split layout automatically.
     std::vector<DungeonSelectInfo> m_dungeonSelectInfos{};
     std::string m_dungeonSelectTitle{};
+
+    float m_menuPanelX{0.f};
+    float m_menuPanelW{0.f};
+    float m_menuFirstRowY{0.f};
+    float m_menuRowStep{0.f};
+    std::size_t m_menuWindowStart{0};
+    std::size_t m_menuNumOptions{0};
+    std::size_t m_menuNumVisible{0};
+
+
     void redrawAll();
 
     // Panel draws — read only from cached state; called only from redrawAll.
@@ -351,6 +372,7 @@ class SDL3Renderer : public IRenderer, public ILayoutQuery
 
     int m_highlightedTargetIndex{-1};
     bool m_highlightingEnemies{true};
+    bool m_battleActive{false};
 
     static SDL_Color affinityColor(Affinity a);
 };

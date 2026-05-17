@@ -18,5 +18,5 @@ class ILayoutQuery
     [[nodiscard]] virtual bool isLogScrollable() const = 0;
     [[nodiscard]] virtual bool isHighlightingEnemies() const = 0;
     [[nodiscard]] virtual int getWindowHeight() const = 0;
-    
+    [[nodiscard]] virtual int getMenuRowAt(int x, int y) const = 0;
 };

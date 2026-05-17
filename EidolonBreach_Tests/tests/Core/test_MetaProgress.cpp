@@ -310,3 +310,17 @@ TEST_CASE("MetaProgress: save/load preserves Hard cleared set")
     CHECK(loaded.hardClearedDungeonIds.count("dungeon_03") == 1);
     std::filesystem::remove(p);
 }   
+TEST_CASE("MetaProgress: characterRunCounts round-trips through save/load")
+{
+    const std::filesystem::path testPath{"test_runcounts.json"};
+    MetaProgress meta{};
+    meta.characterRunCounts["lyra"] = 3;
+    meta.characterRunCounts["vex"] = 7;
+    meta.saveToFile(testPath);
+
+    const MetaProgress loaded{MetaProgress::loadFromFile(testPath)};
+    CHECK(loaded.characterRunCounts.at("lyra") == 3);
+    CHECK(loaded.characterRunCounts.at("vex") == 7);
+
+    std::filesystem::remove(testPath);
+}

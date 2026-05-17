@@ -539,6 +539,12 @@ bool Dungeon::run(Party &party, MetaProgress &meta,
 
     if (m_runContext.runMode == RunMode::Classic)
         meta.gainRunSignals(m_runContext, party);
+    for (std::size_t i{0}; i < party.size(); ++i)
+    {
+        const Unit *u{party.getUnitAt(i)};
+        if (u)
+            ++meta.characterRunCounts[std::string{u->getId()}];
+    }
 
     m_eventBus.emit(RunCompletedEvent{playerWon, floorsCleared});
     m_eventBus.clearRunScope();

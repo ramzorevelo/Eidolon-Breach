@@ -14,9 +14,19 @@
         },
         "vex": {
             "bondTrialComplete": false,
-            "chosenAspects": [],
+            "chosenAspects": [
+                "vex_aggressive_1",
+                "vex_aggressive_2",
+                "vex_aggressive_3",
+                "vex_sacrificial_1",
+                "vex_sacrificial_2",
+                "vex_sacrificial_3",
+                "vex_supportive_1",
+                "vex_supportive_2",
+                "vex_reactive_3"
+            ],
             "echoCount": 5,
-            "insightBalance": 94,
+            "insightBalance": 46,
             "signalTallies": {
                 "Aggressive": 48,
                 "Reactive": 119,
@@ -37,6 +47,7 @@
             }
         }
     },
+    "characterRunCounts": {},
     "characterXP": {
         "ignis": 13601,
         "lyra": 8405,

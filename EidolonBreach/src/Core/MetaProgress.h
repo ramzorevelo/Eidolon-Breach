@@ -111,6 +111,9 @@ class MetaProgress
     std::map<std::string, int> characterXP{};                          
     std::map<std::string, CharacterInsightData> characterInsight{};    
     std::map<std::string, std::vector<std::string>> masteryEventLog{}; 
+    /** Completed runs per character ID, across all run modes. Gates Bond Trial eligibility. */
+    std::map<std::string, int> characterRunCounts{};
+
     int playerXp{0};                                                   
     int playerLevel{1};                                                
     std::set<std::string> clearedDungeonIds{};               

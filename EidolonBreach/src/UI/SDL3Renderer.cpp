@@ -155,6 +155,11 @@ void SDL3Renderer::redrawAll()
     SDL_SetRenderDrawColor(m_renderer, 11, 11, 18, 255);
     SDL_RenderClear(m_renderer);
 
+    if (!m_battleActive)
+    {
+        SDL_RenderPresent(m_renderer);
+        return;
+    }
     // Draw order: background → battle area floor → panels → HUD → effects → vignette → overlays.
     drawBattleArea();
     drawTurnOrderStrip();
@@ -1423,6 +1428,7 @@ void SDL3Renderer::renderTurnOrder(const std::vector<TurnSlot> &order)
 
 void SDL3Renderer::renderPartyStatus(const Party &player, const Party &enemy)
 {
+    m_battleActive = true;
     m_cachedPlayerParty = &player;
     m_cachedEnemyParty = &enemy;
 
@@ -1515,6 +1521,15 @@ void SDL3Renderer::addLogMessage(const std::string &msg, SDL_Color color)
 
 void SDL3Renderer::renderMessage(const std::string &msg)
 {
+    if (!m_battleActive)
+    {
+        SDL_SetRenderDrawColor(m_renderer, 11, 11, 18, 255);
+        SDL_RenderClear(m_renderer);
+        if (m_font)
+            renderText(msg, 40.f, 340.f, 200, 200, 220);
+        SDL_RenderPresent(m_renderer);
+        return;
+    }
     addLogMessage(msg);
     redrawAll();
 }
@@ -1941,7 +1956,13 @@ void SDL3Renderer::renderSelectionMenu(const std::string &title,
         SDL_RenderGeometry(m_renderer, nullptr, tv, 3, nullptr, 0);
         SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_NONE);
     }
-
+    m_menuPanelX = panelX;
+    m_menuPanelW = kPanelW;
+    m_menuFirstRowY = panelY + kTitleH + kListTopPad;
+    m_menuRowStep = kRowStep;
+    m_menuWindowStart = windowStart;
+    m_menuNumOptions = totalOpts;
+    m_menuNumVisible = visRows;
     SDL_RenderPresent(m_renderer);
 }
 
@@ -1997,6 +2018,14 @@ void SDL3Renderer::drawDungeonSelectScreen(const std::string &title,
     // Scroll window.
     const std::size_t windowStart =
         (selected >= visRows) ? std::min(selected - visRows + 1, totalOpts - visRows) : 0;
+
+    m_menuPanelX = kListX;
+    m_menuPanelW = kListW;
+    m_menuFirstRowY = kPanelY + kTitleH + kListPad;
+    m_menuRowStep = kRowStep;
+    m_menuWindowStart = windowStart;
+    m_menuNumOptions = totalOpts;
+    m_menuNumVisible = visRows;
 
     // Left list panel.
     const SDL_FRect listPanel{kListX, kPanelY, kListW, kPanelH};
@@ -2438,6 +2467,8 @@ void SDL3Renderer::clearBattleCache()
     m_actedThisCycle.clear();
     m_dungeonSelectInfos.clear();
     m_dungeonSelectTitle.clear();
+    m_battleActive = false;
+    m_log.clear();
     redrawAll();
 }
 
@@ -2520,6 +2551,26 @@ int SDL3Renderer::getUnitCardAt(int x, int y, bool isPlayerSide) const
     return -1;
 }
 
+int SDL3Renderer::getMenuRowAt(int x, int y) const
+{
+    float lx{}, ly{};
+    SDL_RenderCoordinatesFromWindow(m_renderer,
+                                    static_cast<float>(x), static_cast<float>(y),
+                                    &lx, &ly);
+    if (lx < m_menuPanelX || lx > m_menuPanelX + m_menuPanelW)
+        return -1;
+    const float relY{ly - m_menuFirstRowY};
+    if (relY < 0.f || m_menuRowStep <= 0.f)
+        return -1;
+    const int visRow{static_cast<int>(relY / m_menuRowStep)};
+    if (visRow < 0 || static_cast<std::size_t>(visRow) >= m_menuNumVisible)
+        return -1;
+    const std::size_t optIdx{m_menuWindowStart + static_cast<std::size_t>(visRow)};
+    if (optIdx >= m_menuNumOptions)
+        return -1;
+    return static_cast<int>(optIdx);
+}
+
 void SDL3Renderer::renderTooltip(const std::string &name, float hpFraction,
                                  const std::string &effectSummary, int screenX, int screenY)
 {
@@ -2538,5 +2589,13 @@ void SDL3Renderer::renderTooltip(const std::string &name, float hpFraction,
 
 void SDL3Renderer::onWindowResized(int /*w*/, int /*h*/)
 {
+    redrawAll();
+}
+
+void SDL3Renderer::setResolution(int w, int h)
+{
+    SDL_SetWindowSize(m_window, w, h);
+    m_windowWidth = w;
+    m_windowHeight = h;
     redrawAll();
 }

@@ -276,6 +276,21 @@
     <ClCompile Include="src\UI\AspectTreeScreen.cpp">
       <Filter>UI</Filter>
     </ClCompile>
+    <ClCompile Include="src\Core\Settings.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\BackpackScreen.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\CharacterDetailScreen.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\SettingsScreen.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\HubScreen.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Battle\Battle.h">
@@ -591,6 +606,21 @@
       <Filter>UI</Filter>
     </ClInclude>
     <ClInclude Include="src\UI\ILayoutQuery.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Core\Settings.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\BackpackScreen.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\CharacterDetailScreen.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\SettingsScreen.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\HubScreen.h">
       <Filter>UI</Filter>
     </ClInclude>
   </ItemGroup>

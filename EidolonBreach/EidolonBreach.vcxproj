@@ -48,6 +48,7 @@
     <ClCompile Include="src\Core\EventBus.cpp" />
     <ClCompile Include="src\Core\MetaProgress.cpp" />
     <ClCompile Include="src\Core\RunContext.cpp" />
+    <ClCompile Include="src\Core\Settings.cpp" />
     <ClCompile Include="src\Core\StatusEffectBase.cpp" />
     <ClCompile Include="src\Dungeon\BattleNode.cpp" />
     <ClCompile Include="src\Dungeon\BossNode.cpp" />
@@ -76,8 +77,12 @@
     <ClCompile Include="src\Meta\BondTrial.cpp" />
     <ClCompile Include="src\Summons\SummonRegistry.cpp" />
     <ClCompile Include="src\UI\AspectTreeScreen.cpp" />
+    <ClCompile Include="src\UI\BackpackScreen.cpp" />
+    <ClCompile Include="src\UI\CharacterDetailScreen.cpp" />
+    <ClCompile Include="src\UI\HubScreen.cpp" />
     <ClCompile Include="src\UI\SDL3InputHandler.cpp" />
     <ClCompile Include="src\UI\SDL3Renderer.cpp" />
+    <ClCompile Include="src\UI\SettingsScreen.cpp" />
     <ClCompile Include="src\Vestiges\AttunistGambitVestige.cpp" />
     <ClCompile Include="src\Vestiges\EchoingStrikeVestige.cpp" />
     <ClCompile Include="src\Vestiges\FlameResonanceVestige.cpp" />
@@ -143,6 +148,7 @@
     <ClInclude Include="src\Core\ResourceStats.h" />
     <ClInclude Include="src\Core\RunContext.h" />
     <ClInclude Include="src\Core\ScalingStat.h" />
+    <ClInclude Include="src\Core\Settings.h" />
     <ClInclude Include="src\Core\Stats.h" />
     <ClInclude Include="src\Core\StatusEffectBase.h" />
     <ClInclude Include="src\Core\TargetInfo.h" />
@@ -179,11 +185,15 @@
     <ClInclude Include="src\Summons\SummonDefinition.h" />
     <ClInclude Include="src\Summons\SummonRegistry.h" />
     <ClInclude Include="src\UI\AspectTreeScreen.h" />
+    <ClInclude Include="src\UI\BackpackScreen.h" />
+    <ClInclude Include="src\UI\CharacterDetailScreen.h" />
+    <ClInclude Include="src\UI\HubScreen.h" />
     <ClInclude Include="src\UI\IInputHandler.h" />
     <ClInclude Include="src\UI\ILayoutQuery.h" />
     <ClInclude Include="src\UI\IRenderer.h" />
     <ClInclude Include="src\UI\SDL3InputHandler.h" />
     <ClInclude Include="src\UI\SDL3Renderer.h" />
+    <ClInclude Include="src\UI\SettingsScreen.h" />
     <ClInclude Include="src\Vestiges\AttunistGambitVestige.h" />
     <ClInclude Include="src\Vestiges\EchoingStrikeVestige.h" />
     <ClInclude Include="src\Vestiges\FlameResonanceVestige.h" />

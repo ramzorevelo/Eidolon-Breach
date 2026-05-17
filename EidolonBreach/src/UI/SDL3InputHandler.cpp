@@ -193,17 +193,38 @@ std::size_t SDL3InputHandler::getMenuChoice(std::size_t numOptions)
         }
         if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN && event.button.button == SDL_BUTTON_LEFT)
         {
-            const float firstRowY = static_cast<float>(m_layout.getWindowHeight()) * 0.18f + 36.f;
-            const float fy = static_cast<float>(event.button.y);
-            if (fy >= firstRowY)
+            const int row{m_layout.getMenuRowAt(
+                static_cast<int>(event.button.x), static_cast<int>(event.button.y))};
+            if (row >= 0 && static_cast<std::size_t>(row) < numOptions)
+                return static_cast<std::size_t>(row);
+        }
+        if (event.type == SDL_EVENT_MOUSE_MOTION)
+        {
+            const int row{m_layout.getMenuRowAt(
+                static_cast<int>(event.motion.x), static_cast<int>(event.motion.y))};
+            if (row >= 0 && static_cast<std::size_t>(row) < numOptions)
             {
-                const int row = static_cast<int>((fy - firstRowY) / 30.f);
-                if (row >= 0 && static_cast<std::size_t>(row) < numOptions)
-                    return static_cast<std::size_t>(row);
+                const std::size_t hovered{static_cast<std::size_t>(row)};
+                if (hovered != current)
+                {
+                    current = hovered;
+                    m_renderer.renderSelectionMenu(m_menuTitle, m_menuOptions, current);
+                }
             }
         }
         if (event.type == SDL_EVENT_MOUSE_WHEEL)
-            m_layout.setLogScrollOffset(static_cast<int>(event.wheel.y));
+        {
+            if (event.wheel.y > 0.f && current > 0)
+            {
+                --current;
+                m_renderer.renderSelectionMenu(m_menuTitle, m_menuOptions, current);
+            }
+            else if (event.wheel.y < 0.f && current + 1 < numOptions)
+            {
+                ++current;
+                m_renderer.renderSelectionMenu(m_menuTitle, m_menuOptions, current);
+            }
+        }
     }
     return 0;
 }

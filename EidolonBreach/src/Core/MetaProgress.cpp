@@ -149,6 +149,10 @@ MetaProgress MetaProgress::loadFromFile(const std::filesystem::path &path)
             meta.masteryEventLog[id].push_back(entry.get<std::string>());
     }
 
+    const nlohmann::json runCountJson{j.value("characterRunCounts", nlohmann::json::object())};
+    for (const auto &[id, count] : runCountJson.items())
+        meta.characterRunCounts[id] = count.get<int>(); 
+
     return meta;
 }
 
@@ -195,7 +199,9 @@ void MetaProgress::saveToFile(const std::filesystem::path &path) const
     j["masteryEventLog"] = nlohmann::json::object();
     for (const auto &[id, log] : masteryEventLog)
         j["masteryEventLog"][id] = log;
-
+    j["characterRunCounts"] = nlohmann::json::object();
+    for (const auto &[id, count] : characterRunCounts)
+        j["characterRunCounts"][id] = count;
     std::ofstream file{path};
     if (file.is_open())
         file << j.dump(4);
