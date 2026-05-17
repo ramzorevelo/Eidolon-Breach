@@ -24,7 +24,7 @@ class RestNode : public MapNode
     }
   private:
     /** @brief Restore partial HP to all alive party members. */
-    void applyHeal(Party &party) const;
+    void applyHeal(Party &party, IRenderer &renderer) const;
 
     /** @brief Reduce all party members' Exposure by kPurgeExposureReduction. */
     void applyPurge(Party &party, IRenderer &renderer) const;

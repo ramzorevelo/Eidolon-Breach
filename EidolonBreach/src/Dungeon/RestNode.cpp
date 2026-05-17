@@ -21,7 +21,6 @@ void RestNode::enter(Party &party, MetaProgress &meta,
 
     bool healUsed{false};
     bool purgeUsed{false};
-    bool equipUsed{false};
 
     while (true)
     {
@@ -44,8 +43,7 @@ void RestNode::enter(Party &party, MetaProgress &meta,
         if (!purgeUsed)
             options.push_back("Purge — reduce all Exposure by " +
                               std::to_string(CombatConstants::kPurgeExposureReduction));
-        if (!equipUsed)
-            options.push_back("Equip — equip items from party inventory");
+        options.push_back("Equip — equip items from party inventory");
         if (isDraft)
             options.push_back("Attune — re-equip slot skills");
         if (anyFractured)
@@ -60,8 +58,7 @@ void RestNode::enter(Party &party, MetaProgress &meta,
 
         if (chosen.rfind("Heal", 0) == 0)
         {
-            applyHeal(party);
-            renderer.renderMessage("The party rests and recovers HP.");
+            applyHeal(party, renderer);
             healUsed = true;
         }
         else if (chosen.rfind("Purge", 0) == 0)
@@ -72,7 +69,6 @@ void RestNode::enter(Party &party, MetaProgress &meta,
         else if (chosen.rfind("Equip", 0) == 0)
         {
             applyEquip(party, renderer, input);
-            equipUsed = true;
         }
         else if (isDraft && chosen.rfind("Attune", 0) == 0)
         {
@@ -90,7 +86,7 @@ void RestNode::enter(Party &party, MetaProgress &meta,
 
         // If all repeatable options are exhausted and there are no Fractured PCs,
         // auto-exit to avoid trapping the player in an empty menu.
-        const bool allUsed{healUsed && purgeUsed && equipUsed};
+        const bool allUsed{healUsed && purgeUsed};
         if (allUsed && !anyFractured && !isDraft)
             break;
     }
@@ -104,27 +100,50 @@ std::string RestNode::description() const
     return "[Rest] Recover HP or purge Exposure.";
 }
 
-void RestNode::applyHeal(Party &party) const
+void RestNode::applyHeal(Party &party, IRenderer &renderer) const
 {
+    renderer.renderMessage("Heal preview:");
+    for (std::size_t i{0}; i < party.size(); ++i)
+    {
+        Unit *u{party.getUnitAt(i)};
+        if (!u || !u->isAlive())
+            continue;
+        const int gain{u->getMaxHp() / 2 + 10};
+        const int projected{std::min(u->getMaxHp(), u->getHp() + gain)};
+        renderer.renderMessage("  " + u->getName() + ": " +
+                               std::to_string(u->getHp()) + " -> " +
+                               std::to_string(projected) + " HP");
+    }
     for (std::size_t i{0}; i < party.size(); ++i)
     {
         Unit *u{party.getUnitAt(i)};
         if (u && u->isAlive())
-        {
-            const int missing{u->getMaxHp() - u->getHp()};
-            u->heal(missing / 2 + 10);
-        }
+            u->heal(u->getMaxHp() / 2 + 10);
     }
+    renderer.renderMessage("The party rests and recovers HP.");
 }
 
 void RestNode::applyPurge(Party &party, IRenderer &renderer) const
 {
+    renderer.renderMessage("Purge preview (Exposure -" +
+                           std::to_string(CombatConstants::kPurgeExposureReduction) +
+                           "):");
     for (std::size_t i{0}; i < party.size(); ++i)
     {
         Unit *u{party.getUnitAt(i)};
-        if (!u)
+        auto *pc{u ? u->asPlayableCharacter() : nullptr};
+        if (!pc)
             continue;
-        auto *pc{u->asPlayableCharacter()};
+        const int projected{std::max(0, pc->getExposure() -
+                                            CombatConstants::kPurgeExposureReduction)};
+        renderer.renderMessage("  " + pc->getName() + ": " +
+                               std::to_string(pc->getExposure()) + " -> " +
+                               std::to_string(projected) + " Exposure");
+    }
+    for (std::size_t i{0}; i < party.size(); ++i)
+    {
+        Unit *u{party.getUnitAt(i)};
+        auto *pc{u ? u->asPlayableCharacter() : nullptr};
         if (pc)
             pc->modifyExposure(-CombatConstants::kPurgeExposureReduction);
     }

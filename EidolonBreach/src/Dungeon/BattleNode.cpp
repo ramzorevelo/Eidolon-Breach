@@ -73,6 +73,8 @@ void BattleNode::runBattle(Party &party, MetaProgress &meta,
     if (enemyParty.isAllDead())
     {
         awardBattleXp(party, meta, runCtx);
+        renderer.renderMessage("Battle complete. Press Enter to continue.");
+        input.getMenuChoice(1);
     }
 }
 

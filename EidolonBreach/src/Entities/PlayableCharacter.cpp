@@ -188,6 +188,11 @@ ActionResult PlayableCharacter::takeTurn(Party &allies,
         case TargetMode::Self:
         case TargetMode::AllEnemies:
         case TargetMode::AllAllies:
+            state.renderer.renderHintBar(
+                "[Enter] Confirm  [Esc] Cancel");
+            if (state.inputHandler.getTargetChoice(1) ==
+                IInputHandler::kCancelChoice)
+                continue;
             break;
         case TargetMode::SingleAlly:
         case TargetMode::SplashAlly:
