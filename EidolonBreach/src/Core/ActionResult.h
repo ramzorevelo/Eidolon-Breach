@@ -13,6 +13,7 @@
 #include <string>
 #include "Core/Affinity.h"
 #include <optional>
+#include <vector>
 
 class Unit;
 
@@ -85,4 +86,10 @@ struct ActionResult
     std::optional<AVEffect> suppress{}; // increase target's current AV 
 
     std::string targetName{}; // display name of primary target; empty if none/AoE
+    struct AoETarget
+    {
+        std::string name{};
+        int value{0};
+    };
+    std::vector<AoETarget> aoeTargets{};
 };

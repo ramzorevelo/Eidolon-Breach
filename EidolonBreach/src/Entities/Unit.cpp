@@ -173,3 +173,13 @@ void Unit::rebuildTagCache()
         for (const auto &tag : effect->getTags())
             m_activeTags |= tagToFlag(tag);
 }
+int Unit::getTotalShieldAmount() const
+{
+    int total = 0;
+    for (const auto &effect : m_effects)
+    {
+        if (effect->hasTag(EffectTags::kShield))
+            total += effect->getShieldAmount();
+    }
+    return total;
+}

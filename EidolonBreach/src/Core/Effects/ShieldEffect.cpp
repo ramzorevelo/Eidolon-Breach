@@ -23,3 +23,8 @@ bool ShieldEffect::isExhausted() const
 {
     return m_remainingAbsorb <= 0;
 }
+
+int ShieldEffect::getShieldAmount() const
+{
+    return m_remainingAbsorb;
+}

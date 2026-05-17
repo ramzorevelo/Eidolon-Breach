@@ -1,20 +1,21 @@
 #pragma once
 /**
  * @file SDL3Renderer.h
- * @brief SDL3 implementation of IRenderer.
+ * @brief Resolution-agnostic SDL3 renderer.
  *
- * Design: each render*() call caches the data it receives, then calls
- * redrawAll(). redrawAll() is the only place that calls beginFrame/endFrame —
- * it clears the backbuffer, redraws every panel from cached state, and
- * presents once. This guarantees all panels are always visible regardless
- * of which render method was called last.
+ * All drawing uses a fixed 1280×720 logical canvas. The SDL3
+ * logical presentation mode LETTERBOX maintains aspect ratio.
+ * Mouse input is converted via SDL_RenderCoordinatesFromWindow.
  */
 
-#include "UI/IRenderer.h"
 #include "UI/ILayoutQuery.h"
+#include "UI/IRenderer.h"
 #include <SDL3/SDL.h>
 #include <SDL3_ttf/SDL_ttf.h>
+#include <cmath>
 #include <string>
+#include <unordered_map>
+#include <utility>
 #include <vector>
 
 struct TurnSlot;
@@ -23,11 +24,10 @@ class PlayableCharacter;
 class ResonanceField;
 enum class Affinity;
 
-
 class SDL3Renderer : public IRenderer, public ILayoutQuery
 {
   public:
-    SDL3Renderer(const char *windowTitle, int width, int height);
+    SDL3Renderer(const char *windowTitle, int initialWidth, int initialHeight);
     ~SDL3Renderer() override;
 
     SDL3Renderer(const SDL3Renderer &) = delete;
@@ -35,7 +35,7 @@ class SDL3Renderer : public IRenderer, public ILayoutQuery
     SDL3Renderer(SDL3Renderer &&) = delete;
     SDL3Renderer &operator=(SDL3Renderer &&) = delete;
 
-    // IRenderer 
+    // IRenderer
     void renderActionResult(const std::string &actorName,
                             const ActionResult &result) override;
     void renderBreak(const std::string &enemyName) override;
@@ -60,6 +60,7 @@ class SDL3Renderer : public IRenderer, public ILayoutQuery
                              const std::vector<std::string> &options,
                              std::size_t selected = 0) override;
     void clearBattleCache();
+
     // ILayoutQuery
     [[nodiscard]] int getActionRowAt(int x, int y) const override;
     [[nodiscard]] int getUnitCardAt(int x, int y, bool isPlayerSide) const override;
@@ -77,16 +78,49 @@ class SDL3Renderer : public IRenderer, public ILayoutQuery
 
     void renderTooltip(const std::string &name, float hpFraction,
                        const std::string &effectSummary, int screenX, int screenY);
+    void onWindowResized(int newWidth, int newHeight);
+    void flushAnimations();
+    void flushVisualEffects() override;
+
   private:
-    // SDL handles 
+    // Card geometry constants shared between draw functions and getUnitCardAt.
+    // A single source of truth prevents the hit-test geometry drifting from
+    // the drawn geometry when one side is updated.
+    // Inner top padding applied inside every card so content never touches the card edge.
+    static constexpr float kCardTopPad = 5.f;
+    // Inner bottom padding between the last bar and the card's bottom edge.
+    static constexpr float kCardBotPad = 4.f;
+    // Gap between the name text and the HP bar beneath it.
+    static constexpr float kNameBarGap = 4.f;
+
+    static constexpr float kPCPortraitW = 44.f;
+    static constexpr float kPCPortraitH = 44.f;
+    static constexpr float kPCPortraitPad = 4.f;
+    static constexpr float kPCNameH = 16.f;
+    static constexpr float kPCBarH = 8.f;
+    static constexpr float kPCThinH = 6.f;
+    static constexpr float kPCGapH = 4.f;
+    static constexpr float kPCBottomGap = 8.f; // gap between cards (not inside)
+
+    static constexpr float kEPortraitW = 36.f;
+    static constexpr float kEPortraitH = 36.f;
+    static constexpr float kEPortraitPadR = 4.f;
+    static constexpr float kENameH = 18.f;
+    static constexpr float kEBarH = 8.f;
+    static constexpr float kEThinH = 6.f;
+    static constexpr float kEGapH = 3.f;
+    static constexpr float kEIntentH = 14.f;
+    static constexpr float kEBottomGap = 8.f; // gap between cards (not inside)
+
     SDL_Window *m_window{nullptr};
     SDL_Renderer *m_renderer{nullptr};
-    TTF_Font *m_font{nullptr};
+    TTF_Font *m_font{nullptr};       // 16 pt — UI labels and log
+    TTF_Font *m_fontLarge{nullptr};  // 22 pt — portrait initials and overlays
+    TTF_Font *m_fontDamage{nullptr}; // 20 pt — floating damage numbers
 
-    int m_windowWidth{};
-    int m_windowHeight{};
+    int m_windowWidth{1280};
+    int m_windowHeight{720};
 
-    // Panel layout rects 
     SDL_FRect m_turnOrderPanel{};
     SDL_FRect m_playerPanel{};
     SDL_FRect m_centerPanel{};
@@ -95,9 +129,6 @@ class SDL3Renderer : public IRenderer, public ILayoutQuery
     SDL_FRect m_logPanel{};
     SDL_FRect m_hintBar{};
 
-    // Cached render state 
-    // Pointers are non-owning observers. They are valid for the duration of
-    // a Battle::run() call since Party/ResonanceField outlive all render calls.
     const Party *m_cachedPlayerParty{nullptr};
     const Party *m_cachedEnemyParty{nullptr};
     const PlayableCharacter *m_cachedActiveCharacter{nullptr};
@@ -106,27 +137,94 @@ class SDL3Renderer : public IRenderer, public ILayoutQuery
     std::vector<TurnSlot> m_cachedTurnOrder{};
     std::string m_cachedHint{};
 
-    // Action log 
+    struct LogEntry
+    {
+        std::string text;
+        SDL_Color color{220, 220, 220, 255};
+    };
     static constexpr int kMaxLogLines{64};
-    std::vector<std::string> m_log{};
+    std::vector<LogEntry> m_log{};
     int m_logScrollOffset{0};
     bool m_logExpanded{false};
     Uint64 m_lastLogTime{0};
 
-    // RF trigger overlay state.
     Affinity m_rfTriggerAffinity{};
     Uint64 m_rfTriggerExpiry{0};
     int m_cachedRfGauge{0};
 
-    // Core render loop 
+    struct VisualBarState
+    {
+        float displayed{1.f};
+        float target{1.f};
+    };
+    std::unordered_map<const Unit *, VisualBarState> m_hpBars;
+    std::unordered_map<const Unit *, VisualBarState> m_toughnessBars;
+    float m_rfGaugeDisplayed{0.f};
+    float m_rfGaugeTarget{0.f};
+    float m_rfGaugePulse{1.0f}; // temporary overshoot on trigger
+
+    const Unit *m_breakFlashUnit{nullptr};
+    Uint64 m_breakFlashExpiry{0};
+
+    struct DamageNumber
+    {
+        std::string text{};
+        float spawnX{0.f}; // precomputed logical-space position
+        float spawnY{0.f};
+        Uint64 birthTime{0};
+        float durationMs{1200.f};
+        SDL_Color color{255, 100, 100, 255};
+    };
+    std::vector<DamageNumber> m_damageNumbers;
+
+    // Damage texture cache — key encodes text + color to prevent cross-color reuse.
+    std::unordered_map<std::string, SDL_Texture *> m_damageTextCache;
+
+    // Text rendering cache — key is "text\0r,g,b". Cleared on clearBattleCache and destructor.
+    std::unordered_map<std::string, SDL_Texture *> m_textCache;
+
+    float m_stripSlideOffset{0.f};
+
+    struct FractureLine
+    {
+        float startX{0.f}, startY{0.f};
+        float angle{0.f};
+        float length{30.f};
+        Uint64 birthTime{0};
+        Uint64 durationMs{600};
+        SDL_Color color{255, 255, 255, 255};
+    };
+    std::vector<FractureLine> m_fractureLines;
+
+    // Initialized to 0; assigned SDL_GetTicks() in the constructor body after SDL_Init.
+    Uint64 m_lastFrameTicks{0};
+
+    struct ShakeState
+    {
+        float intensity{0.f}; // peak x-axis offset amplitude in logical pixels
+        Uint64 startMs{0};
+        Uint64 durationMs{350};
+    };
+    std::unordered_map<const Unit *, ShakeState> m_shakes;
+
     /**
-     * @brief Clear the backbuffer, draw every panel from cached state, present.
-     *        This is the only function that calls SDL_RenderClear / SDL_RenderPresent.
+     * @brief Units that have already acted in the current (incomplete) cycle,
+     *        in the order they acted. Pre-populated into the divider detection's
+     *        "seen" set so cycle boundaries reflect battle history, not just the
+     *        first repeat visible in the projected strip.
+     *
+     * Cleared when a full cycle completes (detected when the first unit of the
+     * new projected strip is already in this set, meaning the fastest unit is
+     * about to act again). Pointer validity: units are never destroyed during
+     * battle, so these raw pointers are safe until clearBattleCache().
      */
+    std::vector<const Unit *> m_actedThisCycle{};
+
     void redrawAll();
 
-    // Per-panel draw helpers (called only from redrawAll) 
+    // Panel draws — read only from cached state; called only from redrawAll.
     void drawTurnOrderStrip();
+    void drawBattleArea();
     void drawPlayerPanel();
     void drawEnemyPanel();
     void drawCenterPanel();
@@ -137,24 +235,88 @@ class SDL3Renderer : public IRenderer, public ILayoutQuery
     void drawPlayerCardBars(const PlayableCharacter *pc, float barX, float barW,
                             float &py, bool isActive);
     void drawEnemyCard(const Unit *u, float &ey, bool highlighted);
-    // Layout 
-    void computePanelLayout(int w, int h);
+    void drawFractureLines();
+    void drawDamageNumbers();
 
-    // Low-level drawing primitives
-    void fillRect(const SDL_FRect &rect,
-                  Uint8 r, Uint8 g, Uint8 b, Uint8 a = 255);
+    /**
+     * @brief Screen-edge danger vignette, shown only when a PC is below 30 % HP.
+     * @param severity  0 = invisible, 1 = full danger (0 % HP).
+     *
+     * Uses asymmetric horizontal/vertical insets on stacked rects to approximate
+     * an elliptical falloff. Drawn after all UI panels so it overlays them slightly,
+     * which is intentional for a screen-wide danger indicator.
+     */
+    void drawLowHpVignette(float severity);
+
+    void computePanelLayout();
+
+    // Primitives
+    void fillRect(const SDL_FRect &rect, Uint8 r, Uint8 g, Uint8 b, Uint8 a = 255);
+    void renderBorder(const SDL_FRect &rect, Uint8 r, Uint8 g, Uint8 b, Uint8 a = 255);
+
+    /**
+     * @brief Fill a rect with 45° chamfered corners.
+     * @param cut  Corner cut size in logical pixels.
+     *
+     * Implemented as two overlapping axis-aligned rects — no SDL_RenderGeometry required.
+     */
+    void renderChamferedFillRect(const SDL_FRect &rect, float cut,
+                                 Uint8 r, Uint8 g, Uint8 b, Uint8 a = 255);
+
+    /**
+     * @brief Draw a 1 px chamfered (octagonal) border using SDL_RenderLines.
+     *        Matches the corners of renderChamferedFillRect exactly.
+     */
+    void renderChamferedBorder(const SDL_FRect &rect, float cut,
+                               Uint8 r, Uint8 g, Uint8 b, Uint8 a = 255);
 
     void renderBar(const SDL_FRect &rect, float fraction,
                    Uint8 fr, Uint8 fg, Uint8 fb,
                    Uint8 br, Uint8 bg, Uint8 bb);
-
     void renderText(const std::string &text, float x, float y,
                     Uint8 r, Uint8 g, Uint8 b);
-
-    int m_highlightedTargetIndex{-1}; // -1 = no active targeting
-    bool m_highlightingEnemies{true}; // true = enemy panel, false = player panel
-    static SDL_Color affinityColor(Affinity a);
-    TTF_Font *m_fontLarge{nullptr};   // used for full-screen selection menus
     void renderTextEx(TTF_Font *font, const std::string &text,
                       float x, float y, Uint8 r, Uint8 g, Uint8 b);
+
+    void advanceAnimations();
+    void runAnimationFrames(int durationMs);
+    [[nodiscard]] bool animationPending() const;
+    [[nodiscard]] bool hasActiveVisualEffects() const;
+
+    void fillRects(const std::vector<SDL_FRect> &rects,
+                   Uint8 r, Uint8 g, Uint8 b, Uint8 a = 255);
+
+    SDL_Texture *getOrCreateDamageTexture(const std::string &text, const SDL_Color &color);
+    void clearDamageTextures();
+    void clearTextCache();
+
+    /**
+     * @return Logical-space {centerX, topY} of the card for the named unit.
+     *         Returns {fallbackX, fallbackY} if the unit is not found.
+     */
+    [[nodiscard]] std::pair<float, float>
+    findCardCenter(const std::string &unitName, bool searchEnemySide,
+                   float fallbackX, float fallbackY) const;
+
+    /**
+     * @brief Total height a player-side card occupies in the panel, in logical pixels.
+     *        Must stay in sync with the geometry walked in drawPlayerCard.
+     */
+    [[nodiscard]] float playerCardHeight(const Unit *u, bool isActive) const;
+
+    /**
+     * @brief Total height an enemy-side card occupies in the panel, in logical pixels.
+     *        Must stay in sync with the geometry walked in drawEnemyCard.
+     */
+    [[nodiscard]] float enemyCardHeight(const Unit *u) const;
+
+    void addLogMessage(const std::string &msg, SDL_Color color = {220, 220, 220, 255});
+
+    /** @return Horizontal shake offset for the unit's card this frame, or 0 if not shaking. */
+    [[nodiscard]] float computeShakeOffset(const Unit *u) const;
+
+    int m_highlightedTargetIndex{-1};
+    bool m_highlightingEnemies{true};
+
+    static SDL_Color affinityColor(Affinity a);
 };

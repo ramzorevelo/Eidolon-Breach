@@ -89,6 +89,9 @@ public:
     /** @return true if any active effect carries the given tag. */
     [[nodiscard]] bool hasEffectWithTag(std::string_view tag) const;
 
+    /** @return Total remaining shield absorb amount from all active shield effects. */
+    [[nodiscard]] int getTotalShieldAmount() const;
+
     /**
      * @brief Tick all active effects, decrement durations, remove expired ones.
      *

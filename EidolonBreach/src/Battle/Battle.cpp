@@ -210,8 +210,21 @@ void Battle::processPlayerTurn(Unit *unit, BattleState &state)
             v->onAction(*pc, result, state);
     }
 
-    m_renderer.renderActionResult(unit->getName(), result);
-
+        if (!result.aoeTargets.empty())
+    {
+        for (const auto &aoe : result.aoeTargets)
+        {
+            ActionResult perTarget{ActionResult::Type::Damage, aoe.value};
+            perTarget.targetName = aoe.name;
+            perTarget.actionAffinity = result.actionAffinity;
+            m_renderer.renderActionResult(unit->getName(), perTarget);
+        }
+    }
+    else
+    {
+        m_renderer.renderActionResult(unit->getName(), result);
+    }
+    state.renderer.flushVisualEffects();
     processNewBreaks(enemyBreaksBefore, m_enemyParty, result.actionAffinity, state);
     checkNewDeaths(enemyAliveBefore, m_enemyParty, unit, state);
 
@@ -241,7 +254,7 @@ void Battle::processEnemyTurn(Unit *unit, BattleState &state)
         m_renderer.renderStunned(unit->getName());
     else
         m_renderer.renderActionResult(unit->getName(), result);
-
+    state.renderer.flushVisualEffects();
     checkNewDeaths(playerAliveBefore, m_playerParty, unit, state);
 }
 

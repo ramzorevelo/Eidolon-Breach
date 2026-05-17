@@ -106,5 +106,8 @@ class IRenderer
 
     virtual void clearBattleCache() {}
 
+    /** @brief Let the renderer play any queued visual effects (damage numbers, break flash, etc.). */
+    virtual void flushVisualEffects() {}
+
 };
 

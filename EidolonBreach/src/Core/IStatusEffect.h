@@ -77,6 +77,15 @@ class IStatusEffect
      */
     virtual int absorbDamage(int incoming) = 0;
 
+    /**
+     * @brief Return the current remaining shield capacity.
+     *        Default 0; ShieldEffect overrides.
+     */
+    [[nodiscard]] virtual int getShieldAmount() const
+    {
+        return 0;
+    }
+
     /** @return true when a shield's absorb pool is fully depleted. */
     virtual bool isExhausted() const = 0;
 

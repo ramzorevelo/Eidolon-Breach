@@ -35,7 +35,8 @@ inline void registerIgnis(SummonRegistry &registry)
             target->takeTrueDamage(damage);
 
             ActionResult result{ActionResult::Type::Damage, damage};
-            result.flavorText = ">> Ignis scorches the enemy! <<";
+            result.targetName = target->getName(); 
+            result.flavorText = ">> Ignis scorches " + result.targetName + " ! <<";
             result.actionAffinity = Affinity::Blaze;
             return result;
         }});

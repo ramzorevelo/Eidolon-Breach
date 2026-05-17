@@ -52,7 +52,8 @@ ActionResult ZaraFrostbindAction::execute(PlayableCharacter &user,
             t->applyToughnessHit(kToughnessDamage, Affinity::Frost);
             result.toughnessDamage = kToughnessDamage;
             result.targetEnemyIndex = static_cast<int>(target->index);
-            result.flavorText = user.getName() + " binds the enemy in frost!";
+            result.targetName = t->getName();
+            result.flavorText = user.getName() + " binds " + result.targetName + " in frost !";
         }
     }
     return result;

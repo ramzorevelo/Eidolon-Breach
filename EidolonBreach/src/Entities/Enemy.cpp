@@ -132,6 +132,7 @@ ActionResult Enemy::takeTurn(Party & /*allies*/, Party &targets, BattleState & /
     Unit *target = targets.getUnitAt(decision.targetIndex);
 
     ActionResult result = performAttack();
+    result.targetName = target ? target->getName() : "";
 
     if (target && target->isAlive())
     {

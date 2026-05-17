@@ -42,6 +42,10 @@ ActionResult ZaraUltimateAction::execute(PlayableCharacter &user,
     user.resetEnergy();
     user.gainEnergy(kEnergyRefund);
 
+    // Declare result early so we can fill its aoeTargets vector during the loop.
+    ActionResult result{ActionResult::Type::Damage, 0};
+    result.actionAffinity = Affinity::Frost;
+
     int totalDamage{0};
     for (Unit *u : enemies.getAliveUnits())
     {
@@ -51,11 +55,12 @@ ActionResult ZaraUltimateAction::execute(PlayableCharacter &user,
         u->takeDamage(dmg);
         u->applyEffect(std::make_unique<SlowEffect>(kSlowRatio, kSlowDuration));
         u->applyToughnessHit(kToughnessDamage, Affinity::Frost);
+
         totalDamage += dmg;
+        result.aoeTargets.push_back({u->getName(), dmg});
     }
 
-    ActionResult result{ActionResult::Type::Damage, totalDamage};
-    result.actionAffinity = Affinity::Frost;
+    result.value = totalDamage;
     result.flavorText = user.getName() + " shatters the field with Arctic Shatter!";
     return result;
 }

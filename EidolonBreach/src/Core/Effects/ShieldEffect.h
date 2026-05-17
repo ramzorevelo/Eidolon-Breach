@@ -35,6 +35,8 @@ class ShieldEffect : public StatusEffectBase
      */
     int absorbDamage(int incoming) override;
 
+    [[nodiscard]] int getShieldAmount() const override;
+
     /** @return true when the absorb pool is fully depleted. */
     bool isExhausted() const override;
 
