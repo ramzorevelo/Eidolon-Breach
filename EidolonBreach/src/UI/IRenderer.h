@@ -18,6 +18,25 @@ class Party;
 class Unit;
 class ResonanceField;
 
+/**
+ * @brief Data required to render one dungeon row and its detail panel.
+ *        Populated by main.cpp from DungeonDefinition; the renderer does not
+ *        depend on DungeonDefinition directly.
+ */
+struct DungeonSelectInfo
+{
+    std::string name{};
+    std::string description{};
+    int recommendedLevel{1};
+    int enemyLevel{1};
+    /**
+     * @brief Ordered node types for the floor layout strip.
+     *        Valid strings: "battle", "elite", "boss", "rest", "treasure", "shop".
+     */
+    std::vector<std::string> layout{};
+    bool cleared{false};
+    std::string difficultyLabel{}; // "Normal", "Hard", or "Nightmare"
+};
 class IRenderer
 {
   public:
@@ -108,6 +127,27 @@ class IRenderer
 
     /** @brief Let the renderer play any queued visual effects (damage numbers, break flash, etc.). */
     virtual void flushVisualEffects() {}
+
+    /**
+     * @brief Render the dungeon selection screen with a split list/detail layout.
+     *        Caches the dungeon infos so that subsequent renderSelectionMenu calls
+     *        from SDL3InputHandler (Up/Down navigation) re-draw the split layout.
+     *        Default delegates to renderSelectionMenu for NullRenderer compatibility.
+     * @param title    Screen title (e.g. "DUNGEON SELECT  Player Lv.5").
+     * @param dungeons Ordered list of available dungeon descriptors.
+     * @param selected Currently highlighted 0-based index.
+     */
+    virtual void renderDungeonSelect(const std::string &title,
+                                     const std::vector<DungeonSelectInfo> &dungeons,
+                                     std::size_t selected = 0)
+    {
+        std::vector<std::string> opts;
+        opts.reserve(dungeons.size());
+        for (const auto &d : dungeons)
+            opts.push_back(d.name + (d.cleared ? "  [CLEARED]" : ""));
+        opts.push_back("<< Back");
+        renderSelectionMenu(title, opts, selected);
+    }
 
 };
 

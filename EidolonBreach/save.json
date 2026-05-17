@@ -4,12 +4,12 @@
             "bondTrialComplete": false,
             "chosenAspects": [],
             "echoCount": 5,
-            "insightBalance": 118,
+            "insightBalance": 119,
             "signalTallies": {
                 "Aggressive": 65,
-                "Reactive": 132,
+                "Reactive": 134,
                 "Sacrificial": 45,
-                "Supportive": 147
+                "Supportive": 150
             }
         },
         "vex": {
@@ -21,19 +21,19 @@
                 "Aggressive": 48,
                 "Reactive": 97,
                 "Sacrificial": 32,
-                "Supportive": 90
+                "Supportive": 91
             }
         },
         "zara": {
             "bondTrialComplete": false,
             "chosenAspects": [],
             "echoCount": 5,
-            "insightBalance": 102,
+            "insightBalance": 103,
             "signalTallies": {
                 "Aggressive": 39,
-                "Reactive": 125,
+                "Reactive": 126,
                 "Sacrificial": 31,
-                "Supportive": 135
+                "Supportive": 137
             }
         }
     },
@@ -68,7 +68,7 @@
         ]
     },
     "playerLevel": 8,
-    "playerXp": 3072,
+    "playerXp": 3081,
     "unlockedCharacterIds": [
         "lyra",
         "vex",

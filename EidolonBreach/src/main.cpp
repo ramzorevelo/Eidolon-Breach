@@ -304,8 +304,33 @@ static void runGame(SDL3Renderer &renderer, SDL3InputHandler &input,
 
                 const std::string dungeonTitle =
                     "DUNGEON SELECT  Player Lv." + std::to_string(meta.playerLevel);
+                // Build the richer info list for the split layout.
+                std::vector<DungeonSelectInfo> dungeonInfos{};
+                for (const auto *def : available)
+                {
+                    DungeonSelectInfo info{};
+                    info.name = def->name;
+                    info.description = def->description;
+                    info.recommendedLevel = def->recommendedPlayerLevel;
+                    info.enemyLevel = def->enemyLevel;
+                    info.layout = def->fixedLayout.empty()
+                                      ? std::vector<std::string>(
+                                            static_cast<std::size_t>(def->numFloors),
+                                            "battle")
+                                      : def->fixedLayout;
+                    info.cleared = meta.clearedDungeonIds.count(def->id) > 0;
+                    info.difficultyLabel = (def->difficulty == DungeonDifficulty::Hard)
+                                               ? "Hard"
+                                               : (def->difficulty == DungeonDifficulty::Nightmare
+                                                      ? "Nightmare"
+                                                      : "Normal");
+                    dungeonInfos.push_back(std::move(info));
+                }
+
+                // Use the option strings for SDL3InputHandler's navigation,
+                // and the richer infos for the split layout.
                 input.setMenuContext(dungeonTitle, dungeonOptions);
-                renderer.renderSelectionMenu(dungeonTitle, dungeonOptions);
+                renderer.renderDungeonSelect(dungeonTitle, dungeonInfos);
                 const std::size_t dungeonPick = input.getMenuChoice(dungeonOptions.size());
 
                 if (dungeonPick == IInputHandler::kCancelChoice ||

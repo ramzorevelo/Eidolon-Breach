@@ -60,6 +60,9 @@ class SDL3Renderer : public IRenderer, public ILayoutQuery
                              const std::vector<std::string> &options,
                              std::size_t selected = 0) override;
     void clearBattleCache();
+    void renderDungeonSelect(const std::string &title,
+                             const std::vector<DungeonSelectInfo> &dungeons,
+                             std::size_t selected = 0) override;
 
     // ILayoutQuery
     [[nodiscard]] int getActionRowAt(int x, int y) const override;
@@ -219,7 +222,10 @@ class SDL3Renderer : public IRenderer, public ILayoutQuery
      * battle, so these raw pointers are safe until clearBattleCache().
      */
     std::vector<const Unit *> m_actedThisCycle{};
-
+    // Dungeon select state — cached so SDL3InputHandler's renderSelectionMenu
+    // calls on Up/Down navigation re-draw the split layout automatically.
+    std::vector<DungeonSelectInfo> m_dungeonSelectInfos{};
+    std::string m_dungeonSelectTitle{};
     void redrawAll();
 
     // Panel draws — read only from cached state; called only from redrawAll.
@@ -231,6 +237,31 @@ class SDL3Renderer : public IRenderer, public ILayoutQuery
     void drawActionMenuPanel();
     void drawLogPanel();
     void drawHintBarPanel();
+
+    /**
+     * @brief Draw the dungeon selection split layout (list left, detail right).
+     *        Called from renderDungeonSelect and from renderSelectionMenu when
+     *        dungeon context is active.
+     */
+    void drawDungeonSelectScreen(const std::string &title,
+                                 const std::vector<DungeonSelectInfo> &dungeons,
+                                 std::size_t selected);
+
+    /**
+     * @brief Draw the right-hand detail panel for one dungeon.
+     *        Called from drawDungeonSelectScreen.
+     */
+    void drawDungeonDetailPanel(const SDL_FRect &panel,
+                                const DungeonSelectInfo &info);
+
+    /**
+     * @brief Draw the floor layout node strip inside the detail panel.
+     * @param startX    Left edge of the first node card.
+     * @param y         Top edge of the strip.
+     * @param maxWidth  Maximum horizontal space available for the strip.
+     */
+    void drawFloorLayoutStrip(float startX, float y, float maxWidth,
+                              const std::vector<std::string> &layout);
     void drawPlayerCard(const Unit *u, float &py, bool isActive, bool highlighted);
     void drawPlayerCardBars(const PlayableCharacter *pc, float barX, float barW,
                             float &py, bool isActive);

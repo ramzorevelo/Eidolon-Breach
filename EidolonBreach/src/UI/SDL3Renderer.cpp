@@ -1658,35 +1658,677 @@ void SDL3Renderer::renderSelectionMenu(const std::string &title,
                                        const std::vector<std::string> &options,
                                        std::size_t selected)
 {
+    // Shared geometry constants.
+    constexpr float kPanelW = 1090.f; // ~85 % of the 1280 logical width
+    constexpr float kTitleH = 58.f;
+    constexpr float kRowH = 38.f;
+    constexpr float kRowGap = 5.f;
+    constexpr float kRowStep = kRowH + kRowGap;
+    constexpr float kListTopPad = 12.f;
+    constexpr float kListBotPad = 16.f;
+    constexpr std::size_t kMaxVisibleRows = 11;
+    constexpr float kHintH = 26.f;
+    constexpr float kPanelChamfer = 6.f;
+
+    // When dungeon select is active, re-draw the split layout instead.
+    if (!m_dungeonSelectInfos.empty() && title == m_dungeonSelectTitle)
+    {
+        drawDungeonSelectScreen(title, m_dungeonSelectInfos, selected);
+        SDL_RenderPresent(m_renderer);
+        return;
+    }
+    // Entering a different menu — clear the dungeon context.
+    m_dungeonSelectInfos.clear();
+    m_dungeonSelectTitle.clear();
+
+    // Background — same base as the battle screen.
     SDL_SetRenderDrawColor(m_renderer, 11, 11, 18, 255);
     SDL_RenderClear(m_renderer);
-    if (!m_fontLarge)
+
+    // Faint horizontal grid lines (matches drawBattleArea visual language).
+    SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawColor(m_renderer, 255, 255, 255, 5);
+    for (float gy = 20.f; gy < 720.f; gy += 20.f)
+        SDL_RenderLine(m_renderer, 0.f, gy, 1280.f, gy);
+    SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_NONE);
+
+    // Hint bar — identical to the battle screen hint bar.
+    fillRect({0.f, 720.f - kHintH, 1280.f, kHintH}, 12, 12, 18);
+    fillRect({0.f, 720.f - kHintH, 1280.f, 1.f}, 35, 35, 55);
+    if (m_font)
+        renderText("[Up/Down] Navigate   [Enter] Confirm   [1-9] Direct select   [Esc] Back",
+                   60.f, 720.f - kHintH + 5.f, 100, 100, 120);
+
+    if (!m_fontLarge || options.empty())
     {
         SDL_RenderPresent(m_renderer);
         return;
     }
 
-    constexpr float cx = 1280.f * 0.28f;
-    constexpr float ty = 720.f * 0.18f;
-    renderTextEx(m_fontLarge, "=== " + title + " ===", cx, ty, 220, 200, 100);
+    // Compute the visible window — keeps selected row always in view.
+    const std::size_t totalOpts  = options.size();
+    const std::size_t visRows    = std::min(totalOpts, kMaxVisibleRows);
+    const std::size_t windowStart =
+        (selected >= visRows)
+            ? std::min(selected - visRows + 1, totalOpts - visRows)
+            : 0;
 
-    constexpr float lineH = 30.f;
-    float oy = ty + 36.f;
-    for (std::size_t i = 0; i < options.size(); ++i)
+    // Panel height derived from visible row count.
+    const float listH   = kListTopPad + static_cast<float>(visRows) * kRowStep + kListBotPad;
+    const float panelH  = kTitleH + listH;
+    const float panelX  = (1280.f - kPanelW) * 0.5f;
+    const float panelY  = std::max(16.f, (720.f - kHintH - panelH) * 0.5f);
+    const SDL_FRect panelRect{panelX, panelY, kPanelW, panelH};
+
+    // Drop shadow — same two-triangle quad as card shadows in the battle screen.
     {
-        const bool sel = (i == selected);
-        if (sel)
-            fillRect({cx - 4.f, oy - 2.f, 640.f, lineH}, 40, 40, 60, 255);
-        const Uint8 br = sel ? 255 : 160;
-        renderTextEx(m_fontLarge,
-                     (sel ? "> " : "  ") + std::to_string(i + 1) + ". " + options[i],
-                     cx, oy, br, br, sel ? 100 : br);
-        oy += lineH;
+        constexpr float ox = 6.f, oy = 6.f;
+        const SDL_FColor shadowFar {0.f, 0.f, 0.f, 0.22f};
+        const SDL_FColor shadowNear{0.f, 0.f, 0.f, 0.42f};
+        const SDL_FPoint z{0.f, 0.f};
+        const SDL_Vertex sv[6] = {
+            {{panelX + ox,          panelY + oy},          shadowFar,  z},
+            {{panelX + kPanelW + ox, panelY + oy},         shadowFar,  z},
+            {{panelX + kPanelW + ox, panelY + panelH + oy},shadowNear, z},
+            {{panelX + ox,          panelY + panelH + oy}, shadowNear, z},
+            {{panelX + ox,          panelY + oy},          shadowFar,  z},
+            {{panelX + kPanelW + ox, panelY + panelH + oy},shadowNear, z},
+        };
+        SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_BLEND);
+        SDL_RenderGeometry(m_renderer, nullptr, sv, 6, nullptr, 0);
+        SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_NONE);
     }
-    renderTextEx(m_fontLarge,
-                 "[Up/Down] Navigate   [Enter] Confirm   [1-9] Direct select",
-                 cx, 720.f * 0.88f, 100, 100, 120);
+
+    // Panel backing.
+    renderChamferedFillRect(panelRect, kPanelChamfer, 18, 18, 28);
+    // Sandwich border (outer dark → colored → inner dark).
+    renderChamferedBorder({panelX - 1.f, panelY - 1.f, kPanelW + 2.f, panelH + 2.f},
+                          kPanelChamfer + 1.f, 8, 8, 14, 210);
+    renderChamferedBorder(panelRect, kPanelChamfer, 55, 70, 110, 210);
+    renderChamferedBorder({panelX + 1.f, panelY + 1.f, kPanelW - 2.f, panelH - 2.f},
+                          kPanelChamfer - 1.f, 8, 8, 14, 160);
+
+    // Title sub-region.
+    const SDL_FRect titleRect{panelX, panelY, kPanelW, kTitleH};
+    renderChamferedFillRect(titleRect, kPanelChamfer, 24, 26, 42);
+    // 1 px separator below title.
+    fillRect({panelX + 8.f, panelY + kTitleH - 1.f, kPanelW - 16.f, 1.f}, 55, 70, 110, 200);
+    // Top highlight.
+    fillRect({panelX + kPanelChamfer, panelY, kPanelW - kPanelChamfer * 2.f, 1.f}, 70, 90, 140, 180);
+    // Title text — left-padded.
+    renderTextEx(m_fontLarge, title,
+                 panelX + 22.f, panelY + (kTitleH - 22.f) * 0.5f,
+                 190, 210, 255);
+
+    // Option rows.
+    float ry = panelY + kTitleH + kListTopPad;
+    for (std::size_t vi = 0; vi < visRows; ++vi)
+    {
+        const std::size_t i = windowStart + vi;
+        const bool sel      = (i == selected);
+        const SDL_FRect rowRect{panelX + 10.f, ry, kPanelW - 20.f, kRowH};
+
+        if (sel)
+        {
+            renderChamferedFillRect(rowRect, 3.f, 35, 42, 62);
+            // Glow border passes (same pattern as active turn badge).
+            SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_BLEND);
+            renderChamferedBorder({rowRect.x - 2.f, rowRect.y - 2.f,
+                                   rowRect.w + 4.f, rowRect.h + 4.f}, 5.f, 90, 130, 200, 28);
+            renderChamferedBorder({rowRect.x - 1.f, rowRect.y - 1.f,
+                                   rowRect.w + 2.f, rowRect.h + 2.f}, 4.f, 90, 130, 200, 70);
+            SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_NONE);
+            renderChamferedBorder(rowRect, 3.f, 90, 130, 200, 200);
+        }
+        else
+        {
+            renderChamferedFillRect(rowRect, 3.f, 22, 22, 34);
+            renderChamferedBorder(rowRect, 3.f, 40, 40, 58, 120);
+        }
+
+        // Right-pointing selector arrow on selected row.
+        if (sel)
+        {
+            const float arrowCx = rowRect.x + 10.f;
+            const float arrowCy = ry + kRowH * 0.5f;
+            const SDL_FPoint z{0.f, 0.f};
+            SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_BLEND);
+            const SDL_FColor glow {1.f, 1.f, 1.f, 0.22f};
+            const SDL_Vertex gv[3] = {
+                {{arrowCx + 9.f, arrowCy},        glow, z},
+                {{arrowCx - 1.f, arrowCy - 6.f},  glow, z},
+                {{arrowCx - 1.f, arrowCy + 6.f},  glow, z},
+            };
+            SDL_RenderGeometry(m_renderer, nullptr, gv, 3, nullptr, 0);
+            const SDL_FColor white{1.f, 1.f, 1.f, 0.90f};
+            const SDL_Vertex av[3] = {
+                {{arrowCx + 7.f, arrowCy},        white, z},
+                {{arrowCx,       arrowCy - 5.f},  white, z},
+                {{arrowCx,       arrowCy + 5.f},  white, z},
+            };
+            SDL_RenderGeometry(m_renderer, nullptr, av, 3, nullptr, 0);
+            SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_NONE);
+        }
+
+        // Number label.
+        const float numX = rowRect.x + 22.f;
+        const float textY = ry + (kRowH - 16.f) * 0.5f; // centers 16pt text in kRowH
+        if (m_font)
+            renderText(std::to_string(i + 1) + ".",
+                       numX, textY,
+                       sel ? 140 : 70, sel ? 160 : 78, sel ? 200 : 95);
+
+        // Option text.
+        const float optX = numX + 26.f;
+        if (sel)
+            renderTextEx(m_fontLarge, truncate(options[i], 90),
+                         optX, ry + (kRowH - 22.f) * 0.5f,
+                         220, 230, 255);
+        else if (m_font)
+            renderText(truncate(options[i], 90),
+                       optX, textY, 160, 165, 185);
+
+        ry += kRowStep;
+    }
+
+    // Scroll indicator — up triangle when window is scrolled down.
+    if (windowStart > 0)
+    {
+        const float ix  = panelX + kPanelW * 0.5f;
+        const float iy  = panelY + kTitleH + 3.f;
+        const SDL_FPoint z{0.f, 0.f};
+        const SDL_FColor ind{0.7f, 0.8f, 1.f, 0.70f};
+        const SDL_Vertex tv[3] = {
+            {{ix,        iy},       ind, z},
+            {{ix - 7.f,  iy + 8.f}, ind, z},
+            {{ix + 7.f,  iy + 8.f}, ind, z},
+        };
+        SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_BLEND);
+        SDL_RenderGeometry(m_renderer, nullptr, tv, 3, nullptr, 0);
+        SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_NONE);
+    }
+
+    // Scroll indicator — down triangle when more rows exist below the window.
+    if (windowStart + visRows < totalOpts)
+    {
+        const float ix  = panelX + kPanelW * 0.5f;
+        const float iy  = panelY + panelH - 10.f;
+        const SDL_FPoint z{0.f, 0.f};
+        const SDL_FColor ind{0.7f, 0.8f, 1.f, 0.70f};
+        const SDL_Vertex tv[3] = {
+            {{ix,        iy},       ind, z},
+            {{ix - 7.f,  iy - 8.f}, ind, z},
+            {{ix + 7.f,  iy - 8.f}, ind, z},
+        };
+        SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_BLEND);
+        SDL_RenderGeometry(m_renderer, nullptr, tv, 3, nullptr, 0);
+        SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_NONE);
+    }
+
     SDL_RenderPresent(m_renderer);
+}
+
+void SDL3Renderer::renderDungeonSelect(const std::string &title,
+                                       const std::vector<DungeonSelectInfo> &dungeons,
+                                       std::size_t selected)
+{
+    m_dungeonSelectTitle = title;
+    m_dungeonSelectInfos = dungeons;
+    drawDungeonSelectScreen(title, dungeons, selected);
+    SDL_RenderPresent(m_renderer);
+}
+
+void SDL3Renderer::drawDungeonSelectScreen(const std::string &title,
+                                           const std::vector<DungeonSelectInfo> &dungeons,
+                                           std::size_t selected)
+{
+    constexpr float kHintH = 26.f;
+    constexpr float kMargin = 16.f;
+    constexpr float kGap = 12.f;
+    constexpr float kListW = 660.f;                                    // left panel width
+    constexpr float kDetailW = 1280.f - kListW - kGap - kMargin * 2.f; // ~560 px
+    constexpr float kPanelY = 20.f;
+    const float kPanelH = 720.f - kHintH - kPanelY * 2.f;
+    constexpr float kListX = kMargin;
+    const float kDetailX = kListX + kListW + kGap;
+    constexpr float kTitleH = 56.f;
+    constexpr float kRowH = 38.f;
+    constexpr float kRowGap = 5.f;
+    constexpr float kRowStep = kRowH + kRowGap;
+    constexpr float kListPad = 12.f;
+    constexpr float kChamfer = 6.f;
+    const std::size_t totalOpts = dungeons.size() + 1; // +1 for Back row
+    constexpr std::size_t kMaxVis = 11;
+    const std::size_t visRows = std::min(totalOpts, kMaxVis);
+
+    // Background.
+    SDL_SetRenderDrawColor(m_renderer, 11, 11, 18, 255);
+    SDL_RenderClear(m_renderer);
+    SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawColor(m_renderer, 255, 255, 255, 5);
+    for (float gy = 20.f; gy < 720.f; gy += 20.f)
+        SDL_RenderLine(m_renderer, 0.f, gy, 1280.f, gy);
+    SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_NONE);
+
+    // Hint bar.
+    fillRect({0.f, 720.f - kHintH, 1280.f, kHintH}, 12, 12, 18);
+    fillRect({0.f, 720.f - kHintH, 1280.f, 1.f}, 35, 35, 55);
+    if (m_font)
+        renderText("[Up/Down] Navigate   [Enter] Confirm   [Esc] Back",
+                   kListX + 4.f, 720.f - kHintH + 5.f, 100, 100, 120);
+
+    // Scroll window.
+    const std::size_t windowStart =
+        (selected >= visRows) ? std::min(selected - visRows + 1, totalOpts - visRows) : 0;
+
+    // Left list panel.
+    const SDL_FRect listPanel{kListX, kPanelY, kListW, kPanelH};
+    {
+        const SDL_FColor sf{0.f, 0.f, 0.f, 0.28f};
+        const SDL_FColor sn{0.f, 0.f, 0.f, 0.45f};
+        const SDL_FPoint z{0.f, 0.f};
+        const float ox = 5.f, oy = 5.f;
+        const SDL_Vertex sv[6] = {
+            {{kListX + ox, kPanelY + oy}, sf, z},
+            {{kListX + kListW + ox, kPanelY + oy}, sf, z},
+            {{kListX + kListW + ox, kPanelY + kPanelH + oy}, sn, z},
+            {{kListX + ox, kPanelY + kPanelH + oy}, sn, z},
+            {{kListX + ox, kPanelY + oy}, sf, z},
+            {{kListX + kListW + ox, kPanelY + kPanelH + oy}, sn, z},
+        };
+        SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_BLEND);
+        SDL_RenderGeometry(m_renderer, nullptr, sv, 6, nullptr, 0);
+        SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_NONE);
+    }
+    renderChamferedFillRect(listPanel, kChamfer, 18, 18, 28);
+    renderChamferedBorder({kListX - 1.f, kPanelY - 1.f, kListW + 2.f, kPanelH + 2.f}, kChamfer + 1.f, 8, 8, 14, 210);
+    renderChamferedBorder(listPanel, kChamfer, 55, 70, 110, 210);
+    renderChamferedBorder({kListX + 1.f, kPanelY + 1.f, kListW - 2.f, kPanelH - 2.f}, kChamfer - 1.f, 8, 8, 14, 160);
+
+    // List title area.
+    const SDL_FRect titleRect{kListX, kPanelY, kListW, kTitleH};
+    renderChamferedFillRect(titleRect, kChamfer, 24, 26, 42);
+    fillRect({kListX + 8.f, kPanelY + kTitleH - 1.f, kListW - 16.f, 1.f}, 55, 70, 110, 200);
+    fillRect({kListX + kChamfer, kPanelY, kListW - kChamfer * 2.f, 1.f}, 70, 90, 140, 180);
+    if (m_fontLarge)
+        renderTextEx(m_fontLarge, title,
+                     kListX + 22.f, kPanelY + (kTitleH - 22.f) * 0.5f,
+                     190, 210, 255);
+
+    // Dungeon rows.
+    float ry = kPanelY + kTitleH + kListPad;
+    for (std::size_t vi = 0; vi < visRows; ++vi)
+    {
+        const std::size_t i = windowStart + vi;
+        const bool sel = (i == selected);
+        const bool isBack = (i == dungeons.size());
+        const SDL_FRect rowRect{kListX + 10.f, ry, kListW - 20.f, kRowH};
+
+        if (sel)
+        {
+            renderChamferedFillRect(rowRect, 3.f, 35, 42, 62);
+            SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_BLEND);
+            renderChamferedBorder({rowRect.x - 2.f, rowRect.y - 2.f, rowRect.w + 4.f, rowRect.h + 4.f},
+                                  5.f, 90, 130, 200, 28);
+            renderChamferedBorder({rowRect.x - 1.f, rowRect.y - 1.f, rowRect.w + 2.f, rowRect.h + 2.f},
+                                  4.f, 90, 130, 200, 70);
+            SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_NONE);
+            renderChamferedBorder(rowRect, 3.f, 90, 130, 200, 200);
+        }
+        else
+        {
+            renderChamferedFillRect(rowRect, 3.f, 22, 22, 34);
+            renderChamferedBorder(rowRect, 3.f, 40, 40, 58, 120);
+        }
+
+        // Selection arrow.
+        if (sel)
+        {
+            const float ax = rowRect.x + 10.f;
+            const float ay = ry + kRowH * 0.5f;
+            const SDL_FPoint z{0.f, 0.f};
+            SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_BLEND);
+            const SDL_FColor glow{1.f, 1.f, 1.f, 0.22f};
+            const SDL_Vertex gv[3] = {
+                {{ax + 9.f, ay}, glow, z},
+                {{ax - 1.f, ay - 6.f}, glow, z},
+                {{ax - 1.f, ay + 6.f}, glow, z},
+            };
+            SDL_RenderGeometry(m_renderer, nullptr, gv, 3, nullptr, 0);
+            const SDL_FColor white{1.f, 1.f, 1.f, 0.90f};
+            const SDL_Vertex av[3] = {
+                {{ax + 7.f, ay}, white, z},
+                {{ax, ay - 5.f}, white, z},
+                {{ax, ay + 5.f}, white, z},
+            };
+            SDL_RenderGeometry(m_renderer, nullptr, av, 3, nullptr, 0);
+            SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_NONE);
+        }
+
+        const float textY = ry + (kRowH - 16.f) * 0.5f;
+        const float numX = rowRect.x + 22.f;
+        const float optX = numX + 26.f;
+
+        if (isBack)
+        {
+            if (m_font)
+                renderText(std::to_string(i + 1) + ".", numX, textY,
+                           sel ? 140 : 60, sel ? 160 : 68, sel ? 200 : 85);
+            if (sel && m_fontLarge)
+                renderTextEx(m_fontLarge, "<< Back", optX,
+                             ry + (kRowH - 22.f) * 0.5f, 180, 180, 200);
+            else if (m_font)
+                renderText("<< Back", optX, textY, 120, 120, 140);
+        }
+        else
+        {
+            const auto &d = dungeons[i];
+            if (m_font)
+                renderText(std::to_string(i + 1) + ".", numX, textY,
+                           sel ? 140 : 70, sel ? 160 : 78, sel ? 200 : 95);
+
+            const std::string label = d.name + (d.cleared ? "  [CLEARED]" : "");
+            if (sel && m_fontLarge)
+                renderTextEx(m_fontLarge, truncate(label, 52),
+                             optX, ry + (kRowH - 22.f) * 0.5f, 220, 230, 255);
+            else if (m_font)
+                renderText(truncate(label, 52), optX, textY, 160, 165, 185);
+        }
+        ry += kRowStep;
+    }
+
+    // Scroll indicators.
+    if (windowStart > 0)
+    {
+        const float ix = kListX + kListW * 0.5f;
+        const float iy = kPanelY + kTitleH + 3.f;
+        const SDL_FColor ind{0.7f, 0.8f, 1.f, 0.70f};
+        const SDL_FPoint z{0.f, 0.f};
+        const SDL_Vertex tv[3]{
+            {{ix, iy}, ind, z},
+            {{ix - 7.f, iy + 8.f}, ind, z},
+            {{ix + 7.f, iy + 8.f}, ind, z},
+        };
+        SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_BLEND);
+        SDL_RenderGeometry(m_renderer, nullptr, tv, 3, nullptr, 0);
+        SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_NONE);
+    }
+    if (windowStart + visRows < totalOpts)
+    {
+        const float ix = kListX + kListW * 0.5f;
+        const float iy = kPanelY + kPanelH - 10.f;
+        const SDL_FColor ind{0.7f, 0.8f, 1.f, 0.70f};
+        const SDL_FPoint z{0.f, 0.f};
+        const SDL_Vertex tv[3]{
+            {{ix, iy}, ind, z},
+            {{ix - 7.f, iy - 8.f}, ind, z},
+            {{ix + 7.f, iy - 8.f}, ind, z},
+        };
+        SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_BLEND);
+        SDL_RenderGeometry(m_renderer, nullptr, tv, 3, nullptr, 0);
+        SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_NONE);
+    }
+
+    // Right detail panel.
+    const SDL_FRect detailPanel{kDetailX, kPanelY, kDetailW, kPanelH};
+    if (selected < dungeons.size())
+        drawDungeonDetailPanel(detailPanel, dungeons[selected]);
+    else
+    {
+        // "Back" selected — draw a neutral detail panel.
+        renderChamferedFillRect(detailPanel, kChamfer, 18, 18, 28);
+        renderChamferedBorder(detailPanel, kChamfer, 40, 40, 58, 160);
+        if (m_font)
+            renderText("Return to mode select.", kDetailX + 20.f,
+                       kPanelY + kPanelH * 0.5f, 100, 100, 120);
+    }
+}
+
+void SDL3Renderer::drawDungeonDetailPanel(const SDL_FRect &panel,
+                                          const DungeonSelectInfo &info)
+{
+    constexpr float kChamfer = 6.f;
+    constexpr float kPad = 20.f;
+
+    // Drop shadow.
+    {
+        const SDL_FColor sf{0.f, 0.f, 0.f, 0.25f};
+        const SDL_FColor sn{0.f, 0.f, 0.f, 0.42f};
+        const SDL_FPoint z{0.f, 0.f};
+        const float ox = 5.f, oy = 5.f;
+        const SDL_Vertex sv[6] = {
+            {{panel.x + ox, panel.y + oy}, sf, z},
+            {{panel.x + panel.w + ox, panel.y + oy}, sf, z},
+            {{panel.x + panel.w + ox, panel.y + panel.h + oy}, sn, z},
+            {{panel.x + ox, panel.y + panel.h + oy}, sn, z},
+            {{panel.x + ox, panel.y + oy}, sf, z},
+            {{panel.x + panel.w + ox, panel.y + panel.h + oy}, sn, z},
+        };
+        SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_BLEND);
+        SDL_RenderGeometry(m_renderer, nullptr, sv, 6, nullptr, 0);
+        SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_NONE);
+    }
+
+    renderChamferedFillRect(panel, kChamfer, 20, 20, 32);
+    renderChamferedBorder({panel.x - 1.f, panel.y - 1.f, panel.w + 2.f, panel.h + 2.f},
+                          kChamfer + 1.f, 8, 8, 14, 200);
+    renderChamferedBorder(panel, kChamfer, 55, 70, 110, 200);
+    renderChamferedBorder({panel.x + 1.f, panel.y + 1.f, panel.w - 2.f, panel.h - 2.f},
+                          kChamfer - 1.f, 8, 8, 14, 150);
+
+    // Top accent line.
+    fillRect({panel.x + kChamfer, panel.y, panel.w - kChamfer * 2.f, 1.f},
+             70, 90, 140, 180);
+
+    float cy = panel.y + kPad;
+
+    // Dungeon name.
+    if (m_fontLarge)
+    {
+        renderTextEx(m_fontLarge, info.name,
+                     panel.x + kPad, cy, 210, 225, 255);
+        cy += 28.f;
+    }
+
+    // Difficulty + Cleared badges.
+    {
+        const bool hard = (info.difficultyLabel == "Hard");
+        const bool nightmare = (info.difficultyLabel == "Nightmare");
+        const Uint8 dr = hard ? 220 : (nightmare ? 255 : 100);
+        const Uint8 dg = hard ? 160 : (nightmare ? 80 : 180);
+        const Uint8 db = hard ? 40 : (nightmare ? 40 : 100);
+        const SDL_FRect diffBadge{panel.x + kPad, cy, 80.f, 18.f};
+        renderChamferedFillRect(diffBadge, 3.f, toUint8(dr / 3), toUint8(dg / 3), toUint8(db / 3));
+        renderChamferedBorder(diffBadge, 3.f, dr, dg, db, 200);
+        if (m_font)
+            renderText(info.difficultyLabel, diffBadge.x + 4.f, diffBadge.y + 1.f,
+                       dr, dg, db);
+
+        if (info.cleared)
+        {
+            const SDL_FRect clrBadge{panel.x + kPad + 88.f, cy, 70.f, 18.f};
+            renderChamferedFillRect(clrBadge, 3.f, 20, 55, 25);
+            renderChamferedBorder(clrBadge, 3.f, 80, 200, 100, 200);
+            if (m_font)
+                renderText("CLEARED", clrBadge.x + 4.f, clrBadge.y + 1.f,
+                           80, 200, 100);
+        }
+        cy += 26.f;
+    }
+
+    // Horizontal separator.
+    fillRect({panel.x + kPad, cy, panel.w - kPad * 2.f, 1.f}, 50, 55, 75, 180);
+    cy += 12.f;
+
+    // Stats row.
+    if (m_font)
+    {
+        const std::string stats =
+            "Rec. Lv." + std::to_string(info.recommendedLevel) +
+            "   Enemy Lv." + std::to_string(info.enemyLevel) +
+            "   Floors: " + std::to_string(static_cast<int>(info.layout.size()));
+        renderText(stats, panel.x + kPad, cy, 160, 170, 200);
+        cy += 24.f;
+    }
+
+    // Horizontal separator.
+    fillRect({panel.x + kPad, cy, panel.w - kPad * 2.f, 1.f}, 50, 55, 75, 120);
+    cy += 12.f;
+
+    // Description — word-wrapped manually into fixed-width lines.
+    if (m_font && !info.description.empty())
+    {
+        // Approximate wrap width: panel content width / ~9.5 px per char at 16 pt.
+        const std::size_t charsPerLine =
+            static_cast<std::size_t>((panel.w - kPad * 2.f) / 9.5f);
+        std::string remaining = info.description;
+        while (!remaining.empty() && cy + 18.f < panel.y + panel.h - 80.f)
+        {
+            std::string line;
+            if (remaining.size() <= charsPerLine)
+            {
+                line = remaining;
+                remaining.clear();
+            }
+            else
+            {
+                // Break at last space before charsPerLine.
+                std::size_t breakPos = remaining.rfind(' ', charsPerLine);
+                if (breakPos == std::string::npos || breakPos == 0)
+                    breakPos = charsPerLine;
+                line = remaining.substr(0, breakPos);
+                remaining = remaining.substr(breakPos + (remaining[breakPos] == ' ' ? 1 : 0));
+            }
+            renderText(line, panel.x + kPad, cy, 145, 152, 175);
+            cy += 20.f;
+        }
+        cy += 8.f;
+    }
+
+    // Floor layout strip.
+    if (!info.layout.empty())
+    {
+        fillRect({panel.x + kPad, cy, panel.w - kPad * 2.f, 1.f}, 50, 55, 75, 120);
+        cy += 10.f;
+        if (m_font)
+            renderText("FLOOR LAYOUT", panel.x + kPad, cy, 100, 110, 140);
+        cy += 18.f;
+        drawFloorLayoutStrip(panel.x + kPad, cy, panel.w - kPad * 2.f, info.layout);
+    }
+}
+
+void SDL3Renderer::drawFloorLayoutStrip(float startX, float y, float maxWidth,
+                                        const std::vector<std::string> &layout)
+{
+    constexpr float kNodeW = 36.f;
+    constexpr float kNodeH = 36.f;
+    constexpr float kNodeGap = 6.f;
+    constexpr float kArrowW = 10.f; // connector arrow width
+
+    // Total width: nodes + arrows between them.
+    const float totalW = static_cast<float>(layout.size()) * kNodeW + static_cast<float>(layout.size() > 1 ? layout.size() - 1 : 0) * kArrowW + static_cast<float>(layout.size() > 1 ? layout.size() - 1 : 0) * kNodeGap * 2.f;
+
+    // If too wide, scale everything down.
+    float scale = 1.f;
+    if (totalW > maxWidth)
+        scale = maxWidth / totalW;
+
+    const float nW = kNodeW * scale;
+    const float nH = kNodeH * scale;
+    const float aW = kArrowW * scale;
+    const float gap = kNodeGap * scale;
+
+    float cx = startX;
+
+    for (std::size_t i = 0; i < layout.size(); ++i)
+    {
+        const std::string &nodeType = layout[i];
+
+        // Node color and label by type.
+        Uint8 r{100}, g{100}, b{120};
+        std::string label = "?";
+        if (nodeType == "battle")
+        {
+            r = 180;
+            g = 55;
+            b = 55;
+            label = "B";
+        }
+        else if (nodeType == "elite")
+        {
+            r = 220;
+            g = 120;
+            b = 30;
+            label = "E";
+        }
+        else if (nodeType == "boss")
+        {
+            r = 200;
+            g = 40;
+            b = 40;
+            label = "!";
+        }
+        else if (nodeType == "rest")
+        {
+            r = 55;
+            g = 175;
+            b = 80;
+            label = "R";
+        }
+        else if (nodeType == "treasure")
+        {
+            r = 200;
+            g = 165;
+            b = 35;
+            label = "T";
+        }
+        else if (nodeType == "shop")
+        {
+            r = 70;
+            g = 140;
+            b = 210;
+            label = "S";
+        }
+        else if (nodeType == "event")
+        {
+            r = 160;
+            g = 80;
+            b = 200;
+            label = "?";
+        }
+
+        const SDL_FRect nodeRect{cx, y, nW, nH};
+        // Dark fill, colored border, label.
+        renderChamferedFillRect(nodeRect, 3.f * scale,
+                                toUint8(static_cast<int>(r) / 4),
+                                toUint8(static_cast<int>(g) / 4),
+                                toUint8(static_cast<int>(b) / 4));
+        renderChamferedBorder(nodeRect, 3.f * scale, r, g, b, 220);
+
+        // Centered label.
+        if (m_font)
+            renderText(label, cx + nW * 0.32f, y + nH * 0.22f, r, g, b);
+
+        cx += nW;
+
+        // Arrow connector between nodes.
+        if (i + 1 < layout.size())
+        {
+            cx += gap;
+            const float arrowCy = y + nH * 0.5f;
+            const SDL_FPoint z{0.f, 0.f};
+            const SDL_FColor ac{0.5f, 0.55f, 0.7f, 0.70f};
+            const SDL_Vertex av[3] = {
+                {{cx + aW, arrowCy}, ac, z},
+                {{cx, arrowCy - nH * 0.2f}, ac, z},
+                {{cx, arrowCy + nH * 0.2f}, ac, z},
+            };
+            SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_BLEND);
+            SDL_RenderGeometry(m_renderer, nullptr, av, 3, nullptr, 0);
+            SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_NONE);
+            cx += aW + gap;
+        }
+    }
 }
 
 void SDL3Renderer::clearBattleCache()
@@ -1715,6 +2357,8 @@ void SDL3Renderer::clearBattleCache()
     m_rfGaugePulse = 1.0f;
     m_shakes.clear();
     m_actedThisCycle.clear();
+    m_dungeonSelectInfos.clear();
+    m_dungeonSelectTitle.clear();
     redrawAll();
 }
 
